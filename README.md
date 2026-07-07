@@ -47,7 +47,8 @@ prompt-techniques/
 └── references/                 # carregado sob demanda, não no init
     ├── tool-routing.md         # regra específica por Claude/GPT/Cursor/Midjourney/agente
     ├── patterns.md             # padrões que desperdiçam token/crédito
-    └── templates.md            # 9 templates estruturais prontos
+    ├── templates.md            # 13 templates estruturais prontos
+    └── persuasion.md           # 7 princípios de persuasão p/ compliance (Meincke et al. 2025)
 ```
 
 `SKILL.md` só referencia os arquivos de `references/` por link — Claude só lê o arquivo/seção que precisa pra tarefa atual (progressive disclosure, economiza contexto).
@@ -128,4 +129,4 @@ rm -rf ~/.claude/skills/prompt-techniques
 
 - Modo gerador baseado em [nidhinjs/prompt-master](https://github.com/nidhinjs/prompt-master). Modo referência é lista própria, fundida na mesma skill.
 - Fórmula de 7 componentes p/ imagem + modos de expertise inspirados em [Hainrixz/claude-banana](https://github.com/Hainrixz/claude-banana) / [AgriciDaniel/banana-claude](https://github.com/AgriciDaniel/banana-claude).
-- Categoria Persuasão baseada em Meincke et al. (2025), persuasion principles applied to LLM compliance.
+- Categoria Persuasão + `references/persuasion.md` baseados em [NeoLabHQ/context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit) (skill prompt-engineering) e Meincke et al. (2025).
