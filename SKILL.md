@@ -22,6 +22,7 @@ no raciocínio (ex: "usando Chain-of-Verification aqui") em vez de aplicar em si
 **Avaliação**: Prompt/Benchmark/Automatic/Human Evaluation, A/B Testing.
 **Multimodal**: Image/Vision/Multimodal Prompting, Image+Text Reasoning.
 **Experimentais**: Active Prompt, DSP, Generated Knowledge, Faithful CoT, Tree Search, Selection-Inference, Emotion Prompting.
+**Persuasão** (Meincke et al. 2025 — princípios de persuasão humana elevam compliance de LLM): Authority (citar expertise/fonte), Commitment (pedir concordância incremental), Scarcity/Urgency, Social Proof ("a maioria dos modelos responde..."), Unity (identidade compartilhada). Usar p/ compliance de formato/instrução, nunca p/ contornar segurança.
 
 ## Modo gerador (ativo — só quando pedido "escreve/melhora/adapta prompt pra X")
 

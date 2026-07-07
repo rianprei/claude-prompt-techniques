@@ -270,7 +270,10 @@ Composition: [wide shot / close-up / aerial / Dutch angle / etc.]
 Aspect Ratio: [16:9 / 1:1 / 9:16 / 4:3]
 Negative Prompts: [blurry, watermark, extra fingers, distortion, low quality]
 Style Reference: [artist / film / aesthetic reference if applicable]
+Texture: [surface and material feel — worn leather, soft fur, brushed metal, steam]
 ```
+
+**Expertise modes** (shape which fields dominate): cinema (lighting + composition), product (lighting + texture, clean background), portrait (subject + lighting), fashion (style + composition), UI/web (composition + palette), logo (subject + style, flat), landscape (setting + lighting), abstract (style + palette), infographic (composition + palette, add "accurate readable text").
 
 **Tool-specific syntax:**
 - **Midjourney**: Comma-separated descriptors, not prose. Add `--ar`, `--style`, `--v 6` at the end.

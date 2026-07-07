@@ -126,4 +126,6 @@ rm -rf ~/.claude/skills/prompt-techniques
 
 ## Créditos
 
-Modo gerador baseado em [nidhinjs/prompt-master](https://github.com/nidhinjs/prompt-master). Modo referência é lista própria, fundida na mesma skill.
+- Modo gerador baseado em [nidhinjs/prompt-master](https://github.com/nidhinjs/prompt-master). Modo referência é lista própria, fundida na mesma skill.
+- Fórmula de 7 componentes p/ imagem + modos de expertise inspirados em [Hainrixz/claude-banana](https://github.com/Hainrixz/claude-banana) / [AgriciDaniel/banana-claude](https://github.com/AgriciDaniel/banana-claude).
+- Categoria Persuasão baseada em Meincke et al. (2025), persuasion principles applied to LLM compliance.

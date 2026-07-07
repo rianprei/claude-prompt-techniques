@@ -267,6 +267,7 @@ First detect: generation from scratch or editing an existing image?
 - **DALL-E 3**: Prose description works. Add "do not include text in the image unless specified." Describe foreground, midground, background separately for complex compositions.
 - **Stable Diffusion**: `(word:weight)` syntax. CFG 7-12. Negative prompt is MANDATORY. Steps 20-30 for drafts, 40-50 for finals.
 - **SeeDream**: Strong at artistic and stylized generation. Specify art style explicitly (anime, cinematic, painterly) before scene content. Mood and atmosphere descriptors work well. Negative prompt recommended.
+- **Nano Banana Pro (Gemini image)**: Prose descriptions work best — no weight syntax, no comma-soup. Use the 7-component formula: subject + style + environment + lighting + action + camera framing + texture. Strong at text rendering inside images and photo editing via natural language. Pick an expertise mode to shape the formula: cinema, product, portrait, fashion, UI/web, logo, landscape, abstract, infographic.
 
 ---
 
