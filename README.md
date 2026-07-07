@@ -1,8 +1,10 @@
 # prompt-techniques
 
-**Skill de Claude Code: referência completa de prompt engineering + gerador de prompts otimizados para qualquer ferramenta de IA.**
+**Skill de Claude Code: referência de prompt engineering + gerador de prompts otimizados por ferramenta-alvo.**
 
-Você pede "escreve um prompt pra Midjourney gerar um gato samurai" e recebe um prompt pronto pra colar, otimizado com a sintaxe e as regras específicas do Midjourney. Ou trabalha normalmente e o Claude aplica (e nomeia) a técnica de prompt engineering certa em segundo plano — sem você pedir nada.
+Você pede "escreve um prompt pra Midjourney gerar um gato samurai" e recebe um prompt pronto pra colar, com a sintaxe e as regras específicas do Midjourney. Ou trabalha normalmente e o Claude aplica (e nomeia na resposta) a técnica de prompt engineering relevante.
+
+> **Honestidade primeiro:** essa skill é uma agregação curada de fontes upstream (ver [Créditos](#créditos)) + taxonomia própria, organizada pra economizar contexto. **Não tem benchmarks nem A/B tests** — as regras de routing vêm de docs oficiais e prática da comunidade, não de avaliação formal minha. Trate como framework de trabalho bem organizado, não como verdade medida. Detalhe em [Limitações](#limitações-conhecidas).
 
 ---
 
@@ -19,6 +21,7 @@ Você pede "escreve um prompt pra Midjourney gerar um gato samurai" e recebe um 
 - [Templates incluídos](#templates-incluídos)
 - [Princípios de persuasão](#princípios-de-persuasão)
 - [Regras fixas](#regras-fixas)
+- [Limitações conhecidas](#limitações-conhecidas)
 - [Customizar e estender](#customizar-e-estender)
 - [Troubleshooting / FAQ](#troubleshooting--faq)
 - [Desinstalar](#desinstalar)
@@ -32,10 +35,10 @@ Dois modos numa skill só:
 
 | Modo | Quando ativa | O que faz |
 |---|---|---|
-| **Referência (passivo)** | Sempre, automático | Durante qualquer tarefa, o Claude escolhe e **nomeia** a técnica de prompt engineering aplicável no raciocínio (ex: "usando Chain-of-Verification aqui"). Auditável — você vê qual técnica está em jogo. |
-| **Gerador (ativo)** | Só quando você pede explicitamente | Gera um prompt pronto pra colar, otimizado pra ferramenta-alvo (Claude, GPT, Cursor, Midjourney, Claude Code, ElevenLabs, n8n... 30+ ferramentas). |
+| **Referência (passivo)** | Sempre, automático | Quando uma técnica influencia a abordagem, o Claude a nomeia em 1 linha **na resposta visível** (ex: "Técnica: Chain-of-Verification"). Você vê, não fica escondido no raciocínio interno. Tarefa trivial não ganha rótulo. |
+| **Gerador (ativo)** | Só quando você pede explicitamente | Gera um prompt pronto pra colar, com regras específicas da ferramenta-alvo (Claude, GPT, Cursor, Midjourney, Claude Code, ElevenLabs, n8n...), e oferece loop de refinamento com o output real. |
 
-Cobre **14 categorias de técnicas**: básicas (few-shot, role, delimiters), raciocínio (CoT, Tree of Thoughts, Self-Consistency), decomposição, autocorreção (Reflexion, CoVe, ReAct), múltiplas respostas, ferramentas (RAG, function calling), otimização, código, agentes, segurança, avaliação, multimodal, experimentais e **persuasão** (princípios que dobram compliance de LLM — pesquisa de 2025).
+Cobre **14 categorias de técnicas**: básicas (few-shot, role, delimiters), raciocínio (CoT, Tree of Thoughts, Self-Consistency), decomposição, autocorreção (Reflexion, CoVe, ReAct), múltiplas respostas, ferramentas (RAG, function calling), otimização, código, agentes, segurança, avaliação, multimodal, experimentais e **persuasão** (compliance de instrução — ver caveat na [seção própria](#princípios-de-persuasão)).
 
 ## Por que ela existe
 
@@ -85,7 +88,7 @@ cd ~/.claude/skills/prompt-techniques && git pull
 
 Nada a fazer. Funciona sozinho em qualquer tarefa.
 
-Quando uma técnica de prompt engineering for aplicável ao que você pediu (debug, análise, geração estruturada...), o Claude nomeia a técnica no raciocínio em vez de aplicar em silêncio. Exemplo: numa tarefa de verificação factual, você verá "aplicando Chain-of-Verification" — e sabe exatamente o que está acontecendo.
+Quando uma técnica de prompt engineering influencia de fato a abordagem (debug, análise, verificação factual...), o Claude a nomeia em 1 linha **na resposta visível** — ex: "Técnica: Chain-of-Verification". Você vê o que está em jogo sem abrir raciocínio interno. Tarefa trivial não ganha rótulo, pra não virar ruído.
 
 Se quiser a lista completa de técnicas, pergunte: "lista as categorias de técnicas da skill prompt-techniques".
 
@@ -95,13 +98,16 @@ Peça **explicitamente** um prompt. Gatilhos: "escreve um prompt pra...", "melho
 
 O que acontece internamente:
 
-1. **Confirma a ferramenta-alvo.** Se você não disse pra qual IA é o prompt, o Claude pergunta (máximo 3 perguntas no total).
-2. **Extrai 9 dimensões** silenciosamente: tarefa, ferramenta, formato de saída, restrições, input, contexto, audiência, critério de sucesso, exemplos.
+1. **Confirma a ferramenta-alvo.** Se você não disse pra qual IA é o prompt, o Claude pergunta.
+2. **Extrai 9 dimensões do seu pedido** (extração é leitura, não interrogatório): tarefa, ferramenta, formato de saída, restrições, input, contexto, audiência, critério de sucesso, exemplos. Só vira pergunta o que é crítico E ausente — máximo 3. Se 3 não bastam numa tarefa muito ambígua, ele gera mesmo assim e **declara as assunções no final** pra você corrigir, em vez de entregar prompt genérico em silêncio.
 3. **Escolhe a técnica mais simples que resolve.** Role assignment, few-shot e grounding antes de frameworks pesados (Tree of Thoughts, Mixture of Experts, Self-Consistency) — os pesados têm risco maior de fabricação e só entram se você pedir.
 4. **Aplica as regras da ferramenta-alvo** lendo só a seção relevante de `references/tool-routing.md`.
 5. **Usa o template estrutural certo** de `references/templates.md` se o tipo de tarefa casar.
+6. **Oferece refinamento:** você testa o prompt na ferramenta e cola o output de volta; o Claude diagnostica a falha (checklist de 6 categorias: task/context/format/scope/reasoning/agentic) e ajusta só a dimensão que falhou. Gerar → testar → refinar, não gerar-e-tchau.
 
-**Formato da resposta:** 1 bloco de prompt copiável + `🎯 Target: <ferramenta>` + 1 frase explicando o que foi otimizado. Sem aula de teoria, sem nome de framework no prompt final.
+**Formato da resposta:** 1 bloco de prompt copiável + `🎯 Target: <ferramenta>` + 1 frase explicando o que foi otimizado + oferta de refinamento.
+
+**Esclarecimento (pra não parecer contradição):** "sem nome de framework" vale pro **texto do prompt gerado** — o que você cola no Midjourney não vem rotulado "CO-STAR". A frase de otimização e o modo passivo podem nomear técnica normalmente; são canais diferentes.
 
 ## Exemplos práticos
 
@@ -191,6 +197,8 @@ Ferramenta fora da lista: o Claude aplica regras genéricas (instrução explíc
 
 `references/persuasion.md` — baseado em Meincke et al. (2025), estudo com N=28.000 conversas: técnicas de persuasão humana **dobraram** a taxa de compliance de LLMs (33% → 72%).
 
+**Aviso importante:** compliance = obediência à instrução, **não** qualidade ou veracidade da resposta. Um prompt mais "obedecido" não é automaticamente um prompt melhor. Por isso o escopo aqui é estreito: disciplina de formato e processo (seguir checklist, anunciar skill, não pular verificação) — não "melhorar respostas" em geral.
+
 Os 7 princípios com exemplos ✅/❌ prontos: **Authority** ("YOU MUST, no exceptions"), **Commitment** (exigir anúncio/escolha explícita), **Scarcity** ("IMMEDIATELY before proceeding"), **Social Proof** ("X without Y = failure. Every time."), **Unity** ("we're colleagues"), mais Reciprocity e Liking (documentados como **evitar** — geram sycophancy).
 
 Inclui tabela de qual combinação usar por tipo de prompt (disciplina/guidance/colaborativo/referência) e teste ético: "a técnica serviria o interesse genuíno do usuário se ele a entendesse por completo?". Uso legítimo: compliance de formato e disciplina. Nunca pra contornar segurança.
@@ -215,13 +223,25 @@ Invioláveis, independente do pedido:
 
 Mantenha o `SKILL.md` enxuto — detalhe pesado vai pra `references/`, senão você perde o benefício de contexto.
 
+## Limitações conhecidas
+
+Documentadas de propósito — melhor você saber antes de instalar:
+
+1. **Sem evidência formal de eficácia.** Não há evals, benchmarks nem A/B tests dos prompts gerados. As regras vêm de documentação oficial dos vendors e prática da comunidade. O loop de refinamento existe justamente porque o primeiro prompt pode não ser o melhor — a validação real é você testar na ferramenta.
+2. **Regras de routing envelhecem.** Modelos novos saem toda semana. `tool-routing.md` carrega uma data **"Last verified"**; se a ferramenta/modelo for mais novo que a data ou não estiver listado, a skill aplica regras genéricas e avisa em vez de chutar comportamento de versão. PRs de atualização são bem-vindos.
+3. **Só Claude Code.** Depende de `~/.claude/skills/` e da leitura sob demanda de arquivos locais. Em outros ambientes, dá pra colar o `SKILL.md` como instrução, mas perde o carregamento sob demanda.
+4. **Agregação, não invenção.** O valor está na curadoria, fusão e arquitetura de contexto — as fontes estão todas nos [Créditos](#créditos). Se você prefere as fontes originais separadas, use-as.
+5. **Ativação depende de pedido explícito** no modo gerador. É decisão de design (evita a skill sequestrar tarefas normais), com o custo de pedidos vagos não dispararem. Reformule com "escreve/melhora um prompt pra...".
+6. **Escopo amplo tem custo.** Cobrir texto/imagem/vídeo/3D/agentes significa que nenhuma seção é tão profunda quanto uma skill dedicada a uma ferramenta só. Se 90% do seu uso é uma ferramenta única, uma skill especializada nela pode servir melhor.
+7. **Não instale junto com outra skill de prompt engineering.** Duas skills com trigger parecido = Claude pode ativar a errada ou misturar as duas. Uma por vez.
+
 ## Troubleshooting / FAQ
 
 **A skill não ativa quando peço um prompt.**
 O pedido precisa ser explícito: "escreve/melhora/adapta/cria um prompt pra X". Pedidos implícitos ("me ajuda com o Midjourney") podem não disparar o modo gerador — reformule.
 
 **A skill ativa demais / interfere em tarefas normais.**
-Não deveria: o modo gerador só dispara com pedido explícito de prompt. O modo passivo apenas nomeia técnicas no raciocínio, não muda comportamento. Se incomodar, remova a linha da categoria em `SKILL.md`.
+Não deveria: o modo gerador só dispara com pedido explícito de prompt, e o modo passivo só rotula quando a técnica influenciou de fato a abordagem (tarefa trivial não ganha rótulo). Se ainda incomodar, remova a linha da categoria em `SKILL.md`.
 
 **Claude não leu as regras da minha ferramenta.**
 Confirme que `references/tool-routing.md` existe e que o link relativo em `SKILL.md` bate com o nome do arquivo. Se a ferramenta não tem seção, adicione uma (ver [Customizar](#customizar-e-estender)).

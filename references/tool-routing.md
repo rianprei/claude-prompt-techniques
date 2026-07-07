@@ -41,6 +41,10 @@ For copywriting and content prompts include fillable placeholders where relevant
 
 ---
 
+> **Last verified: 2026-07.** Model-specific rules age fast. If the target tool/model is newer than
+> this date or absent below, do NOT guess version-specific behavior — apply the generic rules
+> (explicit instruction, output contract, format lock) and say the routing entry may be stale.
+
 ## MIDDLE ZONE — Execution Logic, Tool Routing, Diagnostics
 
 ### Intent Extraction
