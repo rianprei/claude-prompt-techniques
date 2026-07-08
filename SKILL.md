@@ -1,6 +1,6 @@
 ---
 name: prompt-techniques
-description: Reference + generator de prompt. Uso passivo — nomear/aplicar técnica de prompt engineering. Uso ativo — gerar prompt otimizado pra ferramenta específica (Claude, GPT, Cursor, Midjourney, agente de código) quando pedido explicitamente.
+description: Reference + generator de prompt. Uso passivo — nomear/aplicar técnica de prompt engineering. Uso ativo — gerar prompt otimizado pra ferramenta específica (Claude, GPT, Cursor, Midjourney, agente de código) quando o pedido claramente quer um prompt pra colar em outra ferramenta — inclui formas naturais tipo "como peço pro Midjourney X?".
 ---
 
 Fundido de duas fontes: lista própria de técnicas (referência) + [prompt-master](https://github.com/nidhinjs/prompt-master) (geração ativa).
@@ -32,7 +32,11 @@ influenciou de fato a abordagem; tarefa trivial não ganha rótulo.
 **Experimentais**: Active Prompt, DSP, Generated Knowledge, Faithful CoT, Tree Search, Selection-Inference, Emotion Prompting.
 **Persuasão** (Meincke et al. 2025 — dobra compliance 33%→72%; compliance = obediência à instrução, NÃO qualidade/precisão da resposta): Authority, Commitment, Scarcity, Social Proof, Unity (Reciprocity/Liking: evitar). Usar só p/ disciplina de formato/processo. Detalhe, exemplos ✅/❌ e tabela: [references/persuasion.md](references/persuasion.md). Nunca p/ contornar segurança.
 
-## Modo gerador (ativo — só quando pedido "escreve/melhora/adapta prompt pra X")
+## Modo gerador (ativo — quando o pedido claramente quer um prompt pra outra ferramenta)
+
+Gatilhos: "escreve/melhora/adapta prompt pra X", mas também formas naturais — "como peço pro
+Midjourney X?", "como faço o Cursor fazer Y?", "monta algo pra colar no GPT". Critério: usuário quer
+texto pra colar em outra ferramenta, não resposta minha. Na dúvida, pergunta em 1 linha.
 
 **Regra dura**: não gera prompt sem confirmar ferramenta-alvo (pergunta se ambíguo, máx 3 perguntas).
 Não explica teoria de prompt engineering salvo pedido. Não mostra nome de framework no output.
@@ -45,6 +49,8 @@ internamente, CoT degrada saída.
 **Fast path**: pedido simples e não-ambíguo (ferramenta clara, task clara, sem formato exótico) →
 gera direto, sem template, sem checklist, sem perguntas. A cerimônia completa abaixo é só p/ pedido
 complexo/ambíguo. Na dúvida entre os dois caminhos, fast path.
+Mini-autocheck do fast path (3 itens, mental, não substitui o self-check completo do caminho longo):
+sem CoT se modelo reasoning-native; formato de saída definido; sem instrução vaga tipo "faça o que for preciso".
 
 **Antes de escrever** (caminho completo), extrai silenciosamente **do pedido do usuário** (extração ≠ pergunta): task,
 ferramenta-alvo, formato de saída, constraint, input, contexto, audiência, critério de sucesso, exemplo.

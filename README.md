@@ -4,7 +4,7 @@
 
 Você pede "escreve um prompt pra Midjourney gerar um gato samurai" e recebe um prompt pronto pra colar, com a sintaxe e as regras específicas do Midjourney. Ou trabalha normalmente e o Claude aplica (e nomeia na resposta) a técnica de prompt engineering relevante.
 
-> **Honestidade primeiro:** essa skill é uma agregação curada de fontes upstream (ver [Créditos](#créditos)) + taxonomia própria, organizada pra economizar contexto. **Não tem benchmarks nem A/B tests** — as regras de routing vêm de docs oficiais e prática da comunidade, não de avaliação formal minha. Trate como framework de trabalho bem organizado, não como verdade medida. Detalhe em [Limitações](#limitações-conhecidas).
+> **Honestidade primeiro:** essa skill é uma agregação curada de fontes upstream (ver [Créditos](#créditos)) + taxonomia própria, organizada pra economizar contexto. **Não tem eval automatizado nem A/B cego** — as regras de routing vêm de docs oficiais e prática da comunidade, não de avaliação formal minha; o que existe é só um protocolo manual de A/B ([`evals/protocol.md`](evals/protocol.md)). Trate como framework de trabalho bem organizado, não como verdade medida. Detalhe em [Limitações](#limitações-conhecidas).
 
 ---
 

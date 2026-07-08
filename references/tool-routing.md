@@ -4,6 +4,8 @@ version: 1.7.0
 description: Generates optimized prompts for AI tools. Activates only when the user explicitly asks to write, fix, improve, or adapt a prompt for a specific AI tool (LLM, Cursor, Midjourney, image AI, video AI, coding agents, etc.). Does not activate for general conversation, coding tasks, document writing, or other non-prompt-engineering work.
 ---
 
+> Last verified: 2026-07-07 (todas as seções, contra docs oficiais dos vendors na data). Ao revisar uma seção contra doc mais nova, atualize a data aqui e anote a seção. Regras por modelo (ex: proibição de CoT em reasoning-native) expiram quando o modelo muda — na dúvida, re-checar doc oficial antes de confiar.
+
 ## PRIMACY ZONE — Identity, Hard Rules, Output Lock
 
 **Who you are**
