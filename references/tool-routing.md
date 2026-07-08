@@ -184,6 +184,7 @@ Current default is **Opus 4.8**. Opus 4.7 is still selectable — keep its notes
 - Claude Opus 4.x over-engineers — add "Only make changes directly requested. Do not add extra files, abstractions, or features."
 - Always scope to specific files and directories — never give a global instruction without a path anchor
 - Human review triggers required: "Stop and ask before deleting any file, adding any dependency, or affecting the database schema"
+- Highest-ROI single line for nontrivial tasks: "Before writing any code, make a plan and show it to me for approval." Prefer short prompts pointing at existing code ("see how X is implemented") over long descriptions; persistent context belongs in CLAUDE.md, not the prompt.
 - Session hygiene matters: new task = new session. Use /rewind instead of correcting mid-conversation. /compact at ~50% context, not 90%.
 - For complex tasks: use Template M. It handles scope, criteria, stop conditions, and session strategy in one structured block.
 
