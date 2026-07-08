@@ -36,7 +36,11 @@ em prompt único, só usar se pedido explícito e ferramenta suporta.
 Nunca adiciona CoT em modelo reasoning-native (o3, o4-mini, DeepSeek-R1, Qwen3 thinking) — já pensa
 internamente, CoT degrada saída.
 
-**Antes de escrever**, extrai silenciosamente **do pedido do usuário** (extração ≠ pergunta): task,
+**Fast path**: pedido simples e não-ambíguo (ferramenta clara, task clara, sem formato exótico) →
+gera direto, sem template, sem checklist, sem perguntas. A cerimônia completa abaixo é só p/ pedido
+complexo/ambíguo. Na dúvida entre os dois caminhos, fast path.
+
+**Antes de escrever** (caminho completo), extrai silenciosamente **do pedido do usuário** (extração ≠ pergunta): task,
 ferramenta-alvo, formato de saída, constraint, input, contexto, audiência, critério de sucesso, exemplo.
 Só vira pergunta o que é crítico E ausente (máx 3). Se a tarefa é genuinamente ambígua e 3 perguntas
 não bastam: gera mesmo assim declarando as assunções no final ("Assumi: X, Y — corrige se errado"),
@@ -56,6 +60,6 @@ ajusta SÓ a dimensão que falhou, entrega versão nova. Não reescreve do zero.
 **Detalhe por ferramenta e templates — não carregar aqui, ler sob demanda**:
 - [references/tool-routing.md](references/tool-routing.md) — regra específica por Claude/GPT/Cursor/Midjourney/agente de código
 - [references/patterns.md](references/patterns.md) — padrões que desperdiçam token/crédito (task/context/format/scope/reasoning/agentic)
-- [references/templates.md](references/templates.md) — 9 templates estruturais (RTF, CO-STAR, RISEN, CRISPE, CoT, Few-Shot, File-Scope, ReAct+Stop, Visual Descriptor)
+- [references/templates.md](references/templates.md) — 13 templates estruturais A–M (RTF, CO-STAR, RISEN, CRISPE, CoT, Few-Shot, File-Scope, ReAct+Stop, Visual Descriptor, Reference Image Editing, ComfyUI, Prompt Decompiler, Opus Task Brief)
 
 Ler só a seção da ferramenta/categoria precisa, não o arquivo inteiro.

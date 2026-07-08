@@ -22,6 +22,7 @@ Você pede "escreve um prompt pra Midjourney gerar um gato samurai" e recebe um 
 - [Princípios de persuasão](#princípios-de-persuasão)
 - [Regras fixas](#regras-fixas)
 - [Limitações conhecidas](#limitações-conhecidas)
+- [Uso fora do Claude Code](#uso-fora-do-claude-code)
 - [Customizar e estender](#customizar-e-estender)
 - [Troubleshooting / FAQ](#troubleshooting--faq)
 - [Desinstalar](#desinstalar)
@@ -146,6 +147,8 @@ prompt-techniques/
     ├── templates.md            # 13 templates estruturais completos
     ├── patterns.md             # padrões que desperdiçam tokens/créditos
     └── persuasion.md           # 7 princípios de persuasão p/ compliance
+evals/
+└── protocol.md                 # protocolo manual de A/B + log de re-prompts
 ```
 
 `SKILL.md` contém só a lista de categorias (modo passivo) e as regras do gerador (modo ativo), com **links** para os arquivos de `references/`. O Claude lê `tool-routing.md` apenas quando você pede um prompt — e só a seção da ferramenta pedida. Isso é *progressive disclosure*: você não paga tokens por conhecimento que não está usando naquele momento.
@@ -201,7 +204,9 @@ Ferramenta fora da lista: o Claude aplica regras genéricas (instrução explíc
 
 Os 7 princípios com exemplos ✅/❌ prontos: **Authority** ("YOU MUST, no exceptions"), **Commitment** (exigir anúncio/escolha explícita), **Scarcity** ("IMMEDIATELY before proceeding"), **Social Proof** ("X without Y = failure. Every time."), **Unity** ("we're colleagues"), mais Reciprocity e Liking (documentados como **evitar** — geram sycophancy).
 
-Inclui tabela de qual combinação usar por tipo de prompt (disciplina/guidance/colaborativo/referência) e teste ético: "a técnica serviria o interesse genuíno do usuário se ele a entendesse por completo?". Uso legítimo: compliance de formato e disciplina. Nunca pra contornar segurança.
+Inclui tabela de qual combinação usar por tipo de prompt (disciplina/guidance/colaborativo/referência) e teste ético: "a técnica serviria o interesse genuíno do usuário se ele a entendesse por completo?".
+
+**Proibições duras (escopo travado):** o alvo da persuasão é **o modelo em prompts/skills próprios, nunca pessoas**. A skill recusa aplicação em phishing/social engineering, dark patterns de UX/copy, chatbots persuadindo usuários finais e bypass de guardrails — pedido nessas categorias não é gerado.
 
 ## Regras fixas
 
@@ -227,9 +232,9 @@ Mantenha o `SKILL.md` enxuto — detalhe pesado vai pra `references/`, senão vo
 
 Documentadas de propósito — melhor você saber antes de instalar:
 
-1. **Sem evidência formal de eficácia.** Não há evals, benchmarks nem A/B tests dos prompts gerados. As regras vêm de documentação oficial dos vendors e prática da comunidade. O loop de refinamento existe justamente porque o primeiro prompt pode não ser o melhor — a validação real é você testar na ferramenta.
+1. **Sem benchmarks automatizados.** Não há evals automáticos nem A/B tests cegos dos prompts gerados. As regras vêm de documentação oficial dos vendors e prática da comunidade. O que existe: [`evals/protocol.md`](evals/protocol.md) — protocolo manual de A/B (seu prompt vs. prompt da skill, métrica = re-prompts até funcionar) com log de resultados. Barato, honesto, sem fingir ciência.
 2. **Regras de routing envelhecem.** Modelos novos saem toda semana. `tool-routing.md` carrega uma data **"Last verified"**; se a ferramenta/modelo for mais novo que a data ou não estiver listado, a skill aplica regras genéricas e avisa em vez de chutar comportamento de versão. PRs de atualização são bem-vindos.
-3. **Só Claude Code.** Depende de `~/.claude/skills/` e da leitura sob demanda de arquivos locais. Em outros ambientes, dá pra colar o `SKILL.md` como instrução, mas perde o carregamento sob demanda.
+3. **Nativa do Claude Code.** O carregamento sob demanda depende de `~/.claude/skills/`. Uso parcial em outros agentes é possível — ver [Uso fora do Claude Code](#uso-fora-do-claude-code).
 4. **Agregação, não invenção.** O valor está na curadoria, fusão e arquitetura de contexto — as fontes estão todas nos [Créditos](#créditos). Se você prefere as fontes originais separadas, use-as.
 5. **Ativação depende de pedido explícito** no modo gerador. É decisão de design (evita a skill sequestrar tarefas normais), com o custo de pedidos vagos não dispararem. Reformule com "escreve/melhora um prompt pra...".
 6. **Escopo amplo tem custo.** Cobrir texto/imagem/vídeo/3D/agentes significa que nenhuma seção é tão profunda quanto uma skill dedicada a uma ferramenta só. Se 90% do seu uso é uma ferramenta única, uma skill especializada nela pode servir melhor.
@@ -254,6 +259,16 @@ Skill de Claude Code (depende da pasta `~/.claude/skills/`). No claude.ai web, v
 
 **Preciso reiniciar depois de editar os arquivos?**
 Sessão nova do Claude Code garante recarga do `SKILL.md`. As references são lidas do disco na hora do uso, então edições nelas valem imediatamente.
+
+## Uso fora do Claude Code
+
+A skill é markdown puro — funciona parcialmente em qualquer agente que leia arquivos de regras:
+
+- **Cursor**: copie `SKILL.md` pra `.cursor/rules/prompt-techniques.mdc` (ou cole em Rules). Os links relativos de `references/` funcionam se você copiar a pasta pro repo e o agente puder ler arquivos.
+- **Cline / Windsurf / Codex CLI**: cole o `SKILL.md` no arquivo de regras do agente (`.clinerules`, `AGENTS.md`, etc.) e mantenha `references/` no repo — agentes com acesso a arquivo conseguem seguir os links sob demanda.
+- **claude.ai web / ChatGPT**: cole o `SKILL.md` como instrução de projeto. Sem filesystem, os links de `references/` morrem — cole junto só a seção da ferramenta que você usa (ex: só o bloco Midjourney do `tool-routing.md`).
+
+O que se perde fora do Claude Code: descoberta automática da skill e garantia do carregamento sob demanda. O conteúdo em si é portátil.
 
 ## Desinstalar
 

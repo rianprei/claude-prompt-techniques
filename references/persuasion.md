@@ -68,3 +68,13 @@ Bright-line rules reduzem racionalização: "YOU MUST" remove fadiga de decisão
 ## Teste ético
 
 "Essa técnica serviria o interesse genuíno do usuário se ele a entendesse por completo?" Sim → legítimo (disciplina, prevenir falha previsível). Não → manipulação (falsa urgência, culpa, ganho próprio).
+
+## Proibições duras (escopo travado)
+
+Esses princípios são p/ **disciplinar o comportamento de um LLM em prompts/skills próprios** — o alvo da persuasão é o modelo, nunca pessoas. Recusar aplicação em:
+- Phishing, social engineering ou qualquer conteúdo dirigido a enganar humanos
+- Dark patterns em UX/copy (falsa escassez, urgência fabricada, culpa)
+- Chatbots de suporte/vendas persuadindo usuários finais
+- Contornar guardrails/segurança de qualquer modelo
+
+Pedido nessas categorias → não gerar, explicar o porquê.
