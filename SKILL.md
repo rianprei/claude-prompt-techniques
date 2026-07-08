@@ -6,7 +6,13 @@ description: Reference + generator de prompt. Uso passivo — nomear/aplicar té
 Fundido de duas fontes: lista própria de técnicas (referência) + [prompt-master](https://github.com/nidhinjs/prompt-master) (geração ativa).
 
 ## Modo referência (passivo)
-Não recite lista salvo se pedido. Escolhe a técnica que serve a tarefa. Quando aplicar uma,
+Não recite lista salvo se pedido. Escolhe a técnica que serve a tarefa.
+
+**Prioridade (nem toda técnica pesa igual)**:
+- **Alto impacto, sempre considerar**: Role, Context, Output Formatting, Few-shot, Grounding, Delimiters.
+- **Condicional**: CoT (só modelo NÃO-reasoning), ReAct/RAG/Function Calling (só c/ ferramentas reais), Reflexion/CoVe (tarefa factual/verificável).
+- **Experimental/legado em modelos 2025+**: ToT, GoT, MoE simulado, Self-Consistency, chaining em camadas — ganho não comprovado em modelo moderno, risco de fabricação; só sob pedido explícito.
+Base: The Prompt Report (arXiv:2406.06608) + docs oficiais de vendors — não avaliação própria. Quando aplicar uma,
 nomeia em 1 linha curta **na resposta visível** (ex: "Técnica: Chain-of-Verification"), não só
 no raciocínio interno — o usuário precisa ver pra ser auditável. Só nomeia quando a técnica
 influenciou de fato a abordagem; tarefa trivial não ganha rótulo.
@@ -49,6 +55,14 @@ em vez de gerar prompt genérico em silêncio.
 **Nota sobre "não mostrar framework"**: vale pro **prompt gerado** (o texto que o usuário cola na
 ferramenta não carrega rótulo "CO-STAR"). A frase de otimização e o modo passivo PODEM nomear técnica —
 são canais diferentes, não é contradição.
+
+**Self-check antes de entregar**: revisa o prompt gerado contra a seção da ferramenta em
+tool-routing.md. Violação detectada (ex: CoT em modelo reasoning-native, prosa onde a ferramenta
+quer vírgulas, sem stop condition em agente) → corrige em silêncio antes de mostrar.
+
+**Ferramenta desconhecida/nova**: se não está em tool-routing.md e web search está disponível,
+busca "prompt best practices <ferramenta> <ano>" antes de gerar; depois oferece o bloco pronto
+p/ o usuário colar em tool-routing.md. Sem web search → regras genéricas + aviso.
 
 **Output**: 1 bloco de prompt copiável + `🎯 Target: <ferramenta>` + 1 frase do que foi otimizado e por quê
 + oferta de refinamento: "Testa na ferramenta e cola o resultado aqui se quiser que eu refine."

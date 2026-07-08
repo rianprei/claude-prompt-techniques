@@ -8,6 +8,22 @@ Você pede "escreve um prompt pra Midjourney gerar um gato samurai" e recebe um 
 
 ---
 
+## Quick Start (30 segundos)
+
+```bash
+git clone https://github.com/rianprei/claude-prompt-techniques ~/.claude/skills/prompt-techniques
+```
+
+Abra sessão nova do Claude Code e peça:
+
+```
+escreve um prompt pra Midjourney: gato samurai em estilo ukiyo-e
+```
+
+Pronto. O resto deste README é detalhe — leia quando precisar.
+
+---
+
 ## Índice
 
 - [O que essa skill faz](#o-que-essa-skill-faz)
@@ -39,7 +55,9 @@ Dois modos numa skill só:
 | **Referência (passivo)** | Sempre, automático | Quando uma técnica influencia a abordagem, o Claude a nomeia em 1 linha **na resposta visível** (ex: "Técnica: Chain-of-Verification"). Você vê, não fica escondido no raciocínio interno. Tarefa trivial não ganha rótulo. |
 | **Gerador (ativo)** | Só quando você pede explicitamente | Gera um prompt pronto pra colar, com regras específicas da ferramenta-alvo (Claude, GPT, Cursor, Midjourney, Claude Code, ElevenLabs, n8n...), e oferece loop de refinamento com o output real. |
 
-Cobre **14 categorias de técnicas**: básicas (few-shot, role, delimiters), raciocínio (CoT, Tree of Thoughts, Self-Consistency), decomposição, autocorreção (Reflexion, CoVe, ReAct), múltiplas respostas, ferramentas (RAG, function calling), otimização, código, agentes, segurança, avaliação, multimodal, experimentais e **persuasão** (compliance de instrução — ver caveat na [seção própria](#princípios-de-persuasão)).
+Cobre **14 categorias de técnicas** — com **camadas de prioridade** (nem toda técnica pesa igual): alto impacto (role, context, output format, few-shot, grounding), condicionais (CoT só em modelo não-reasoning, ReAct/RAG só com ferramentas reais) e experimentais/legadas em modelos 2025+ (ToT, GoT, Self-Consistency — só sob pedido explícito, risco de fabricação). Base: [The Prompt Report](https://arxiv.org/abs/2406.06608) + docs oficiais dos vendors. Inclui **persuasão** (compliance de instrução — ver caveat na [seção própria](#princípios-de-persuasão)).
+
+Antes de entregar qualquer prompt, a skill faz **self-check** contra as regras da ferramenta-alvo e corrige violações em silêncio. Ferramenta que não está no routing: busca best practices na web (se disponível) e oferece o bloco pronto pra você adicionar ao `tool-routing.md`.
 
 ## Por que ela existe
 
