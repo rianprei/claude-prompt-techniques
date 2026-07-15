@@ -1,85 +1,76 @@
 ---
 name: prompt-techniques
-description: Reference + generator de prompt. Uso passivo — nomear/aplicar técnica de prompt engineering. Uso ativo — gerar prompt otimizado pra ferramenta específica (Claude, GPT, Cursor, Midjourney, agente de código) quando o pedido claramente quer um prompt pra colar em outra ferramenta — inclui formas naturais tipo "como peço pro Midjourney X?".
+description: Reference + prompt generator. Passive use — name/apply a prompt engineering technique. Active use — generate an optimized prompt for a specific tool (Claude, GPT, Cursor, Midjourney, coding agent) when the request clearly wants a prompt to paste into another tool — includes natural forms like "how do I ask Midjourney for X?".
 ---
 
-Fundido de duas fontes: lista própria de técnicas (referência) + [prompt-master](https://github.com/nidhinjs/prompt-master) (geração ativa).
+Merged from two sources: own technique list (reference) + [prompt-master](https://github.com/nidhinjs/prompt-master) (active generation).
 
-## Modo referência (passivo)
-Não recite lista salvo se pedido. Escolhe a técnica que serve a tarefa.
+## Reference mode (passive)
+Do not recite the list unless asked. Pick the technique that serves the task.
 
-**Prioridade (nem toda técnica pesa igual)**:
-- **Alto impacto, sempre considerar**: Role, Context, Output Formatting, Few-shot, Grounding, Delimiters.
-- **Condicional**: CoT (só modelo NÃO-reasoning), ReAct/RAG/Function Calling (só c/ ferramentas reais), Reflexion/CoVe (tarefa factual/verificável).
-- **Experimental/legado em modelos 2025+**: ToT, GoT, MoE simulado, Self-Consistency, chaining em camadas — ganho não comprovado em modelo moderno, risco de fabricação; só sob pedido explícito.
-Base: The Prompt Report (arXiv:2406.06608) + docs oficiais de vendors — não avaliação própria. Quando aplicar uma,
-nomeia em 1 linha curta **na resposta visível** (ex: "Técnica: Chain-of-Verification"), não só
-no raciocínio interno — o usuário precisa ver pra ser auditável. Só nomeia quando a técnica
-influenciou de fato a abordagem; tarefa trivial não ganha rótulo.
+**Priority (not every technique weighs the same)**:
+- **High impact, always consider**: Role, Context, Output Formatting, Few-shot, Grounding, Delimiters.
+- **Conditional**: CoT (only NON-reasoning models), ReAct/RAG/Function Calling (only with real tools), Reflexion/CoVe (factual/verifiable task).
+- **Experimental/legacy on 2025+ models**: ToT, GoT, simulated MoE, Self-Consistency, layered chaining — gain not proven on modern models, fabrication risk; only on explicit request.
+Base: The Prompt Report (arXiv:2406.06608) + official vendor docs — not own evaluation. When applying one,
+name it in 1 short line **in the visible reply** (e.g. "Technique: Chain-of-Verification"), not only
+in internal reasoning — the user needs to see it for auditability. Only name when the technique
+actually influenced the approach; trivial tasks get no label.
 
-**Básicas**: Zero-shot, Few-shot, One-shot, Role/Persona, Instruction, Context, Delimiters (XML/MD/tags), Output Formatting, Negative Prompting, Templates.
-**Raciocínio**: Chain-of-Thought (CoT), Zero/Few-shot CoT, Self-Consistency, Least-to-Most, Tree of Thoughts, Graph of Thoughts, Skeleton-of-Thought, Plan-and-Solve, Analogical, Step-back, Thread-of-Thought.
-**Decomposição**: Prompt Chaining, Task Decomposition, Sequential/Recursive Prompting, Progressive Refinement.
-**Autocorreção**: Self-Refine, Reflexion, Self-Critique, Chain-of-Verification (CoVe), ReAct, PAL.
-**Múltiplas respostas**: Best-of-N, Majority Voting, Ensemble, Debate, Multi-Agent.
-**Ferramentas**: Function Calling, Tool Use, RAG, Context Injection, Grounding, External Memory.
-**Otimização**: APE, Prompt Optimization/Compression, Meta Prompting, Prompt Generation/Mutation, Prefix/P-Tuning.
-**Código**: Program-of-Thought, Code Prompting, Execution-based Prompting.
-**Agentes**: Agent Prompting, Planning Agents, Tool-Augmented Agents, Multi-Agent Systems.
-**Segurança**: Defensive Prompting, Jailbreak Resistance, Prompt Injection Defense, Input Sanitization, Guardrails.
-**Avaliação**: Prompt/Benchmark/Automatic/Human Evaluation, A/B Testing.
-**Multimodal**: Image/Vision/Multimodal Prompting, Image+Text Reasoning.
-**Experimentais**: Active Prompt, DSP, Generated Knowledge, Faithful CoT, Tree Search, Selection-Inference, Emotion Prompting.
-**Persuasão** (Meincke et al. 2025 — dobra compliance 33%→72%; compliance = obediência à instrução, NÃO qualidade/precisão da resposta): Authority, Commitment, Scarcity, Social Proof, Unity (Reciprocity/Liking: evitar). Usar só p/ disciplina de formato/processo. Detalhe, exemplos ✅/❌ e tabela: [references/persuasion.md](references/persuasion.md). Nunca p/ contornar segurança.
+Priority tier above already names the ~18 techniques that cover most real usage. Task needs a named
+technique outside it (rare — a specific reasoning/decomposition/agent pattern by name) →
+[references/taxonomy.md](references/taxonomy.md) has the full category index. Generator mode never needs this file.
 
-## Modo gerador (ativo — quando o pedido claramente quer um prompt pra outra ferramenta)
+**Persuasion** (Meincke et al. 2025 — doubles compliance 33%→72%; compliance = obedience to the instruction, NOT answer quality/accuracy): Authority, Commitment, Scarcity, Social Proof, Unity (Reciprocity/Liking: avoid). Use only for format/process discipline. Detail, ✅/❌ examples and table: [references/persuasion.md](references/persuasion.md). Never to bypass safety.
 
-Gatilhos: "escreve/melhora/adapta prompt pra X", mas também formas naturais — "como peço pro
-Midjourney X?", "como faço o Cursor fazer Y?", "monta algo pra colar no GPT". Critério: usuário quer
-texto pra colar em outra ferramenta, não resposta minha. Na dúvida, pergunta em 1 linha.
+## Generator mode (active — when the request clearly wants a prompt for another tool)
 
-**Regra dura**: não gera prompt sem confirmar ferramenta-alvo (pergunta se ambíguo, máx 3 perguntas).
-Não explica teoria de prompt engineering salvo pedido. Não mostra nome de framework no output.
-Preferir técnica simples (role, few-shot, grounding) sobre framework complexo (Mixture-of-Experts,
-Tree/Graph-of-Thought, Self-Consistency, prompt chaining em camada) — essas têm risco de fabricação maior
-em prompt único, só usar se pedido explícito e ferramenta suporta.
-Nunca adiciona CoT em modelo reasoning-native (o3, o4-mini, DeepSeek-R1, Qwen3 thinking) — já pensa
-internamente, CoT degrada saída.
+Triggers: "write/improve/adapt a prompt for X", but also natural forms — "how do I ask
+Midjourney for X?", "how do I get Cursor to do Y?", "build something to paste into GPT". Criterion: user wants
+text to paste into another tool, not my answer. When unsure, ask in 1 line.
 
-**Fast path**: pedido simples e não-ambíguo (ferramenta clara, task clara, sem formato exótico) →
-gera direto, sem template, sem checklist, sem perguntas. A cerimônia completa abaixo é só p/ pedido
-complexo/ambíguo. Na dúvida entre os dois caminhos, fast path.
-Mini-autocheck do fast path (3 itens, mental, não substitui o self-check completo do caminho longo):
-sem CoT se modelo reasoning-native; formato de saída definido; sem instrução vaga tipo "faça o que for preciso".
+**Hard rule**: do not generate a prompt without confirming the target tool (ask if ambiguous, max 3 questions).
+Do not explain prompt engineering theory unless asked. Do not show framework names in the output.
+Prefer simple techniques (role, few-shot, grounding) over complex frameworks (Mixture-of-Experts,
+Tree/Graph-of-Thought, Self-Consistency, layered prompt chaining) — those have higher fabrication risk
+in a single prompt; only use if explicitly requested and the tool supports them.
+Never add CoT on reasoning-native models (o3, o4-mini, DeepSeek-R1, Qwen3 thinking) — they already think
+internally; CoT degrades output.
 
-**Antes de escrever** (caminho completo), extrai silenciosamente **do pedido do usuário** (extração ≠ pergunta): task,
-ferramenta-alvo, formato de saída, constraint, input, contexto, audiência, critério de sucesso, exemplo.
-Só vira pergunta o que é crítico E ausente (máx 3). Se a tarefa é genuinamente ambígua e 3 perguntas
-não bastam: gera mesmo assim declarando as assunções no final ("Assumi: X, Y — corrige se errado"),
-em vez de gerar prompt genérico em silêncio.
+**Fast path**: simple, unambiguous request (clear tool, clear task, no exotic format) →
+generate directly, no template, no checklist, no questions. The full ceremony below is only for
+complex/ambiguous requests. When unsure between the two paths, fast path.
+Fast-path mini-autocheck (3 items, mental, does not replace the full long-path self-check):
+no CoT if reasoning-native model; defined output format; no vague instruction like "do whatever is needed".
 
-**Nota sobre "não mostrar framework"**: vale pro **prompt gerado** (o texto que o usuário cola na
-ferramenta não carrega rótulo "CO-STAR"). A frase de otimização e o modo passivo PODEM nomear técnica —
-são canais diferentes, não é contradição.
+**Before writing** (full path), silently extract **from the user request** (extraction ≠ question): task,
+target tool, output format, constraint, input, context, audience, success criterion, example.
+Only turn into a question what is critical AND missing (max 3). If the task is genuinely ambiguous and 3 questions
+are not enough: generate anyway and declare assumptions at the end ("Assumed: X, Y — correct if wrong"),
+instead of silently generating a generic prompt.
 
-**Self-check antes de entregar**: revisa o prompt gerado contra a seção da ferramenta em
-tool-routing.md. Violação detectada (ex: CoT em modelo reasoning-native, prosa onde a ferramenta
-quer vírgulas, sem stop condition em agente) → corrige em silêncio antes de mostrar.
+**Note on "don't show framework"**: applies to the **generated prompt** (the text the user pastes into the
+tool does not carry a "CO-STAR" label). The optimization sentence and passive mode MAY name a technique —
+different channels, not a contradiction.
 
-**Ferramenta desconhecida/nova**: se não está em tool-routing.md e web search está disponível,
-busca "prompt best practices <ferramenta> <ano>" antes de gerar; depois oferece o bloco pronto
-p/ o usuário colar em tool-routing.md. Sem web search → regras genéricas + aviso.
+**Self-check before delivering**: review the generated prompt against the tool section in
+tool-routing.md. Detected violation (e.g. CoT on reasoning-native model, prose where the tool
+wants commas, no stop condition on an agent) → fix silently before showing.
 
-**Output**: 1 bloco de prompt copiável + `🎯 Target: <ferramenta>` + 1 frase do que foi otimizado e por quê
-+ oferta de refinamento: "Testa na ferramenta e cola o resultado aqui se quiser que eu refine."
+**Unknown/new tool**: if not in tool-routing.md and web search is available,
+search "prompt best practices <tool> <year>" before generating; then offer a ready block
+for the user to paste into tool-routing.md. Without web search → generic rules + warning.
 
-**Loop de refinamento** (quando o usuário volta com o output real da ferramenta): diagnostica a falha
-com o Diagnostic Checklist de [references/tool-routing.md](references/tool-routing.md) (task/context/format/scope/reasoning/agentic),
-ajusta SÓ a dimensão que falhou, entrega versão nova. Não reescreve do zero.
+**Output**: 1 copyable prompt block + `🎯 Target: <tool>` + 1 sentence on what was optimized and why
++ refinement offer: "Test it in the tool and paste the result here if you want me to refine."
 
-**Detalhe por ferramenta e templates — não carregar aqui, ler sob demanda**:
-- [references/tool-routing.md](references/tool-routing.md) — regra específica por Claude/GPT/Cursor/Midjourney/agente de código
-- [references/patterns.md](references/patterns.md) — padrões que desperdiçam token/crédito (task/context/format/scope/reasoning/agentic)
-- [references/templates.md](references/templates.md) — 13 templates estruturais A–M (RTF, CO-STAR, RISEN, CRISPE, CoT, Few-Shot, File-Scope, ReAct+Stop, Visual Descriptor, Reference Image Editing, ComfyUI, Prompt Decompiler, Opus Task Brief)
+**Refinement loop** (when the user returns with the tool's real output): diagnose the failure
+with the Diagnostic Checklist from [references/tool-routing.md](references/tool-routing.md) (task/context/format/scope/reasoning/agentic),
+adjust ONLY the dimension that failed, deliver a new version. Do not rewrite from scratch.
 
-Ler só a seção da ferramenta/categoria precisa, não o arquivo inteiro.
+**Per-tool detail and templates — do not load here, read on demand**:
+- [references/tool-routing.md](references/tool-routing.md) — rules specific to Claude/GPT/Cursor/Midjourney/coding agent
+- [references/patterns.md](references/patterns.md) — patterns that waste tokens/credits (task/context/format/scope/reasoning/agentic)
+- [references/templates.md](references/templates.md) — 13 structural templates A–M (RTF, CO-STAR, RISEN, CRISPE, CoT, Few-Shot, File-Scope, ReAct+Stop, Visual Descriptor, Reference Image Editing, ComfyUI, Prompt Decompiler, Opus Task Brief)
+
+Read only the needed tool/category section, not the whole file.

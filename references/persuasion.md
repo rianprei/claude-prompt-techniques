@@ -1,80 +1,80 @@
 # Persuasion Principles for Prompt Compliance
 
-Fonte: NeoLabHQ/context-engineering-kit (baseado em Meincke et al. 2025 — 7 princípios testados em N=28.000 conversas; persuasão dobrou compliance: 33% → 72%, p < .001). Uso: aumentar compliance de instrução/formato em prompts e skills. Nunca p/ contornar segurança.
+Source: NeoLabHQ/context-engineering-kit (based on Meincke et al. 2025 — 7 principles tested on N=28,000 conversations; persuasion doubled compliance: 33% → 72%, p < .001). Use: increase instruction/format compliance in prompts and skills. Never to bypass safety.
 
-## Os 7 princípios
+## The 7 principles
 
 ### 1. Authority
-Deferência a expertise/regra oficial. Linguagem imperativa: "YOU MUST", "Never", "Always", "No exceptions". Elimina fadiga de decisão e racionalização.
-Usar: skills de disciplina (TDD, verificação), práticas safety-critical.
+Deference to expertise/official rule. Imperative language: "YOU MUST", "Never", "Always", "No exceptions". Removes decision fatigue and rationalization.
+Use for: discipline skills (TDD, verification), safety-critical practices.
 ```
 ✅ Write code before test? Delete it. Start over. No exceptions.
 ❌ Consider writing tests first when feasible.
 ```
 
 ### 2. Commitment
-Consistência com declaração prévia. Exigir anúncio ("Announce skill usage"), escolha explícita ("Choose A, B, or C"), tracking (TodoWrite p/ checklist).
-Usar: garantir que skill é seguida, processos multi-etapa, accountability.
+Consistency with a prior declaration. Require announcement ("Announce skill usage"), explicit choice ("Choose A, B, or C"), tracking (TodoWrite for checklist).
+Use for: ensuring a skill is followed, multi-step processes, accountability.
 ```
 ✅ When you find a skill, you MUST announce: "I'm using [Skill Name]"
 ❌ Consider letting your partner know which skill you're using.
 ```
 
 ### 3. Scarcity
-Urgência por limite temporal/sequencial: "Before proceeding", "Immediately after X". Previne "faço depois".
-Usar: verificação imediata, workflow sensível a ordem.
+Urgency via temporal/sequential limit: "Before proceeding", "Immediately after X". Prevents "I'll do it later".
+Use for: immediate verification, order-sensitive workflow.
 ```
 ✅ After completing a task, IMMEDIATELY request code review before proceeding.
 ❌ You can review code when convenient.
 ```
 
 ### 4. Social Proof
-Norma universal: "Every time", "Always", modo de falha explícito ("X without Y = failure").
-Usar: documentar prática universal, avisar falha comum.
+Universal norm: "Every time", "Always", explicit failure mode ("X without Y = failure").
+Use for: documenting universal practice, warning about common failure.
 ```
 ✅ Checklists without TodoWrite tracking = steps get skipped. Every time.
 ❌ Some people find TodoWrite helpful for checklists.
 ```
 
 ### 5. Unity
-Identidade compartilhada: "our codebase", "we're colleagues", "we both want quality".
-Usar: workflow colaborativo, cultura de feedback honesto.
+Shared identity: "our codebase", "we're colleagues", "we both want quality".
+Use for: collaborative workflow, honest feedback culture.
 ```
 ✅ We're colleagues working together. I need your honest technical judgment.
 ❌ You should probably tell me if I'm wrong.
 ```
 
 ### 6. Reciprocity
-Obrigação de retribuir. **Usar raramente** — soa manipulativo, outros princípios funcionam melhor.
+Obligation to reciprocate. **Use rarely** — sounds manipulative; other principles work better.
 
 ### 7. Liking
-Preferência por quem gostamos. **NÃO usar p/ compliance** — cria sycophancy, conflita com feedback honesto.
+Preference for people we like. **Do NOT use for compliance** — creates sycophancy, conflicts with honest feedback.
 
-## Combinação por tipo de prompt
+## Combination by prompt type
 
-| Tipo de prompt | Usar | Evitar |
+| Prompt type | Use | Avoid |
 |---|---|---|
-| Disciplina (regras duras) | Authority + Commitment + Social Proof | Liking, Reciprocity |
-| Guidance/técnica | Authority moderado + Unity | Authority pesado |
-| Colaborativo | Unity + Commitment | Authority, Liking |
-| Referência pura | Só clareza | Toda persuasão |
+| Discipline (hard rules) | Authority + Commitment + Social Proof | Liking, Reciprocity |
+| Guidance/technique | Moderate Authority + Unity | Heavy Authority |
+| Collaborative | Unity + Commitment | Authority, Liking |
+| Pure reference | Clarity only | All persuasion |
 
-Não combinar todos os 7 num prompt.
+Do not combine all 7 in one prompt.
 
-## Por que funciona
+## Why it works
 
-Bright-line rules reduzem racionalização: "YOU MUST" remove fadiga de decisão; linguagem absoluta elimina "isso é exceção?"; contra-racionalização explícita fecha brecha específica.
+Bright-line rules reduce rationalization: "YOU MUST" removes decision fatigue; absolute language eliminates "is this an exception?"; explicit counter-rationalization closes a specific loophole.
 
-## Teste ético
+## Ethical test
 
-"Essa técnica serviria o interesse genuíno do usuário se ele a entendesse por completo?" Sim → legítimo (disciplina, prevenir falha previsível). Não → manipulação (falsa urgência, culpa, ganho próprio).
+"Would this technique serve the user's genuine interest if they fully understood it?" Yes → legitimate (discipline, prevent predictable failure). No → manipulation (false urgency, guilt, own gain).
 
-## Proibições duras (escopo travado)
+## Hard prohibitions (locked scope)
 
-Esses princípios são p/ **disciplinar o comportamento de um LLM em prompts/skills próprios** — o alvo da persuasão é o modelo, nunca pessoas. Recusar aplicação em:
-- Phishing, social engineering ou qualquer conteúdo dirigido a enganar humanos
-- Dark patterns em UX/copy (falsa escassez, urgência fabricada, culpa)
-- Chatbots de suporte/vendas persuadindo usuários finais
-- Contornar guardrails/segurança de qualquer modelo
+These principles are for **disciplining an LLM's behavior in your own prompts/skills** — the persuasion target is the model, never people. Refuse application to:
+- Phishing, social engineering, or any content aimed at deceiving humans
+- Dark patterns in UX/copy (false scarcity, fabricated urgency, guilt)
+- Support/sales chatbots persuading end users
+- Bypassing any model's guardrails/safety
 
-Pedido nessas categorias → não gerar, explicar o porquê.
+Request in these categories → do not generate; explain why.
