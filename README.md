@@ -83,7 +83,7 @@ git clone https://github.com/rianprei/claude-prompt-techniques ~/.claude/skills/
 mkdir -p ~/.claude/skills/prompt-techniques/references
 base=https://raw.githubusercontent.com/rianprei/claude-prompt-techniques/master
 curl -fL $base/SKILL.md -o ~/.claude/skills/prompt-techniques/SKILL.md
-for f in tool-routing patterns templates persuasion; do
+for f in tool-routing patterns templates persuasion taxonomy; do
   curl -fL $base/references/$f.md -o ~/.claude/skills/prompt-techniques/references/$f.md
 done
 ```
@@ -92,7 +92,7 @@ done
 
 ```bash
 ls ~/.claude/skills/prompt-techniques/ ~/.claude/skills/prompt-techniques/references/
-# Esperado: SKILL.md, README.md e references/ com 4 arquivos .md
+# Esperado: SKILL.md, README.md e references/ com 5 arquivos .md
 ```
 
 **Ativar:** abra uma sessão nova do Claude Code. A skill carrega automaticamente — zero configuração. Pra confirmar, pergunte ao Claude: "qual skill de prompt engineering você tem disponível?"
@@ -164,12 +164,13 @@ prompt-techniques/
     ├── tool-routing.md         # regras específicas de 30+ ferramentas (~460 linhas)
     ├── templates.md            # 13 templates estruturais completos
     ├── patterns.md             # padrões que desperdiçam tokens/créditos
+    ├── taxonomy.md            # taxonomia completa: ~90 técnicas em 14 categorias, só sob demanda
     └── persuasion.md           # 7 princípios de persuasão p/ compliance
 evals/
 └── protocol.md                 # protocolo manual de A/B + log de re-prompts
 ```
 
-`SKILL.md` contém só a lista de categorias (modo passivo) e as regras do gerador (modo ativo), com **links** para os arquivos de `references/`. O Claude lê `tool-routing.md` apenas quando você pede um prompt — e só a seção da ferramenta pedida. Isso é *progressive disclosure*: você não paga tokens por conhecimento que não está usando naquele momento.
+`SKILL.md` contém só a camada de prioridade (modo passivo) e as regras do gerador (modo ativo), com **links** para os arquivos de `references/` — a taxonomia completa das ~90 técnicas mora em `references/taxonomy.md`. O Claude lê `tool-routing.md` ou `taxonomy.md` só quando precisa (pedido de prompt, ou técnica fora da camada de prioridade). Isso é *progressive disclosure*: você não paga tokens por conhecimento que não está usando naquele momento.
 
 Comparação: skills que carregam tudo no início custam milhares de tokens por sessão e causam o efeito "lost in the middle" (modelo ignora regras porque o contexto saturou). Aqui o custo fixo por sessão é só o SKILL.md.
 
@@ -241,7 +242,7 @@ Invioláveis, independente do pedido:
 
 - **Nova ferramenta:** adicione uma seção em `references/tool-routing.md` seguindo o padrão existente (nome em negrito, bullets curtos com regras específicas do modelo/versão).
 - **Novo template:** adicione em `references/templates.md` com letra nova + linha na tabela de índice.
-- **Nova técnica (modo passivo):** adicione na categoria certa da lista em `SKILL.md`.
+- **Nova técnica (modo passivo):** alto impacto → camada de Prioridade em `SKILL.md`; senão, categoria certa em `references/taxonomy.md`.
 - **Regra pessoal fixa:** edite a seção "Modo gerador" do `SKILL.md`.
 
 Mantenha o `SKILL.md` enxuto — detalhe pesado vai pra `references/`, senão você perde o benefício de contexto.
