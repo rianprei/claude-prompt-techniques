@@ -55,7 +55,7 @@ Dois modos numa skill só:
 | **Referência (passivo)** | Sempre, automático | Quando uma técnica influencia a abordagem, o Claude a nomeia em 1 linha **na resposta visível** (ex: "Técnica: Chain-of-Verification"). Você vê, não fica escondido no raciocínio interno. Tarefa trivial não ganha rótulo. |
 | **Gerador (ativo)** | Só quando você pede explicitamente | Gera um prompt pronto pra colar, com regras específicas da ferramenta-alvo (Claude, GPT, Cursor, Midjourney, Claude Code, ElevenLabs, n8n...), e oferece loop de refinamento com o output real. |
 
-Cobre **14 categorias de técnicas** — com **camadas de prioridade** (nem toda técnica pesa igual): alto impacto (role, context, output format, few-shot, grounding), condicionais (CoT só em modelo não-reasoning, ReAct/RAG só com ferramentas reais) e experimentais/legadas em modelos 2025+ (ToT, GoT, Self-Consistency — só sob pedido explícito, risco de fabricação). Base: [The Prompt Report](https://arxiv.org/abs/2406.06608) + docs oficiais dos vendors. Inclui **persuasão** (compliance de instrução — ver caveat na [seção própria](#princípios-de-persuasão)).
+Cobre **13 categorias de técnicas** — com **camadas de prioridade** (nem toda técnica pesa igual): alto impacto (role, context, output format, few-shot, grounding), condicionais (CoT só em modelo não-reasoning, ReAct/RAG só com ferramentas reais) e experimentais/legadas em modelos 2025+ (ToT, GoT, Self-Consistency — só sob pedido explícito, risco de fabricação). Base: [The Prompt Report](https://arxiv.org/abs/2406.06608) + docs oficiais dos vendors. Inclui **persuasão** (compliance de instrução — ver caveat na [seção própria](#princípios-de-persuasão)).
 
 Antes de entregar qualquer prompt, a skill faz **self-check** contra as regras da ferramenta-alvo e corrige violações em silêncio. Ferramenta que não está no routing: busca best practices na web (se disponível) e oferece o bloco pronto pra você adicionar ao `tool-routing.md`.
 
@@ -83,6 +83,7 @@ git clone https://github.com/rianprei/claude-prompt-techniques ~/.claude/skills/
 mkdir -p ~/.claude/skills/prompt-techniques/references
 base=https://raw.githubusercontent.com/rianprei/claude-prompt-techniques/master
 curl -fL $base/SKILL.md -o ~/.claude/skills/prompt-techniques/SKILL.md
+curl -fL $base/README.md -o ~/.claude/skills/prompt-techniques/README.md
 for f in tool-routing patterns templates persuasion taxonomy; do
   curl -fL $base/references/$f.md -o ~/.claude/skills/prompt-techniques/references/$f.md
 done
@@ -161,10 +162,10 @@ Claude pergunta a ferramenta-alvo e o contexto que falta (máx 3 perguntas), dep
 prompt-techniques/
 ├── SKILL.md                    # entry point — pequeno, carregado sempre
 └── references/                 # pesados, carregados SÓ sob demanda
-    ├── tool-routing.md         # regras específicas de 30+ ferramentas (~460 linhas)
+    ├── tool-routing.md         # regras específicas de 30+ ferramentas (~380 linhas)
     ├── templates.md            # 13 templates estruturais completos
     ├── patterns.md             # padrões que desperdiçam tokens/créditos
-    ├── taxonomy.md            # taxonomia completa: ~90 técnicas em 14 categorias, só sob demanda
+    ├── taxonomy.md            # taxonomia completa: ~90 técnicas em 13 categorias, só sob demanda
     └── persuasion.md           # 7 princípios de persuasão p/ compliance
 evals/
 └── protocol.md                 # protocolo manual de A/B + log de re-prompts
@@ -180,7 +181,7 @@ Regras específicas em `references/tool-routing.md`:
 
 | Categoria | Ferramentas |
 |---|---|
-| LLMs de texto | Claude (Opus 4.7/4.8), ChatGPT/GPT-5.x, Gemini 2.x/3 Pro, Qwen 2.5, Llama/Mistral, MiniMax M3/M2.7 |
+| LLMs de texto | Claude (Opus/Sonnet atuais), ChatGPT/GPT-5.x, Gemini 2.x/3 Pro, Qwen 2.5, Llama/Mistral, MiniMax M3/M2.7 |
 | Reasoning-native | o3, o4-mini, DeepSeek-R1, Qwen3 thinking (regra: NUNCA adicionar CoT) |
 | Local | Ollama (pergunta qual modelo antes de gerar) |
 | Agentes de código | Claude Code, Cursor, Windsurf, Cline, GitHub Copilot, Devin, SWE-agent, Antigravity |
@@ -213,7 +214,7 @@ Ferramenta fora da lista: o Claude aplica regras genéricas (instrução explíc
 | J — Reference Image Editing | editar imagem existente (só descreve o delta) |
 | K — ComfyUI | workflow nodal (positive + negative separados) |
 | L — Prompt Decompiler | quebrar/adaptar/dividir prompt existente |
-| M — Opus 4.7/4.8 Task Brief | tarefa complexa/agentic em Claude Opus |
+| M — Opus Task Brief | tarefa complexa/agentic em Claude Opus |
 
 ## Princípios de persuasão
 
@@ -302,6 +303,6 @@ Sem resíduo — a skill não toca em nenhum outro arquivo.
 - **Modo gerador** baseado em [nidhinjs/prompt-master](https://github.com/nidhinjs/prompt-master) (tool routing, templates A–M, patterns, intent extraction).
 - **Fórmula de 7 componentes para imagem + modos de expertise** inspirados em [Hainrixz/claude-banana](https://github.com/Hainrixz/claude-banana) e [AgriciDaniel/banana-claude](https://github.com/AgriciDaniel/banana-claude).
 - **Princípios de persuasão** de [NeoLabHQ/context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit) (skill prompt-engineering), fundamentados em Meincke et al. (2025).
-- **Modo referência** (taxonomia de 14 categorias de técnicas) é lista própria.
+- **Modo referência** (taxonomia de 13 categorias de técnicas) é lista própria.
 
 Licenças das fontes upstream aplicam-se ao conteúdo derivado delas.

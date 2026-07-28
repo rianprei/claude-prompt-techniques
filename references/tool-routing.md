@@ -1,71 +1,22 @@
----
-name: prompt-master
-version: 1.7.0
-description: Generates optimized prompts for AI tools. Activates only when the user explicitly asks to write, fix, improve, or adapt a prompt for a specific AI tool (LLM, Cursor, Midjourney, image AI, video AI, coding agents, etc.). Does not activate for general conversation, coding tasks, document writing, or other non-prompt-engineering work.
----
+Reference file for the `prompt-techniques` skill. Loaded on demand by SKILL.md's active generator mode — not a standalone skill entry point.
 
-> Last verified: 2026-07-07 (all sections, against official vendor docs as of that date). When reviewing a section against a newer doc, update the date here and note the section. Per-model rules (e.g. CoT ban on reasoning-native) expire when the model changes — when unsure, re-check official docs before trusting.
+> Last verified: 2026-07-28 (Claude section, against current model family as of that date — see note below). Other sections last verified 2026-07-07. When reviewing a section against a newer doc, update the date here and note the section. Per-model rules (e.g. CoT ban on reasoning-native) expire when the model changes — when unsure, re-check official docs before trusting.
 
-## PRIMACY ZONE — Identity, Hard Rules, Output Lock
+Identity, hard rules, output format, and the 9 intent-extraction dimensions live in SKILL.md — this
+file holds per-tool rules only. The high-fabrication-risk techniques SKILL.md names without detail:
 
-**Who you are**
+- **Mixture of Experts** — simulated multi-persona routing in a single forward pass
+- **Tree of Thought** — simulated branching without real parallel execution
+- **Graph of Thought** — requires an external graph engine not present in most tools
+- **Universal Self-Consistency** — requires independent sampling passes
+- **Prompt chaining as a layered technique** — compounds fabrication risk across longer chains
 
-When generating or improving prompts, operate as a prompt engineer. Take the rough idea, identify the target AI tool, extract the actual intent, and output a single production-ready prompt optimized for that specific tool with zero wasted tokens. This role applies only to prompt generation; for all other tasks, follow default behavior and safety guidelines.
-Do not discuss prompting theory unless explicitly asked.
-Do not show framework names in output.
-Build prompts one at a time, ready to paste.
-
----
-
-**Hard rules — NEVER violate these**
-
-- Do not output a prompt without first confirming the target tool — ask if ambiguous
-- Prefer simpler techniques (role assignment, few-shot, grounding anchors, chain of thought) over complex meta-reasoning frameworks in single-prompt contexts. The following techniques carry higher fabrication risk when used in a single prompt and should only be applied when the user explicitly requests them and the target tool supports them:
-  - **Mixture of Experts** -- simulated multi-persona routing in a single forward pass
-  - **Tree of Thought** -- simulated branching without real parallel execution
-  - **Graph of Thought** -- requires an external graph engine not present in most tools
-  - **Universal Self-Consistency** -- requires independent sampling passes
-  - **Prompt chaining as a layered technique** -- compounds fabrication risk across longer chains
-- Do not add Chain of Thought to reasoning-native models (o3, o4-mini, DeepSeek-R1, Qwen3 thinking mode) — they think internally, CoT degrades output
-- Do not ask more than 3 clarifying questions before producing a prompt
-- Do not pad output with explanations the user did not request
-
----
-
-**Output format — Follow this format**
-
-Output format:
-1. A single copyable prompt block ready to paste into the target tool
-2. 🎯 Target: [tool name],💡 [One sentence — what was optimized and why]
-3. If the prompt needs setup steps before pasting, add a short plain-English instruction note below. 1-2 lines max. ONLY when genuinely needed.
-
-For copywriting and content prompts include fillable placeholders where relevant ONLY: [TONE], [AUDIENCE], [BRAND VOICE], [PRODUCT NAME].
-
----
+For copywriting/content prompts, include fillable placeholders only where relevant: `[TONE]`,
+`[AUDIENCE]`, `[BRAND VOICE]`, `[PRODUCT NAME]`.
 
 > **Last verified: 2026-07.** Model-specific rules age fast. If the target tool/model is newer than
 > this date or absent below, do NOT guess version-specific behavior — apply the generic rules
 > (explicit instruction, output contract, format lock) and say the routing entry may be stale.
-
-## MIDDLE ZONE — Execution Logic, Tool Routing, Diagnostics
-
-### Intent Extraction
-
-Before writing any prompt, silently extract these 9 dimensions. Missing critical dimensions trigger clarifying questions (max 3 total).
-
-| Dimension | What to extract | Critical? |
-|-----------|----------------|-----------|
-| **Task** | Specific action — convert vague verbs to precise operations | Always |
-| **Target tool** | Which AI system receives this prompt | Always |
-| **Output format** | Shape, length, structure, filetype of the result | Always |
-| **Constraints** | What MUST and MUST NOT happen, scope boundaries | If complex |
-| **Input** | What the user is providing alongside the prompt | If applicable |
-| **Context** | Domain, project state, prior decisions from this session | If session has history |
-| **Audience** | Who reads the output, their technical level | If user-facing |
-| **Success criteria** | How to know the prompt worked — binary where possible | If task is complex |
-| **Examples** | Desired input/output pairs for pattern lock | If format-critical |
-
----
 
 ### Tool Routing
 
@@ -73,27 +24,24 @@ Identify the tool and route accordingly. Read full templates from [references/te
 
 ---
 
-**Claude (claude.ai, Claude API, Claude 4.x)**
+**Claude (claude.ai, Claude API, Claude Code)**
 
-Current default is **Opus 4.8**. Opus 4.7 is still selectable — keep its notes, but assume 4.8 unless the user names a specific version.
+Current model family: Claude 5 (Sonnet 5, Opus 5, Haiku 4.5). Do not assume a specific point version — ask or check current docs if the user names one; do not hardcode a "default" version number in generated prompts.
 
-*Durable across Claude 4.x (4.6 / 4.7 / 4.8):*
-- Be explicit and specific — Claude 4.x follows instructions literally. It does exactly what you say, nothing more. Missing context = narrow literal output, not a smart guess.
-- Claude Opus 4.x over-engineers by default — add "Only make changes directly requested. Do not add features or refactor beyond what was asked."
+*Durable across Claude 4.x/5.x:*
+- Be explicit and specific — Claude follows instructions literally. It does exactly what you say, nothing more. Missing context = narrow literal output, not a smart guess.
+- Claude Opus over-engineers by default — add "Only make changes directly requested. Do not add features or refactor beyond what was asked."
 - XML tags help for complex multi-section prompts: `<context>`, `<task>`, `<constraints>`, `<output_format>`
 - Provide context and reasoning WHY, not just WHAT — Claude generalizes better from explanations
 - Always specify output format and length explicitly
 - For complex or multi-step tasks: front-load everything in one turn — intent, constraints, acceptance criteria, relevant files. Every extra back-and-forth turn adds reasoning overhead and token cost.
-- Do NOT add "think step by step" or fixed thinking-budget instructions — Opus 4.x uses adaptive thinking and calibrates depth automatically. To influence depth: "Think carefully before responding" (more) or "Prioritize responding quickly" (less).
+- Do NOT add "think step by step" or fixed thinking-budget instructions — current Opus/Sonnet models use adaptive thinking and calibrate depth automatically. To influence depth: "Think carefully before responding" (more) or "Prioritize responding quickly" (less).
 - Use Template M for agentic or multi-step tasks.
 
-*Opus 4.8 (current default):*
-- Shares 4.7's literalism and adaptive thinking — the same front-loading discipline applies. Treat the first turn as the only turn for complex work: intent, scope, constraints, acceptance criteria up front.
-- 1M-token context window — large multi-file context can go in a single prompt, but keep it relevant; padding still dilutes attention.
-- Effort/thinking depth is calibrated automatically — do not specify an effort level or thinking budget.
-
-*Opus 4.7 (still selectable):*
-- More literal than 4.6 — vague first turns produce narrower results. Front-load intent, file scope, constraints, and acceptance criteria.
+*Current-generation notes:*
+- Literalism and adaptive thinking hold across recent generations — front-loading discipline applies regardless of exact version. Treat the first turn as the only turn for complex work: intent, scope, constraints, acceptance criteria up front.
+- Large context windows (six figures to 1M tokens depending on model/tier) — large multi-file context can go in a single prompt, but keep it relevant; padding still dilutes attention.
+- Effort/thinking depth is calibrated automatically on current models — do not specify an effort level or thinking budget unless the harness explicitly exposes one (e.g. Claude Code's `/fast`).
 
 ---
 
@@ -179,11 +127,11 @@ Current default is **Opus 4.8**. Opus 4.7 is still selectable — keep its notes
 - Agentic — runs tools, edits files, executes commands autonomously
 - Starting state + target state + allowed actions + forbidden actions + stop conditions + checkpoints
 - Stop conditions are MANDATORY — runaway loops are the biggest credit killer
-- Default model is Opus 4.8 (4.7 still selectable). Effort and thinking depth are managed by the Claude Code harness on current Opus models — do NOT hardcode an effort level or thinking budget in prompts.
-- Opus 4.7 and 4.8 are more literal than 4.6 — vague first turns produce narrower results. Front-load everything: intent, file scope, constraints, acceptance criteria, session strategy.
-- Opus 4.7+ uses fewer tool calls by default and reasons more between calls — explicitly instruct tool use when needed: "Read all files in /src/auth/ before starting"
-- Opus 4.7+ spawns fewer subagents by default — explicitly request when needed: "Use a subagent to investigate X so it stays out of main context"
-- Claude Opus 4.x over-engineers — add "Only make changes directly requested. Do not add extra files, abstractions, or features."
+- Default model is set by the Claude Code harness (currently Sonnet 5, with Opus 5 selectable) — do not hardcode a version number; effort and thinking depth are managed by the harness on current models, do NOT hardcode an effort level or thinking budget in prompts.
+- Current models are more literal than older generations — vague first turns produce narrower results. Front-load everything: intent, file scope, constraints, acceptance criteria, session strategy.
+- Current models use fewer tool calls by default and reason more between calls — explicitly instruct tool use when needed: "Read all files in /src/auth/ before starting"
+- Current models spawn fewer subagents by default — explicitly request when needed: "Use a subagent to investigate X so it stays out of main context"
+- Claude Opus over-engineers — add "Only make changes directly requested. Do not add extra files, abstractions, or features."
 - Always scope to specific files and directories — never give a global instruction without a path anchor
 - Human review triggers required: "Stop and ask before deleting any file, adding any dependency, or affecting the database schema"
 - Highest-ROI single line for nontrivial tasks: "Before writing any code, make a plan and show it to me for approval." Prefer short prompts pointing at existing code ("see how X is implemented") over long descriptions; persistent context belongs in CLAUDE.md, not the prompt.
@@ -359,49 +307,16 @@ Read references/templates.md Template L for the full Prompt Decompiler template.
 ---
 
 **Unknown tool:**
-Identify the closest matching tool category from context. If genuinely unclear, ask: "Which tool is this for?" — then route accordingly. If not tool is found listed connect to the closest related tool.
+Identify the closest matching tool category from context. If genuinely unclear, ask: "Which tool is this for?" — then route accordingly. If no tool is listed, connect it to the closest related tool.
 Then build using the closest matching category.
 
 ---
 
 ### Diagnostic Checklist
 
-Scan every user-provided prompt or rough idea for these failure patterns. Fix silently — flag only if the fix changes the user's intent.
-
-**Task failures**
-- Vague task verb → replace with a precise operation
-- Two tasks in one prompt → split, deliver as Prompt 1 and Prompt 2
-- No success criteria → derive a binary pass/fail from the stated goal
-- Emotional description ("it's broken") → extract the specific technical fault
-- Scope is "the whole thing" → decompose into sequential prompts
-
-**Context failures**
-- Assumes prior knowledge → prepend memory block with all prior decisions
-- Invites hallucination → add grounding constraint: "State only what you can verify. If uncertain, say so."
-- No mention of prior failures → ask what they already tried (counts toward 3-question limit)
-
-**Format failures**
-- No output format specified → derive from task type and add explicit format lock
-- Implicit length ("write a summary") → add word or sentence count
-- No role assignment for complex tasks → add domain-specific expert identity
-- Vague aesthetic ("make it professional") → translate to concrete measurable specs
-
-**Scope failures**
-- No file or function boundaries for IDE AI → add explicit scope lock
-- No stop conditions for agents → add checkpoint and human review triggers
-- Entire codebase pasted as context → scope to the relevant file and function only
-
-**Reasoning failures**
-- Logic or analysis task with no step-by-step → add "Think through this carefully before answering"
-- CoT added to o3/o4-mini/R1/Qwen3-thinking → REMOVE IT
-- New prompt contradicts prior session decisions → flag, resolve, include memory block
-
-**Agentic failures**
-- No starting state → add current project state description
-- No target state → add specific deliverable description
-- Silent agent → add "After each step output: ✅ [what was completed]"
-- Unrestricted filesystem → add scope lock on which files and directories are touchable
-- No human review trigger → add "Stop and ask before: [list destructive actions]"
+Scan every user-provided prompt or rough idea for failure patterns, fix silently, flag only if the fix
+changes the user's intent. Full list: [references/patterns.md](patterns.md) — 37 patterns across the
+same six axes (task/context/format/scope/reasoning/agentic), each with a bad/fixed example.
 
 ---
 

@@ -61,7 +61,7 @@
 
 | # | Pattern | Bad Example | Fixed |
 |---|---------|------------|-------|
-| 26 | **No CoT for logic task** | "which approach is better?" | "Think through both approaches step by step before recommending" |
+| 26 | **No CoT for logic task** | "which approach is better?" | "Think through both approaches step by step before recommending" — non-reasoning models only, see row 27 |
 | 27 | **Adding CoT to reasoning models** | "think step by step" sent to o1/o3 | Remove it — reasoning models think internally, CoT instructions degrade output |
 | 28 | **Expecting inter-session memory** | "you already know my project" | Always re-provide the Memory Block in every new session |
 | 29 | **Contradicting prior work** | New prompt ignores earlier architecture | Include Memory Block with all established decisions |
@@ -78,5 +78,5 @@
 | 33 | **Silent agent** | No progress output | "After each step output: ✅ [what was completed]" |
 | 34 | **Unlocked filesystem** | No file restrictions | "Only edit files inside `src/`. Do not touch `package.json`, `.env`, or any config file." |
 | 35 | **No human review trigger** | Agent decides everything autonomously | "Stop and ask before: deleting any file, adding any dependency, or changing the database schema" |
-| 36 | **Vague first turn on Opus 4.7 / 4.8** | "fix the auth bug" with no scope, no files, no criteria | Opus 4.7 and 4.8 read prompts literally — they no longer fill implicit context like 4.6 did. Use Template M. Front-load intent, file scope, constraints, and acceptance criteria. |
+| 36 | **Vague first turn on current Opus** | "fix the auth bug" with no scope, no files, no criteria | Current Opus models read prompts literally — they don't fill implicit context. Use Template M. Front-load intent, file scope, constraints, and acceptance criteria. |
 | 37 | **Context rot on long sessions** | Keeps correcting in the same session for 60+ turns | New task = new session. Use /rewind instead of correcting. /compact at ~50% context. Subagents for file-heavy investigation. |

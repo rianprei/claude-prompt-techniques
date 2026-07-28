@@ -1,9 +1,7 @@
 ---
 name: prompt-techniques
-description: Reference + prompt generator. Passive use — name/apply a prompt engineering technique. Active use — generate an optimized prompt for a specific tool (Claude, GPT, Cursor, Midjourney, coding agent) when the request clearly wants a prompt to paste into another tool — includes natural forms like "how do I ask Midjourney for X?".
+description: Use when a prompt engineering technique applies to the current task (name/apply it), or when the request wants a prompt written for a specific tool (Claude, GPT, Cursor, Midjourney, coding agent) to paste elsewhere — includes natural forms like "how do I ask Midjourney for X?" or "how do I get Cursor to do Y?".
 ---
-
-Merged from two sources: own technique list (reference) + [prompt-master](https://github.com/nidhinjs/prompt-master) (active generation).
 
 ## Reference mode (passive)
 Do not recite the list unless asked. Pick the technique that serves the task.
@@ -17,7 +15,7 @@ name it in 1 short line **in the visible reply** (e.g. "Technique: Chain-of-Veri
 in internal reasoning — the user needs to see it for auditability. Only name when the technique
 actually influenced the approach; trivial tasks get no label.
 
-Priority tier above already names the ~18 techniques that cover most real usage. Task needs a named
+Priority tier above already names the ~17 techniques that cover most real usage. Task needs a named
 technique outside it (rare — a specific reasoning/decomposition/agent pattern by name) →
 [references/taxonomy.md](references/taxonomy.md) has the full category index. Generator mode never needs this file.
 
@@ -65,7 +63,7 @@ for the user to paste into tool-routing.md. Without web search → generic rules
 + refinement offer: "Test it in the tool and paste the result here if you want me to refine."
 
 **Refinement loop** (when the user returns with the tool's real output): diagnose the failure
-with the Diagnostic Checklist from [references/tool-routing.md](references/tool-routing.md) (task/context/format/scope/reasoning/agentic),
+with the pattern list from [references/patterns.md](references/patterns.md) (task/context/format/scope/reasoning/agentic),
 adjust ONLY the dimension that failed, deliver a new version. Do not rewrite from scratch.
 
 **Per-tool detail and templates — do not load here, read on demand**:
