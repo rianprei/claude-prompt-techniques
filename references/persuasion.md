@@ -1,6 +1,6 @@
 # Persuasion Principles for Prompt Compliance
 
-Source: NeoLabHQ/context-engineering-kit (based on Meincke et al. 2025 — 7 principles tested on N=28,000 conversations; persuasion doubled compliance: 33% → 72%, p < .001). Use: increase instruction/format compliance in prompts and skills. Never to bypass safety.
+Source: NeoLabHQ/context-engineering-kit, citing Meincke et al. (2025) — 7 principles reportedly tested on N=28,000 conversations; persuasion said to double compliance: 33% → 72%, p < .001. No DOI/arXiv link verified in this repo — treat as reported by the upstream source, not independently measured here. Use: increase instruction/format compliance in prompts and skills. Never to bypass safety.
 
 ## The 7 principles
 

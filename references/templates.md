@@ -1,6 +1,6 @@
 # Prompt Templates Reference
 
-Full template library for Prompt Master. Read the relevant template when the user's task type matches. Do not load all templates at once — only the one you need.
+Full template library for the prompt-techniques skill. Read the relevant template when the user's task type matches. Do not load all templates at once — only the one you need.
 
 ## Table of Contents
 
@@ -125,7 +125,7 @@ Experiment: Give 3 variants ranging from minimal to bold.
 
 *Use for logic-heavy tasks, math, debugging, and multi-factor analysis where the AI needs to reason carefully before committing to an answer.*
 
-**Important:** Only use CoT for standard reasoning models (Claude, GPT-4o, Gemini). Do NOT add CoT instructions to o1, o3, or Claude extended thinking — they reason internally and CoT instructions degrade their output.
+**Important:** Only use explicit "think step by step" CoT on non-adaptive-thinking models (GPT-4o-class, Gemini non-thinking, Qwen2.5 instruct, Llama). Do NOT add it to o1/o3/o4-mini/DeepSeek-R1/Qwen3-thinking or current Claude — reasoning-native models reason internally and it degrades output; for current Claude, depth is adjusted only with the soft phrases in tool-routing.md ("Think carefully before responding" / "Prioritize responding quickly").
 
 ```
 [Task statement]

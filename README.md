@@ -123,7 +123,7 @@ O que acontece internamente:
 3. **Escolhe a técnica mais simples que resolve.** Role assignment, few-shot e grounding antes de frameworks pesados (Tree of Thoughts, Mixture of Experts, Self-Consistency) — os pesados têm risco maior de fabricação e só entram se você pedir.
 4. **Aplica as regras da ferramenta-alvo** lendo só a seção relevante de `references/tool-routing.md`.
 5. **Usa o template estrutural certo** de `references/templates.md` se o tipo de tarefa casar.
-6. **Oferece refinamento:** você testa o prompt na ferramenta e cola o output de volta; o Claude diagnostica a falha (checklist de 6 categorias: task/context/format/scope/reasoning/agentic) e ajusta só a dimensão que falhou. Gerar → testar → refinar, não gerar-e-tchau.
+6. **Oferece refinamento:** você testa o prompt na ferramenta e cola o output de volta; o Claude diagnostica a falha via `references/patterns.md` (6 eixos: task/context/format/scope/reasoning/agentic) e ajusta só a dimensão que falhou. Gerar → testar → refinar, não gerar-e-tchau.
 
 **Formato da resposta:** 1 bloco de prompt copiável + `🎯 Target: <ferramenta>` + 1 frase explicando o que foi otimizado + oferta de refinamento.
 

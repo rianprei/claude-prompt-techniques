@@ -61,7 +61,7 @@
 
 | # | Pattern | Bad Example | Fixed |
 |---|---------|------------|-------|
-| 26 | **No CoT for logic task** | "which approach is better?" | "Think through both approaches step by step before recommending" — non-reasoning models only, see row 27 |
+| 26 | **No CoT for logic task** | "which approach is better?" | Non-adaptive-thinking models: "Think through both approaches step by step before recommending." Current Claude: "Think carefully before responding" instead — see row 27 |
 | 27 | **Adding CoT to reasoning models** | "think step by step" sent to o1/o3 | Remove it — reasoning models think internally, CoT instructions degrade output |
 | 28 | **Expecting inter-session memory** | "you already know my project" | Always re-provide the Memory Block in every new session |
 | 29 | **Contradicting prior work** | New prompt ignores earlier architecture | Include Memory Block with all established decisions |
