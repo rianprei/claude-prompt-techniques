@@ -1,6 +1,6 @@
 Reference file for the `prompt-techniques` skill. Loaded on demand by SKILL.md's active generator mode — not a standalone skill entry point.
 
-> Last verified: 2026-07-28 (Claude section, against current model family as of that date — see note below). Other sections last verified 2026-07-07. When reviewing a section against a newer doc, update the date here and note the section. Per-model rules (e.g. CoT ban on reasoning-native) expire when the model changes — when unsure, re-check official docs before trusting.
+> Last verified: 2026-07-28 (Claude section). Other sections last verified 2026-07-07 — model-specific rules age fast; if the target tool/model is newer than that or absent below, do NOT guess version-specific behavior, apply generic rules (explicit instruction, output contract, format lock) and say the entry may be stale.
 
 Identity, hard rules, output format, and the 9 intent-extraction dimensions live in SKILL.md — this
 file holds per-tool rules only. The high-fabrication-risk techniques SKILL.md names without detail:
@@ -14,13 +14,9 @@ file holds per-tool rules only. The high-fabrication-risk techniques SKILL.md na
 For copywriting/content prompts, include fillable placeholders only where relevant: `[TONE]`,
 `[AUDIENCE]`, `[BRAND VOICE]`, `[PRODUCT NAME]`.
 
-> **Last verified: 2026-07.** Model-specific rules age fast. If the target tool/model is newer than
-> this date or absent below, do NOT guess version-specific behavior — apply the generic rules
-> (explicit instruction, output contract, format lock) and say the routing entry may be stale.
-
 ### Tool Routing
 
-Identify the tool and route accordingly. Read full templates from [references/templates.md](references/templates.md) only for the category you need.
+Identify the tool and route accordingly. Read full templates from [templates.md](templates.md) only for the category you need.
 
 ---
 
@@ -218,7 +214,7 @@ Current model family: Claude 5 (Sonnet 5, Opus 5, Haiku 4.5). Do not assume a sp
 **Image AI — Generation** (Midjourney, DALL-E 3, Stable Diffusion, SeeDream)
 First detect: generation from scratch or editing an existing image?
 
-- **Midjourney**: Comma-separated descriptors, not prose. Subject first, then style, mood, lighting, composition. Parameters at end: `--ar 16:9 --v 6 --style raw`. Negative prompts via `--no [unwanted elements]`
+- **Midjourney**: Comma-separated descriptors, not prose. Subject first, then style, mood, lighting, composition. Parameters at end: `--ar 16:9 --v <current>` (check current default, do not hardcode a version) `--style raw`. Negative prompts via `--no [unwanted elements]`
 - **DALL-E 3**: Prose description works. Add "do not include text in the image unless specified." Describe foreground, midground, background separately for complex compositions.
 - **Stable Diffusion**: `(word:weight)` syntax. CFG 7-12. Negative prompt is MANDATORY. Steps 20-30 for drafts, 40-50 for finals.
 - **SeeDream**: Strong at artistic and stylized generation. Specify art style explicitly (anime, cinematic, painterly) before scene content. Mood and atmosphere descriptors work well. Negative prompt recommended.
@@ -345,7 +341,7 @@ When the user's request references prior work, decisions, or session history —
 **Grounding anchors** — for any factual or citation task:
 "Use only information you are highly confident is accurate. If uncertain, write [uncertain] next to the claim. Do not fabricate citations or statistics."
 
-**Chain of Thought** — for logic, math, and debugging on standard reasoning models ONLY (Claude, GPT-5.x, Gemini, Qwen2.5, Llama). Never on o3/o4-mini/R1/Qwen3-thinking.
+**Chain of Thought** — for logic, math, and debugging on non-adaptive-thinking models ONLY (GPT-5.x non-reasoning, Gemini non-thinking, Qwen2.5, Llama). Never on o3/o4-mini/R1/Qwen3-thinking. For current Claude, use the soft depth phrases above instead of literal step-by-step.
 "Think through this step by step before answering."
 
 ---
@@ -379,5 +375,5 @@ Read only when the task requires it. Do not load both at once.
 
 | File | Read When |
 |------|-----------|
-| [references/templates.md](references/templates.md) | You need the full template structure for any tool category |
-| [references/patterns.md](references/patterns.md) | User pastes a bad prompt to fix, or you need the complete 37-pattern reference |
+| [templates.md](templates.md) | You need the full template structure for any tool category |
+| [patterns.md](patterns.md) | User pastes a bad prompt to fix, or you need the complete 37-pattern reference |

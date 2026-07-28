@@ -276,7 +276,7 @@ Texture: [surface and material feel — worn leather, soft fur, brushed metal, s
 **Expertise modes** (shape which fields dominate): cinema (lighting + composition), product (lighting + texture, clean background), portrait (subject + lighting), fashion (style + composition), UI/web (composition + palette), logo (subject + style, flat), landscape (setting + lighting), abstract (style + palette), infographic (composition + palette, add "accurate readable text").
 
 **Tool-specific syntax:**
-- **Midjourney**: Comma-separated descriptors, not prose. Add `--ar`, `--style`, `--v 6` at the end.
+- **Midjourney**: Comma-separated descriptors, not prose. Add `--ar`, `--style`, `--v <current>` at the end (do not hardcode a version).
 - **Stable Diffusion**: Use `(word:1.3)` weight syntax. CFG scale 7 to 12. Negative prompt is mandatory.
 - **DALL-E 3**: Prose works well. Add "do not include any text in the image" unless text is needed.
 - **Sora / video**: Add camera movement (slow dolly, static shot, crane up), duration in seconds, and cut style.

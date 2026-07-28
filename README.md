@@ -134,7 +134,7 @@ O que acontece internamente:
 **Imagem:**
 > "escreve um prompt pro Midjourney: cidade cyberpunk chuvosa vista de cima"
 
-Retorna descritores separados por vírgula (não prosa), sujeito primeiro, depois estilo/mood/iluminação/composição, parâmetros `--ar 16:9 --v 6` no final.
+Retorna descritores separados por vírgula (não prosa), sujeito primeiro, depois estilo/mood/iluminação/composição, parâmetros `--ar 16:9 --v <atual>` no final (não fixa versão — confira a atual).
 
 **Modelo de raciocínio:**
 > "adapta esse meu prompt do Claude pro o3"
@@ -165,13 +165,13 @@ prompt-techniques/
     ├── tool-routing.md         # regras específicas de 30+ ferramentas (~380 linhas)
     ├── templates.md            # 13 templates estruturais completos
     ├── patterns.md             # padrões que desperdiçam tokens/créditos
-    ├── taxonomy.md            # taxonomia completa: ~90 técnicas em 13 categorias, só sob demanda
+    ├── taxonomy.md            # taxonomia completa: ~70 técnicas em 13 categorias, só sob demanda
     └── persuasion.md           # 7 princípios de persuasão p/ compliance
 evals/
 └── protocol.md                 # protocolo manual de A/B + log de re-prompts
 ```
 
-`SKILL.md` contém só a camada de prioridade (modo passivo) e as regras do gerador (modo ativo), com **links** para os arquivos de `references/` — a taxonomia completa das ~90 técnicas mora em `references/taxonomy.md`. O Claude lê `tool-routing.md` ou `taxonomy.md` só quando precisa (pedido de prompt, ou técnica fora da camada de prioridade). Isso é *progressive disclosure*: você não paga tokens por conhecimento que não está usando naquele momento.
+`SKILL.md` contém só a camada de prioridade (modo passivo) e as regras do gerador (modo ativo), com **links** para os arquivos de `references/` — a taxonomia completa das ~70 técnicas mora em `references/taxonomy.md`. O Claude lê `tool-routing.md` ou `taxonomy.md` só quando precisa (pedido de prompt, ou técnica fora da camada de prioridade). Isso é *progressive disclosure*: você não paga tokens por conhecimento que não está usando naquele momento.
 
 Comparação: skills que carregam tudo no início custam milhares de tokens por sessão e causam o efeito "lost in the middle" (modelo ignora regras porque o contexto saturou). Aqui o custo fixo por sessão é só o SKILL.md.
 
@@ -218,7 +218,7 @@ Ferramenta fora da lista: o Claude aplica regras genéricas (instrução explíc
 
 ## Princípios de persuasão
 
-`references/persuasion.md` — baseado em Meincke et al. (2025), estudo com N=28.000 conversas: técnicas de persuasão humana **dobraram** a taxa de compliance de LLMs (33% → 72%).
+`references/persuasion.md` — baseado em Meincke et al. (2025), estudo reportado com N=28.000 conversas: técnicas de persuasão humana teriam **dobrado** a taxa de compliance de LLMs (33% → 72%). Número reportado pela fonte upstream, não verificado de forma independente neste repo.
 
 **Aviso importante:** compliance = obediência à instrução, **não** qualidade ou veracidade da resposta. Um prompt mais "obedecido" não é automaticamente um prompt melhor. Por isso o escopo aqui é estreito: disciplina de formato e processo (seguir checklist, anunciar skill, não pular verificação) — não "melhorar respostas" em geral.
 
