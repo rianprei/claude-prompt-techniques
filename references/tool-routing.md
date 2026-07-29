@@ -38,6 +38,7 @@ Current model family: Claude 5 (Sonnet 5, Opus 5, Haiku 4.5). Do not assume a sp
 - Literalism and adaptive thinking hold across recent generations — front-loading discipline applies regardless of exact version. Treat the first turn as the only turn for complex work: intent, scope, constraints, acceptance criteria up front.
 - Large context windows (six figures to 1M tokens depending on model/tier) — large multi-file context can go in a single prompt, but keep it relevant; padding still dilutes attention.
 - Effort/thinking depth is calibrated automatically on current models — do not specify an effort level or thinking budget unless the harness explicitly exposes one (e.g. Claude Code's `/fast`).
+- For a system prompt or any prompt reused across repeated calls (API integration, RAG, multi-document analysis): put static content first (identity, rules, instructions) and dynamic content last (retrieved documents, session data, the actual query). Most API providers cache the shared prefix — reordering this way turns repeated calls cheaper and faster for free.
 
 ---
 
