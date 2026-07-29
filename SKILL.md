@@ -63,7 +63,12 @@ for the user to paste into tool-routing.md. Without web search → generic rules
 + refinement offer: "Test it in the tool and paste the result here if you want me to refine."
 Full path only, add 1 line: `Score: N/6 axes addressed (task/context/format/scope/reasoning/agentic)`
 — same 6 axes as the refinement loop below, so the number is checkable, not decorative. Skip
-on fast path — it's the whole point of taking the fast path.
+on fast path — it's the whole point of taking the fast path. For a target with its own session
+state (Claude Code, Cursor, Copilot): count an axis as addressed if the target's own environment
+already supplies it (open file, git diff, project structure) — a short prompt isn't missing
+context just because it doesn't restate what the tool can already see. For a one-shot target
+with no environment (Midjourney, GPT, DALL-E): nothing is implicit, every axis must be explicit
+in the prompt itself.
 
 **Refinement loop** (when the user returns with the tool's real output): diagnose the failure
 with the pattern list from [references/patterns.md](references/patterns.md) (task/context/format/scope/reasoning/agentic),
