@@ -276,13 +276,18 @@ Locked Attributes: [any color/material/count the user stated as non-negotiable �
 
 **Locked Attributes — mandatory field whenever the request names a specific color, material,
 or count for an object.** Image models default to the most common real-world version of an
-object, and a plain adjective loses that fight (e.g. "golden katana" still renders steel-colored —
-the katana shape carries a strong steel/silver prior that outweighs one adjective). For each
-locked attribute:
+object, and a plain adjective loses that fight (e.g. "golden katana" can render as a dark,
+desaturated bronze that reads as steel in shadow — the katana shape carries a strong
+steel/silver prior, and a bare color adjective without a brightness/saturation cue lets the
+model pick a muted tone that technically matches the hue but not the intent). For each locked
+attribute:
 - State it twice: once in the main description, once again near the end of the prompt —
   position near the end carries more weight than an early, buried mention.
-- Pair it with an explicit negative: "the blade is solid gold-colored metal — NOT silver, NOT
-  steel-colored" beats "a golden blade" alone.
+- Pair it with an explicit negative, AND lock brightness/saturation, not just hue: "the blade
+  is bright, polished, reflective gold — NOT silver, NOT steel-colored, NOT dark bronze, NOT
+  tarnished, NOT brass" beats "a golden blade" alone. Hue without a brightness/saturation cue
+  still leaves room for a dull, shadow-toned result that verifies as "gold" in hex but reads
+  as gray to the eye.
 - For an exact multiplier ("3x the size of X"), don't rely on the raw number — image models
   render scale unreliably from multipliers. Anchor it to a visual comparison instead: not
   "a sword 3x the cat's length" but "a sword as long as the cat is tall plus its own body

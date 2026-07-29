@@ -41,7 +41,7 @@
 | 17 | **Vague aesthetic adjectives** | "make it look professional" | "Monochrome palette, 16px base font, 24px line height, no decorative elements" |
 | 18 | **No negative prompts for image AI** | "a portrait of a woman" | Add: "no watermark, no blur, no extra fingers, no distortion, no text overlay" |
 | 19 | **Prose prompt for Midjourney** | Full descriptive sentence | "subject, style, mood, lighting, composition, --ar 16:9 --v <current>" |
-| 20 | **Unlocked color/material/count on image gen** | "golden katana" (renders steel-colored) | Use the Locked Attributes field from Template I — restate near the end, pair with an explicit negative, anchor multipliers to a visual comparison instead of a raw number |
+| 20 | **Unlocked color/material/count on image gen** | "golden katana" (renders as dull, shadow-toned bronze — technically gold-hued but reads gray) | Use the Locked Attributes field from Template I — restate near the end, lock brightness/saturation not just hue, pair with an explicit negative, anchor multipliers to a visual comparison instead of a raw number |
 
 ---
 
