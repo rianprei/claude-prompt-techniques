@@ -350,6 +350,17 @@ Relationship: [how the combined elements interact — scale, position, lighting 
 Negative prompt: [what to avoid introducing]
 ```
 
+**Outpainting / aspect expansion variant** — growing the canvas beyond the original image, not
+editing content inside it (different operation from both variants above):
+```
+Target aspect ratio: [e.g. 16:9]
+Extend: [which sides — left/right/top/bottom]
+Context awareness: match the original lighting, weather, texture, and grain exactly
+Logical completion: any object cut off at the original border (a shoulder, a branch, a building
+  edge) must be completed naturally by inference, not left ambiguous
+Do not distort or regenerate the original center image
+```
+
 ---
 
 ## Template K — ComfyUI
