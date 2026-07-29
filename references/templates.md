@@ -295,6 +295,12 @@ attribute:
 
 **Expertise modes** (shape which fields dominate): cinema (lighting + composition), product (lighting + texture, clean background), portrait (subject + lighting), fashion (style + composition), UI/web (composition + palette), logo (subject + style, flat), landscape (setting + lighting), abstract (style + palette), infographic (composition + palette, add "accurate readable text").
 
+**Vocabulary anchors** — a named real-world term beats a vague adjective in the Camera/Lighting/Style
+fields; use these as a starting point, not an exhaustive list:
+- Camera/lens: `shot on RED V-Raptor`, `ARRI Alexa`, `35mm`, `85mm portrait`, `f/1.2 shallow DOF`, `anamorphic lens flare`
+- Lighting: `golden hour`, `Rembrandt lighting`, `rim light`, `volumetric god rays`, `studio three-point lighting`
+- Film stock (photoreal look): `Kodak Portra 400` (warm skin tones), `Fuji Velvia 50` (saturated landscapes), `Ilford HP5` (B&W grain)
+
 **Tool-specific syntax:**
 - **Midjourney**: Comma-separated descriptors, not prose. Add `--ar`, `--style`, `--v <current>` at the end (do not hardcode a version).
 - **Stable Diffusion**: Use `(word:1.3)` weight syntax. CFG scale 7 to 12. Negative prompt is mandatory.

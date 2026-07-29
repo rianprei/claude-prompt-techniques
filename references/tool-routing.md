@@ -211,7 +211,7 @@ Current model family: Claude 5 (Sonnet 5, Opus 5, Haiku 4.5). Do not assume a sp
 
 ---
 
-**Image AI — Generation** (Midjourney, DALL-E 3, Stable Diffusion, SeeDream)
+**Image AI — Generation** (Midjourney, DALL-E 3, Stable Diffusion, SeeDream, Flux, Ideogram)
 First detect: generation from scratch or editing an existing image?
 
 - **Midjourney**: Comma-separated descriptors, not prose. Subject first, then style, mood, lighting, composition. Parameters at end: `--ar 16:9 --v <current>` (check current default, do not hardcode a version) `--style raw`. Negative prompts via `--no [unwanted elements]`
@@ -220,6 +220,8 @@ First detect: generation from scratch or editing an existing image?
 - **Stable Diffusion**: `(word:weight)` syntax. CFG 7-12. Negative prompt is MANDATORY. Steps 20-30 for drafts, 40-50 for finals.
 - **SeeDream**: Strong at artistic and stylized generation. Specify art style explicitly (anime, cinematic, painterly) before scene content. Mood and atmosphere descriptors work well. Negative prompt recommended.
 - **Nano Banana Pro (Gemini image)**: Prose descriptions work best — no weight syntax, no comma-soup. Use the 7-component formula: subject + style + environment + lighting + action + camera framing + texture. Strong at text rendering inside images and photo editing via natural language. Pick an expertise mode to shape the formula: cinema, product, portrait, fashion, UI/web, logo, landscape, abstract, infographic.
+- **Flux**: Pure natural language, no parameter syntax at all — everything must be in the description, including camera and lens for photorealism. Longer, more descriptive prompts outperform short ones here (opposite of Midjourney). Strong at text rendering.
+- **Ideogram**: Best-in-class text rendering — wrap the exact text to render in quotation marks inside the prompt. Style tags guide aesthetic direction separately from the text-rendering instruction. Best pick when the request is a logo, poster, or social graphic with specific on-image text.
 
 ---
 
