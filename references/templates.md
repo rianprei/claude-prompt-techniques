@@ -271,7 +271,22 @@ Aspect Ratio: [16:9 / 1:1 / 9:16 / 4:3]
 Negative Prompts: [blurry, watermark, extra fingers, distortion, low quality]
 Style Reference: [artist / film / aesthetic reference if applicable]
 Texture: [surface and material feel — worn leather, soft fur, brushed metal, steam]
+Locked Attributes: [any color/material/count the user stated as non-negotiable — see rule below]
 ```
+
+**Locked Attributes — mandatory field whenever the request names a specific color, material,
+or count for an object.** Image models default to the most common real-world version of an
+object, and a plain adjective loses that fight (e.g. "golden katana" still renders steel-colored —
+the katana shape carries a strong steel/silver prior that outweighs one adjective). For each
+locked attribute:
+- State it twice: once in the main description, once again near the end of the prompt —
+  position near the end carries more weight than an early, buried mention.
+- Pair it with an explicit negative: "the blade is solid gold-colored metal — NOT silver, NOT
+  steel-colored" beats "a golden blade" alone.
+- For an exact multiplier ("3x the size of X"), don't rely on the raw number — image models
+  render scale unreliably from multipliers. Anchor it to a visual comparison instead: not
+  "a sword 3x the cat's length" but "a sword as long as the cat is tall plus its own body
+  length again, clearly dwarfing the cat holding it."
 
 **Expertise modes** (shape which fields dominate): cinema (lighting + composition), product (lighting + texture, clean background), portrait (subject + lighting), fashion (style + composition), UI/web (composition + palette), logo (subject + style, flat), landscape (setting + lighting), abstract (style + palette), infographic (composition + palette, add "accurate readable text").
 

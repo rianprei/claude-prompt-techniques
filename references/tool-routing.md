@@ -311,7 +311,7 @@ Then build using the closest matching category.
 ### Diagnostic Checklist
 
 Scan every user-provided prompt or rough idea for failure patterns, fix silently, flag only if the fix
-changes the user's intent. Full list: [references/patterns.md](patterns.md) — 37 patterns across the
+changes the user's intent. Full list: [references/patterns.md](patterns.md) — 38 patterns across the
 same six axes (task/context/format/scope/reasoning/agentic), each with a bad/fixed example.
 
 ---
@@ -376,4 +376,4 @@ Read only when the task requires it. Do not load both at once.
 | File | Read When |
 |------|-----------|
 | [templates.md](templates.md) | You need the full template structure for any tool category |
-| [patterns.md](patterns.md) | User pastes a bad prompt to fix, or you need the complete 37-pattern reference |
+| [patterns.md](patterns.md) | User pastes a bad prompt to fix, or you need the complete 38-pattern reference |

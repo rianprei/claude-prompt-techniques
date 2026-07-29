@@ -1,6 +1,6 @@
 # Credit-Killing Patterns Reference
 
-37 patterns that waste tokens and cause re-prompts. Read this file when the user pastes a bad prompt and asks you to fix it, or when diagnosing why a prompt is underperforming.
+38 patterns that waste tokens and cause re-prompts. Read this file when the user pastes a bad prompt and asks you to fix it, or when diagnosing why a prompt is underperforming.
 
 ---
 
@@ -41,6 +41,7 @@
 | 17 | **Vague aesthetic adjectives** | "make it look professional" | "Monochrome palette, 16px base font, 24px line height, no decorative elements" |
 | 18 | **No negative prompts for image AI** | "a portrait of a woman" | Add: "no watermark, no blur, no extra fingers, no distortion, no text overlay" |
 | 19 | **Prose prompt for Midjourney** | Full descriptive sentence | "subject, style, mood, lighting, composition, --ar 16:9 --v <current>" |
+| 20 | **Unlocked color/material/count on image gen** | "golden katana" (renders steel-colored) | Use the Locked Attributes field from Template I — restate near the end, pair with an explicit negative, anchor multipliers to a visual comparison instead of a raw number |
 
 ---
 
@@ -48,12 +49,12 @@
 
 | # | Pattern | Bad Example | Fixed |
 |---|---------|------------|-------|
-| 20 | **No scope boundary** | "fix my app" | "Fix only the login form validation in `src/auth.js`. Touch nothing else." |
-| 21 | **No stack constraints** | "build a React component" | "React 18, TypeScript strict, no external libraries, Tailwind only" |
-| 22 | **No stop condition for agents** | "build the whole feature" | Explicit stop conditions + ✅ checkpoint output after each step |
-| 23 | **No file path for IDE AI** | "update the login function" | "Update `handleLogin()` in `src/pages/Login.tsx` only" |
-| 24 | **Wrong template for tool** | GPT-style prose prompt used in Cursor | Adapt to File-Scope Template (Template G) |
-| 25 | **Pasting entire codebase** | Full repo context every prompt | Scope to only the relevant function and file |
+| 21 | **No scope boundary** | "fix my app" | "Fix only the login form validation in `src/auth.js`. Touch nothing else." |
+| 22 | **No stack constraints** | "build a React component" | "React 18, TypeScript strict, no external libraries, Tailwind only" |
+| 23 | **No stop condition for agents** | "build the whole feature" | Explicit stop conditions + ✅ checkpoint output after each step |
+| 24 | **No file path for IDE AI** | "update the login function" | "Update `handleLogin()` in `src/pages/Login.tsx` only" |
+| 25 | **Wrong template for tool** | GPT-style prose prompt used in Cursor | Adapt to File-Scope Template (Template G) |
+| 26 | **Pasting entire codebase** | Full repo context every prompt | Scope to only the relevant function and file |
 
 ---
 
@@ -61,11 +62,11 @@
 
 | # | Pattern | Bad Example | Fixed |
 |---|---------|------------|-------|
-| 26 | **No CoT for logic task** | "which approach is better?" | Non-adaptive-thinking models: "Think through both approaches step by step before recommending." Current Claude: "Think carefully before responding" instead — see row 27 |
-| 27 | **Adding CoT to reasoning models** | "think step by step" sent to o1/o3 | Remove it — reasoning models think internally, CoT instructions degrade output |
-| 28 | **Expecting inter-session memory** | "you already know my project" | Always re-provide the Memory Block in every new session |
-| 29 | **Contradicting prior work** | New prompt ignores earlier architecture | Include Memory Block with all established decisions |
-| 30 | **No grounding rule for factual tasks** | "summarize what experts say about X" | "Use only information you are highly confident is accurate. Say [uncertain] if not." |
+| 27 | **No CoT for logic task** | "which approach is better?" | Non-adaptive-thinking models: "Think through both approaches step by step before recommending." Current Claude: "Think carefully before responding" instead — see row 28 |
+| 28 | **Adding CoT to reasoning models** | "think step by step" sent to o1/o3 | Remove it — reasoning models think internally, CoT instructions degrade output |
+| 29 | **Expecting inter-session memory** | "you already know my project" | Always re-provide the Memory Block in every new session |
+| 30 | **Contradicting prior work** | New prompt ignores earlier architecture | Include Memory Block with all established decisions |
+| 31 | **No grounding rule for factual tasks** | "summarize what experts say about X" | "Use only information you are highly confident is accurate. Say [uncertain] if not." |
 
 ---
 
@@ -73,10 +74,10 @@
 
 | # | Pattern | Bad Example | Fixed |
 |---|---------|------------|-------|
-| 31 | **No starting state** | "build me a REST API" | "Empty Node.js project, Express installed, `src/app.js` exists" |
-| 32 | **No target state** | "add authentication" | "`/src/middleware/auth.js` with JWT verify. `POST /login` and `POST /register` in `/src/routes/auth.js`" |
-| 33 | **Silent agent** | No progress output | "After each step output: ✅ [what was completed]" |
-| 34 | **Unlocked filesystem** | No file restrictions | "Only edit files inside `src/`. Do not touch `package.json`, `.env`, or any config file." |
-| 35 | **No human review trigger** | Agent decides everything autonomously | "Stop and ask before: deleting any file, adding any dependency, or changing the database schema" |
-| 36 | **Vague first turn on current Opus** | "fix the auth bug" with no scope, no files, no criteria | Current Opus models read prompts literally — they don't fill implicit context. Use Template M. Front-load intent, file scope, constraints, and acceptance criteria. |
-| 37 | **Context rot on long sessions** | Keeps correcting in the same session for 60+ turns | New task = new session. Use /rewind instead of correcting. /compact at ~50% context. Subagents for file-heavy investigation. |
+| 32 | **No starting state** | "build me a REST API" | "Empty Node.js project, Express installed, `src/app.js` exists" |
+| 33 | **No target state** | "add authentication" | "`/src/middleware/auth.js` with JWT verify. `POST /login` and `POST /register` in `/src/routes/auth.js`" |
+| 34 | **Silent agent** | No progress output | "After each step output: ✅ [what was completed]" |
+| 35 | **Unlocked filesystem** | No file restrictions | "Only edit files inside `src/`. Do not touch `package.json`, `.env`, or any config file." |
+| 36 | **No human review trigger** | Agent decides everything autonomously | "Stop and ask before: deleting any file, adding any dependency, or changing the database schema" |
+| 37 | **Vague first turn on current Opus** | "fix the auth bug" with no scope, no files, no criteria | Current Opus models read prompts literally — they don't fill implicit context. Use Template M. Front-load intent, file scope, constraints, and acceptance criteria. |
+| 38 | **Context rot on long sessions** | Keeps correcting in the same session for 60+ turns | New task = new session. Use /rewind instead of correcting. /compact at ~50% context. Subagents for file-heavy investigation. |
