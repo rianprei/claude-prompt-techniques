@@ -270,6 +270,22 @@ Read references/templates.md Template K for the full ComfyUI template.
 
 ---
 
+**Music AI** (Suno)
+- Formula: `[Genre] [Mood] featuring [Instrumentation], with [Structure], [Tempo]`. Custom Mode
+  supports the same fields as bracketed `[Genre: ...] [Mood: ...] [Tempo: ...]` blocks for finer control.
+- Genre and mood must be specific — "synthwave" not "electronic", "melancholic and introspective"
+  not "sad". Vague genre/mood is this tool's version of a vague task verb.
+- Tempo: combine a BPM number with a classical tempo term (`120 BPM, Allegro`) — Suno reads tempo
+  semantically, not as a strict DAW clock. Match BPM to genre norms (ambient 50-80, house 120-130,
+  drum & bass 160-180) unless the user wants an intentional mismatch.
+- Structure via bracketed meta tags in the Lyrics box: `[Intro]`, `[Build]`, `[Drop]`, `[Breakdown]`,
+  `[Instrumental Break]`, `[Guitar Solo]`, `[Fade Out]`, etc. — one tag per section, in the order
+  the track should play.
+- Instrumental-only track: enable Instrumental Mode, or add `vocals`/`singing`/`lyrics` to Exclude
+  Styles (Pro/Premier), or leave the Lyrics box with only structure tags and no words.
+
+---
+
 **Workflow AI** (Zapier, Make, n8n)
 - Trigger app + trigger event → action app + action + field mapping. Step by step.
 - Auth requirements noted explicitly — "assumes [app] is already connected"

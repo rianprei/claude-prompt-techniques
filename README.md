@@ -191,6 +191,7 @@ Regras específicas em `references/tool-routing.md`:
 | Imagem | Midjourney, DALL-E 3, Stable Diffusion, SeeDream, Nano Banana Pro, ComfyUI |
 | Vídeo | Sora, Runway, Kling, LTX Video, Dream Machine |
 | Voz | ElevenLabs |
+| Música | Suno |
 | 3D | Meshy, Tripo, Rodin, Unity AI, Blender AI |
 | Workflow | Zapier, Make, n8n |
 
