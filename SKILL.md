@@ -61,6 +61,9 @@ for the user to paste into tool-routing.md. Without web search → generic rules
 
 **Output**: 1 copyable prompt block + `🎯 Target: <tool>` + 1 sentence on what was optimized and why
 + refinement offer: "Test it in the tool and paste the result here if you want me to refine."
+Full path only, add 1 line: `Score: N/6 axes addressed (task/context/format/scope/reasoning/agentic)`
+— same 6 axes as the refinement loop below, so the number is checkable, not decorative. Skip
+on fast path — it's the whole point of taking the fast path.
 
 **Refinement loop** (when the user returns with the tool's real output): diagnose the failure
 with the pattern list from [references/patterns.md](references/patterns.md) (task/context/format/scope/reasoning/agentic),

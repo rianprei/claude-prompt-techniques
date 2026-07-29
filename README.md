@@ -125,7 +125,7 @@ O que acontece internamente:
 5. **Usa o template estrutural certo** de `references/templates.md` se o tipo de tarefa casar.
 6. **Oferece refinamento:** você testa o prompt na ferramenta e cola o output de volta; o Claude diagnostica a falha via `references/patterns.md` (6 eixos: task/context/format/scope/reasoning/agentic) e ajusta só a dimensão que falhou. Gerar → testar → refinar, não gerar-e-tchau.
 
-**Formato da resposta:** 1 bloco de prompt copiável + `🎯 Target: <ferramenta>` + 1 frase explicando o que foi otimizado + oferta de refinamento.
+**Formato da resposta:** 1 bloco de prompt copiável + `🎯 Target: <ferramenta>` + 1 frase explicando o que foi otimizado + oferta de refinamento. Fluxo completo (não fast-path) também mostra `Score: N/6 eixos` (mesmos 6 do refinamento) — número checável, não decorativo.
 
 **Esclarecimento (pra não parecer contradição):** "sem nome de framework" vale pro **texto do prompt gerado** — o que você cola no Midjourney não vem rotulado "CO-STAR". A frase de otimização e o modo passivo podem nomear técnica normalmente; são canais diferentes.
 
