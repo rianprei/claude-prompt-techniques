@@ -340,6 +340,16 @@ Style consistency: maintain photorealistic style, same lighting direction
 Negative prompt: no new elements, no style changes, no background changes
 ```
 
+**Multi-image composition variant** — user attaches 2+ reference images to combine, not one to
+edit (Nano Banana, GPT Image, and Midjourney `--cref`/`--sref` all support this):
+```
+Reference images: [image 1 — what it contributes], [image 2 — what it contributes], ...
+Combination: [exactly what comes from which image — subject from image 1, background from
+  image 2, style from image 3, etc. — one clause per image, no ambiguity about source]
+Relationship: [how the combined elements interact — scale, position, lighting must reconcile]
+Negative prompt: [what to avoid introducing]
+```
+
 ---
 
 ## Template K — ComfyUI
