@@ -188,7 +188,7 @@ Regras específicas em `references/tool-routing.md`:
 | Geradores full-stack | Bolt, v0, Lovable, Figma Make, Google Stitch |
 | Pesquisa/orquestração | Perplexity, Manus AI |
 | Browser/computer-use | Comet, Atlas, Claude in Chrome |
-| Imagem | Midjourney, DALL-E 3, Stable Diffusion, SeeDream, Nano Banana Pro, ComfyUI |
+| Imagem | Midjourney, DALL-E 3, GPT Image, Stable Diffusion, SeeDream, Nano Banana Pro, ComfyUI |
 | Vídeo | Sora, Runway, Kling, LTX Video, Dream Machine |
 | Voz | ElevenLabs |
 | Música | Suno |
