@@ -376,6 +376,13 @@ When the user's request references prior work, decisions, or session history —
 **Grounding anchors** — for any factual or citation task:
 "Use only information you are highly confident is accurate. If uncertain, write [uncertain] next to the claim. Do not fabricate citations or statistics."
 
+**Structured citations** — different from grounding above: grounding hedges uncertainty, this makes
+sources auditable. For RAG, multi-document, or research tasks where the user needs to verify what
+the answer is based on: give every source a unique ID, and require a separate citations list tied
+to those IDs rather than inline prose links — "Tag each provided document with a unique ID. After
+your answer, list every ID actually used to produce it — not what was merely read, what was used."
+This survives reformatting and is easy to consume programmatically, unlike inline citation prose.
+
 **Chain of Thought** — for logic, math, and debugging on non-adaptive-thinking models ONLY (GPT-5.x non-reasoning, Gemini non-thinking, Qwen2.5, Llama). Never on o3/o4-mini/R1/Qwen3-thinking. For current Claude, use the soft depth phrases above instead of literal step-by-step.
 "Think through this step by step before answering."
 
