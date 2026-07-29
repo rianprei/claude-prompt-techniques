@@ -383,6 +383,20 @@ RESOLUTION: [width x height — must be divisible by 64]
 **For Adapt tasks, always ask:**
 "What tool is the original prompt from, and what tool are you adapting it for?"
 
+**Match the fix to the prompt's existing sophistication — don't downgrade or over-build:**
+- Already has role, explicit constraints, examples, and anti-patterns named? It's Expert-level —
+  tighten and remove ambiguity only. Adding a persona/format template it didn't ask for is not
+  a fix, it's noise.
+- Bare one-liner, no structure at all? Add the next layer up (role + explicit output shape),
+  not the full ceremony in one jump — match the gap between current and next level, not current
+  and maximum.
+
+**Never rewrite technical parameters — copy them verbatim into the output:**
+code fences and inline code, exact numbers/flags/paths (`--ar 16:9`, `v2.3.0`), model IDs and
+proper nouns, error messages and stack traces, URLs and email addresses. A flag that looks like
+a typo may be exactly what the target tool requires — if genuinely ambiguous, leave it untouched
+and flag it in the output note instead of guessing.
+
 **Break down output format:**
 ```
 Original prompt: [paste]
