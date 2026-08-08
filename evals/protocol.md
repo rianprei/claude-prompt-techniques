@@ -31,3 +31,12 @@ Adicione 1 linha por teste em `evals/results.md` (crie se não existir):
 ## O que isso NÃO é
 
 Não é benchmark científico: N pequeno, avaliador é você, sem cegamento. É trilha de evidência pessoal — suficiente pra decidir se a skill paga o próprio custo no SEU uso.
+
+## Toda claim carrega sua limitação junto, não separada
+
+Se um resultado do log virar afirmação em README/SKILL.md ("a skill reduz re-prompts em X%"),
+a limitação anda junto na mesma frase, não num rodapé genérico. Formato: **claim + condição em
+que ela vale + o que ela não prova**. Ex: "3 de 3 testes com Midjourney tiveram 0 re-prompts
+via skill vs. 1-2 manual — N=3, mesmo avaliador sem cegamento, não prova generalização pra
+outras ferramentas." Uma claim sem essas duas cláusulas anexadas não entra em doc público —
+fica só no log.
