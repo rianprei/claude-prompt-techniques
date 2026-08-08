@@ -14,7 +14,7 @@ Full template library for the prompt-techniques skill. Read the relevant templat
 | [F — Few-Shot](#template-f--few-shot) | Consistent structured output, pattern replication |
 | [G — File-Scope](#template-g--file-scope) | Cursor, Windsurf, Copilot — code editing AI |
 | [H — ReAct + Stop Conditions](#template-h--react--stop-conditions) | Claude Code, Devin — autonomous agents |
-| [I — Visual Descriptor](#template-i--visual-descriptor) | Midjourney, DALL-E, Stable Diffusion, Sora |
+| [I — Visual Descriptor](#template-i--visual-descriptor) | Midjourney, GPT Image, Stable Diffusion, Sora |
 | [J — Reference Image Editing](#template-j--reference-image-editing) | Editing an existing image with a reference |
 | [K — ComfyUI](#template-k--comfyui) | ComfyUI node-based image workflows |
 | [L — Prompt Decompiler](#template-l--prompt-decompiler) | Breaking down, adapting, or splitting existing prompts |
@@ -256,7 +256,7 @@ At the end, output a full summary of every file changed.
 
 ## Template I — Visual Descriptor
 
-*Use for Midjourney, DALL-E 3, Stable Diffusion, Sora, Runway, and any image or video generation tool.*
+*Use for Midjourney, GPT Image, Stable Diffusion, Sora, Runway, and any image or video generation tool.*
 
 ```
 Subject: [Main subject — specific, not vague]
@@ -304,7 +304,6 @@ fields; use these as a starting point, not an exhaustive list:
 **Tool-specific syntax:**
 - **Midjourney**: Comma-separated descriptors, not prose. Add `--ar`, `--style`, `--v <current>` at the end (do not hardcode a version).
 - **Stable Diffusion**: Use `(word:1.3)` weight syntax. CFG scale 7 to 12. Negative prompt is mandatory.
-- **DALL-E 3**: Prose works well. Add "do not include any text in the image" unless text is needed.
 - **Sora / video**: Add camera movement (slow dolly, static shot, crane up), duration in seconds, and cut style.
 
 ---
@@ -318,7 +317,7 @@ fields; use these as a starting point, not an exhaustive list:
 
 **Detect the tool's editing capability:**
 - Midjourney: use `--cref [image URL]` for character reference or `--sref` for style reference
-- DALL-E 3: use the Edit endpoint, not the Generate endpoint. User must be in ChatGPT with image editing enabled
+- GPT Image (ChatGPT): use the Edit capability in ChatGPT's image tool, not a fresh Generate request
 - Stable Diffusion: use img2img mode, not txt2img. Set denoising strength 0.3-0.6 to preserve the original
 
 ```
@@ -412,11 +411,14 @@ RESOLUTION: [width x height — must be divisible by 64]
   not the full ceremony in one jump — match the gap between current and next level, not current
   and maximum.
 
-**Never rewrite technical parameters — copy them verbatim into the output:**
+**Never rewrite technical parameters — copy them verbatim into the output, EXCEPT secrets:**
 code fences and inline code, exact numbers/flags/paths (`--ar 16:9`, `v2.3.0`), model IDs and
 proper nouns, error messages and stack traces, URLs and email addresses. A flag that looks like
 a typo may be exactly what the target tool requires — if genuinely ambiguous, leave it untouched
-and flag it in the output note instead of guessing.
+and flag it in the output note instead of guessing. Exception, no matter what: API keys, tokens,
+signed URLs, passwords, connection strings — strip these even inside a verbatim block and replace
+with a placeholder, same as Credential Safety in tool-routing.md. This applies even if that
+section wasn't loaded — don't rely on it being in context.
 
 **Break down output format:**
 ```

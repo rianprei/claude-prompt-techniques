@@ -162,16 +162,16 @@ Claude pergunta a ferramenta-alvo e o contexto que falta (máx 3 perguntas), dep
 prompt-techniques/
 ├── SKILL.md                    # entry point — pequeno, carregado sempre
 └── references/                 # pesados, carregados SÓ sob demanda
-    ├── tool-routing.md         # regras específicas de 30+ ferramentas (~380 linhas)
+    ├── tool-routing.md         # regras específicas de 30+ ferramentas (~430 linhas)
     ├── templates.md            # 13 templates estruturais completos
     ├── patterns.md             # padrões que desperdiçam tokens/créditos
-    ├── taxonomy.md            # taxonomia completa: ~70 técnicas em 13 categorias, só sob demanda
+    ├── taxonomy.md            # taxonomia completa: ~80 técnicas em 13 categorias, só sob demanda
     └── persuasion.md           # 7 princípios de persuasão p/ compliance
 evals/
 └── protocol.md                 # protocolo manual de A/B + log de re-prompts
 ```
 
-`SKILL.md` contém só a camada de prioridade (modo passivo) e as regras do gerador (modo ativo), com **links** para os arquivos de `references/` — a taxonomia completa das ~70 técnicas mora em `references/taxonomy.md`. O Claude lê `tool-routing.md` ou `taxonomy.md` só quando precisa (pedido de prompt, ou técnica fora da camada de prioridade). Isso é *progressive disclosure*: você não paga tokens por conhecimento que não está usando naquele momento.
+`SKILL.md` contém só a camada de prioridade (modo passivo) e as regras do gerador (modo ativo), com **links** para os arquivos de `references/` — a taxonomia completa das ~80 técnicas mora em `references/taxonomy.md`. O Claude lê `tool-routing.md` ou `taxonomy.md` só quando precisa (pedido de prompt, ou técnica fora da camada de prioridade). Isso é *progressive disclosure*: você não paga tokens por conhecimento que não está usando naquele momento.
 
 Comparação: skills que carregam tudo no início custam milhares de tokens por sessão e causam o efeito "lost in the middle" (modelo ignora regras porque o contexto saturou). Aqui o custo fixo por sessão é só o SKILL.md.
 
@@ -188,7 +188,7 @@ Regras específicas em `references/tool-routing.md`:
 | Geradores full-stack | Bolt, v0, Lovable, Figma Make, Google Stitch |
 | Pesquisa/orquestração | Perplexity, Manus AI |
 | Browser/computer-use | Comet, Atlas, Claude in Chrome |
-| Imagem | Midjourney, DALL-E 3, GPT Image, Stable Diffusion, SeeDream, Nano Banana Pro, Flux, Ideogram, ComfyUI |
+| Imagem | Midjourney, GPT Image, Stable Diffusion, SeeDream, Nano Banana Pro, Flux, Ideogram, ComfyUI |
 | Vídeo | Sora, Runway, Kling, LTX Video, Dream Machine, Seedance |
 | Voz | ElevenLabs |
 | Música | Suno |
@@ -211,7 +211,7 @@ Ferramenta fora da lista: o Claude aplica regras genéricas (instrução explíc
 | F — Few-Shot | formato mais fácil de mostrar que descrever |
 | G — File-Scope | Cursor/Windsurf/Copilot — edição de código |
 | H — ReAct + Stop Conditions | Claude Code/Devin — agentes autônomos |
-| I — Visual Descriptor | Midjourney/DALL-E/SD/Sora (inclui fórmula de 7 componentes + 9 modos de expertise) |
+| I — Visual Descriptor | Midjourney/GPT Image/SD/Sora (inclui fórmula de 7 componentes + 9 modos de expertise) |
 | J — Reference Image Editing | editar imagem existente (só descreve o delta) |
 | K — ComfyUI | workflow nodal (positive + negative separados) |
 | L — Prompt Decompiler | quebrar/adaptar/dividir prompt existente |
