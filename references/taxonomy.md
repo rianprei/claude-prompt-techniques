@@ -4,8 +4,8 @@ Full name index by category. Consult only when the task needs a named technique
 outside SKILL.md's Priority/Conditional/Experimental tiers — most real usage is
 covered there and never reaches this file.
 
-**Basics**: Zero-shot, Few-shot, One-shot, Role/Persona, Instruction, Context, Delimiters (XML/MD/tags), Output Formatting, Negative Prompting, Templates.
-**Reasoning**: Chain-of-Thought (CoT), Zero/Few-shot CoT, Self-Consistency, Least-to-Most, Tree of Thoughts, Graph of Thoughts, Skeleton-of-Thought, Plan-and-Solve, Analogical, Step-back, Thread-of-Thought.
+**Basics**: Zero-shot, Few-shot, One-shot, Role/Persona, Instruction, Context, Delimiters (XML/MD/tags), Output Formatting, Negative Prompting, Templates, Cross-Lingual Prompting, Chain-of-Translation.
+**Reasoning**: Chain-of-Thought (CoT), Zero/Few-shot CoT, Self-Consistency, Universal Self-Consistency, Least-to-Most, Tree of Thoughts, Graph of Thoughts, Skeleton-of-Thought, Plan-and-Solve, Analogical, Step-back, Thread-of-Thought, Chain-of-Draft, Chain-of-Symbol, Contrastive CoT, Multi-Chain Reasoning, Tabular CoT, Self-Ask, Rephrase-and-Respond, Meta-Cognitive Prompting.
 **Decomposition**: Prompt Chaining, Task Decomposition, Sequential/Recursive Prompting, Progressive Refinement.
 **Self-correction**: Self-Refine, Reflexion, Self-Critique, Chain-of-Verification (CoVe), ReAct, PAL.
 **Multiple answers**: Best-of-N, Majority Voting, Ensemble, Debate, Multi-Agent.
