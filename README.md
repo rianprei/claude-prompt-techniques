@@ -189,7 +189,7 @@ Regras específicas em `references/tool-routing.md`:
 | Pesquisa/orquestração | Perplexity, Manus AI |
 | Browser/computer-use | Comet, Atlas, Claude in Chrome |
 | Imagem | Midjourney, DALL-E 3, GPT Image, Stable Diffusion, SeeDream, Nano Banana Pro, Flux, Ideogram, ComfyUI |
-| Vídeo | Sora, Runway, Kling, LTX Video, Dream Machine |
+| Vídeo | Sora, Runway, Kling, LTX Video, Dream Machine, Seedance |
 | Voz | ElevenLabs |
 | Música | Suno |
 | 3D | Meshy, Tripo, Rodin, Unity AI, Blender AI |
