@@ -151,6 +151,7 @@ Current model family: Claude 5 (Sonnet 5, Opus 5, Haiku 4.5). Do not assume a sp
 - Never give a global instruction without a file anchor
 - "Done when:" is required — defines when the agent stops editing
 - For complex tasks: split into sequential prompts rather than one large prompt
+- Cursor's own agent instructions default to "state assumptions and continue — don't stop for approval unless blocked." A stop-before/ask-first constraint has to fight that default, so word it as a hard rule ("STOP — do not proceed without explicit confirmation"), not a soft ask, or the agent runs through it.
 
 ---
 
