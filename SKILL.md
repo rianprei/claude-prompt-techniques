@@ -38,9 +38,8 @@ internally; CoT degrades output.
 **Fast path**: simple, unambiguous request (clear tool, clear task, no exotic format) →
 generate directly, no template, no checklist, no questions. The full ceremony below is only for
 complex/ambiguous requests. When unsure between the two paths, fast path.
-Fast-path mini-autocheck (4 items, mental, does not replace the full long-path self-check):
-no CoT if reasoning-native model; defined output format; no vague instruction like "do whatever is needed";
-if the target executes code or commands (Claude Code, Cursor, Devin, etc.), a stop condition is present.
+Fast-path mini-autocheck (3 items, mental, does not replace the full long-path self-check):
+no CoT if reasoning-native model; defined output format; no vague instruction like "do whatever is needed".
 
 **Before writing** (full path), silently extract **from the user request** (extraction ≠ question): task,
 target tool, output format, constraint, input, context, audience, success criterion, example.

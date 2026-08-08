@@ -192,7 +192,6 @@ Current model family: Claude 5 (Sonnet 5, Opus 5, Haiku 4.5). Do not assume a sp
 - Very explicit starting state + target state required
 - Forbidden actions list is critical — Devin will make decisions you did not intend without explicit constraints
 - Scope the filesystem: "Only work within /src. Do not touch infrastructure, config, or CI files."
-- The most autonomous, longest-running agent in this list, often cloud/async — stop conditions are not optional here. Use Template H. Always include: an attempt ceiling before pausing ("stop after 2 failed attempts and report"), and a human review trigger for irreversible actions (deleting files, adding dependencies, schema changes).
 
 ---
 
