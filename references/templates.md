@@ -210,6 +210,13 @@ Constraints:
 
 Done When:
 [Exact condition that confirms the change worked correctly]
+
+Stop and ask before proceeding if:
+- An error or failing test can't be resolved in 2 attempts
+- The fix requires touching a file outside Scope
+- Two genuinely different valid approaches exist
+
+After each step, output: ✅ [what was completed]
 ```
 
 ---
