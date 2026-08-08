@@ -259,12 +259,13 @@ Read references/templates.md Template K for the full ComfyUI template.
 
 ---
 
-**Video AI** (Sora, Runway, Kling, LTX Video, Dream Machine)
+**Video AI** (Sora, Runway, Kling, LTX Video, Dream Machine, Seedance)
 - Sora: describe as if directing a film shot. Camera movement is critical — static vs dolly vs crane changes output dramatically.
 - Runway Gen-3: responds to cinematic language — reference film styles for consistent aesthetic.
 - Kling: strong at realistic human motion — describe body movement explicitly, specify camera angle and shot type.
 - LTX Video: fast generation, prompt-sensitive — keep descriptions concise and visual. Specify resolution and motion intensity explicitly.
 - Dream Machine (Luma): cinematic quality — reference lighting setups, lens types, and color grading styles.
+- Seedance 2.0: multi-shot mode produces real cuts, not one flowing take. Sweet spot is 5-6 shots per 15s (~2.5-3s each) — under that wastes the multi-shot capability, over 7 shots drops consistency and needs budget for re-rolls. Front-load character/subject identity in the first 20-30 words — the model weights opening tokens heaviest for character anchoring across cuts. One clip with one audio decision beats stitching two renders — music won't match tempo/key across separate generations.
 
 ---
 
