@@ -2,6 +2,17 @@ Reference file for the `prompt-techniques` skill. Loaded on demand by SKILL.md's
 
 > Last verified: 2026-07-28 (Claude section). Other sections last verified 2026-07-07 — model-specific rules age fast; if the target tool/model is newer than that or absent below, do NOT guess version-specific behavior, apply generic rules (explicit instruction, output contract, format lock) and say the entry may be stale.
 
+**Contents** (jump to the section you need, don't read the whole file):
+- Text/chat LLMs: Claude, ChatGPT/GPT-5.x, Gemini, Qwen 2.5/3, Ollama, Llama/Mistral, DeepSeek-R1, MiniMax
+- Coding agents: Claude Code, Antigravity, Cursor/Windsurf, Cline, GitHub Copilot, Bolt/v0/Lovable/Figma Make/Stitch, Devin/SWE-agent
+- Research/browser agents: Perplexity/Manus, Comet/Atlas/Claude in Chrome
+- Image: Generation, Reference Editing, ComfyUI
+- Video/Voice/Music: Sora/Runway/Kling/etc, ElevenLabs, Suno
+- Workflow automation: Zapier/Make/n8n
+- Safety: Credential Safety, Input Sanitization, Sandwich Defense
+- Diagnostics: Prompt Decompiler, Unknown-tool fallback, Diagnostic Checklist, Memory Block
+- Cross-cutting techniques: Safe Techniques (role/few-shot/grounding/citations/CoT), Agentic Output Warning, pre-delivery checklist
+
 Identity, hard rules, output format, and the 9 intent-extraction dimensions live in SKILL.md — this
 file holds per-tool rules only. The high-fabrication-risk techniques SKILL.md names without detail:
 
