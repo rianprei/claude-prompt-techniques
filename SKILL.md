@@ -67,7 +67,7 @@ on fast path — it's the whole point of taking the fast path. For a target with
 state (Claude Code, Cursor, Copilot): count an axis as addressed if the target's own environment
 already supplies it (open file, git diff, project structure) — a short prompt isn't missing
 context just because it doesn't restate what the tool can already see. For a one-shot target
-with no environment (Midjourney, GPT, DALL-E): nothing is implicit, every axis must be explicit
+with no environment (Midjourney, GPT, GPT Image): nothing is implicit, every axis must be explicit
 in the prompt itself.
 
 **Refinement loop** (when the user returns with the tool's real output): diagnose the failure
