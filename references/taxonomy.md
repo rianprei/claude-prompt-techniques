@@ -14,13 +14,13 @@ covered there and never reaches this file. Each entry with its source and status
 **Code**: Program-of-Thought, Code Prompting, Execution-based Prompting.
 **Agents**: Agent Prompting, Planning Agents, Tool-Augmented Agents, Multi-Agent Systems.
 **Safety**: Defensive Prompting, Jailbreak Resistance, Prompt Injection Defense, Input Sanitization, Guardrails, Spotlighting (Hines et al. 2024), Instruction Hierarchy (Wallace et al. 2024; training-based), Sandwich Defense, Canary Tokens, Least Privilege, Red Teaming (Perez et al. 2022; conceptual only). Full defense table: references/defenses.md.
-**Evaluation**: Prompt/Benchmark/Automatic/Human Evaluation, A/B Testing, LLM-as-a-Judge (Zheng et al. 2023), G-Eval (Liu et al. 2023), Verbalized Confidence (Tian et al. 2023), Hallucination Detection (SelfCheckGPT, Manakul et al. 2023).
+**Evaluation**: Prompt/Benchmark/Automatic/Human Evaluation, A/B Testing, LLM-as-a-Judge (Zheng et al. 2023), G-Eval (Liu et al. 2023), Pairwise Evaluation (Chen et al. 2023; Wang et al. 2023, via PR-2024), Role-based Evaluation (PR-2024), Verbalized Confidence (Tian et al. 2023), Hallucination Detection (SelfCheckGPT, Manakul et al. 2023).
 **Multimodal**: Image/Vision/Multimodal Prompting, Image+Text Reasoning, Set-of-Mark (Yang et al. 2023). Image style names: references/image-styles.md.
 **Experimental**: Active Prompt, DSP, Generated Knowledge, Faithful CoT, Tree Search, Selection-Inference, Emotion Prompting.
 **Vendor features** (VENDOR, not prompt text): Structured Outputs, Prompt Caching, Context Compaction.
-**Training-time** (TRAINING-TIME): AutoPrompt, Sentinel-token chunking (Luo et al. 2024), Self-RAG (Asai et al. 2023).
+**Training-time** (TRAINING-TIME): AutoPrompt, Prompt Tuning (soft prompts), Sentinel-token chunking (Luo et al. 2024), Self-RAG (Asai et al. 2023).
 
-**Exemplars**: Exemplar Ordering (Lu et al. 2021), Learned Exemplar Retrieval (EPR, Rubin et al. 2021), Similarity-based Selection (KNN), Contextual Calibration (Zhao et al. 2021; label distribution), Exemplar Augmentation (source not checked).
+**Exemplars**: Exemplar Ordering (Lu et al. 2021), Learned Exemplar Retrieval (EPR, Rubin et al. 2021), Similarity-based Selection (KNN), Vote-K (Su et al. 2022), Contextual Calibration (Zhao et al. 2021; label distribution), Exemplar Augmentation (source not checked).
 
 **White et al. pattern catalog (2023)**: 16 patterns in 6 categories. Input Semantics: Meta Language Creation. Output Customization: Output Automater, Persona, Visualization Generator, Recipe, Template. Error Identification: Fact Check List, Reflection. Prompt Improvement: Question Refinement, Alternative Approaches, Cognitive Verifier, Refusal Breaker. Interaction: Flipped Interaction, Game Play, Infinite Generation. Context Control: Context Manager. Clarification Questions (roughly Flipped Interaction) is an amerob name, not a White pattern name.
 
@@ -45,7 +45,7 @@ Checked on arXiv (title, first author, and date read in session):
 - 2404.13208 (Wallace et al., 2024-04-19): The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions
 - 2306.05685 (Zheng et al., 2023-06-09): Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena
 
-The rows added on 2026-10-12 (ReWOO, RAP, LATS, Self-Debugging, HyDE, IRCoT, Self-RAG, the LLMLingua family, OPRO, DSPy, TextGrad, EvoPrompt, Promptbreeder, G-Eval, multi-agent debate, CAMEL, MetaGPT, Set-of-Mark, Sentinel tokens, Graph of Thoughts, Anthropic compaction, Prompt Chaining) have their sources and checks in [technique-catalog.md](technique-catalog.md), sections 1 and 2.
+The rows added on 2026-10-12 (ReWOO, RAP, LATS, Self-Debugging, HyDE, IRCoT, Self-RAG, the LLMLingua family, OPRO, DSPy, TextGrad, EvoPrompt, Promptbreeder, G-Eval, multi-agent debate, CAMEL, MetaGPT, Set-of-Mark, Sentinel tokens, Graph of Thoughts, Anthropic compaction, Prompt Chaining, Vote-K, Pairwise Evaluation, Role-based Evaluation, Prompt Tuning) have their sources and checks in [technique-catalog.md](technique-catalog.md), sections 1 and 2.
 
 Not verified. Do not cite these as established:
 - Output Priming: named in amerob and in FareedKhan's cheatsheet; no primary source found. The prefill form is API-only and returns 400 on Claude 4.6+.
