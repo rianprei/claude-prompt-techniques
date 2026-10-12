@@ -44,6 +44,8 @@ that work's license notice here. Entries below are ideas and names only; no text
 - Hainrixz/claude-banana (MIT): https://github.com/Hainrixz/claude-banana
   Style names only, in references/image-styles.md (from the catalog's section headings).
 - AgriciDaniel/banana-claude (MIT): https://github.com/AgriciDaniel/banana-claude
+  Ideas only: the contract that a key goes in a header and never in a URL (scripts/check_repo.py),
+  and a model catalog with a verification date (references/gemini-image-models.json). No code was copied.
 - drxvb/apex-prompt-architect (MIT): https://github.com/drxvb/apex-prompt-architect
   Idea only: a validator script and golden cases. No code was copied.
 - Valhall-ai/prompt-injection-mitigations (Apache-2.0): https://github.com/Valhall-ai/prompt-injection-mitigations
@@ -86,6 +88,11 @@ VENDOR DOCUMENTATION
 Model-routing rules were checked against public documentation from Anthropic,
 OpenAI, and xAI. The rules are stated in this project's own words, and no
 vendor text is reproduced, except short quoted sentences, which are attributed where used. Anthropic, "Prompting best practices" (platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices), section "Long context prompting", read 2026-10-12.
+
+Google, Gemini API documentation (ai.google.dev: image generation guide, API reference, pricing and
+deprecations) and the Google Cloud prompting guide dated 2026-03-05, read 2026-10-12. Only facts are
+recorded (model IDs, sizes, aspect ratios, prices, dates) in references/gemini-image-models.md and
+references/gemini-image-models.json. No vendor text is reproduced.
 
 MIT LICENSE (nidhinjs/prompt-master)
 ------------------------------------

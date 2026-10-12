@@ -1,19 +1,28 @@
 #!/usr/bin/env python3
-"""Checks for the tracked files: markdown links and anchors, formatting, numbering.
+"""Checks for the repo files (tracked and new, not ignored): markdown links and anchors, formatting, numbering,
+and the image-model contract (model IDs against the catalog, no key in a URL).
 
 Usage: python3 scripts/check_repo.py
 Exit status: 0 when clean, 1 when a problem is found.
 """
 
+import json
 import os
 import re
 import subprocess
 import sys
+from datetime import date
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LINK = re.compile(r"\]\(([^)\s]+)\)")
 MARKER = re.compile(r"\b(TODO|FIXME|XXX|TBD)\b")
 TEMPLATES = "ABCDEFGHIJKLM"
+CATALOG = "references/gemini-image-models.json"
+CATALOG_PREFIX = "references/gemini-image-models."
+STALE_DAYS = 90  # the catalog is a snapshot; past this age, the script only warns
+MODEL_ID = re.compile(r"gemini-(?:nano-banana|\d)[a-z0-9.\-]*")
+# Built from two parts so that this file does not contain the forbidden text itself.
+KEY_IN_URL = re.compile(r"[?&]" + "key=")
 
 
 def read(rel):
@@ -21,9 +30,23 @@ def read(rel):
         return fh.read()
 
 
-def tracked_files():
-    out = subprocess.check_output(["git", "ls-files"], cwd=ROOT, text=True)
-    return out.split()
+def read_text(rel):
+    """Text of a tracked file, or None when the file is not UTF-8 text."""
+    try:
+        return read(rel)
+    except UnicodeDecodeError:
+        return None
+
+
+def repo_files():
+    """Tracked files plus new files that git does not ignore, so new files are checked before commit.
+
+    A file deleted from disk but still in the index is left out instead of crashing the run.
+    """
+    out = subprocess.check_output(
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard"], cwd=ROOT, text=True
+    )
+    return sorted(f for f in set(out.split()) if os.path.exists(os.path.join(ROOT, f)))
 
 
 def slugify(text):
@@ -92,16 +115,62 @@ def check_numbering():
     return problems, len(nums), len(tpl)
 
 
+def check_model_ids(texts, catalog):
+    """A model ID must be in the catalog; a shut-down ID may appear only inside the catalog.
+
+    Test files are skipped: their fixtures use example IDs on purpose.
+    """
+    status = {m["id"]: m["status"] for m in catalog["models"]}
+    problems = []
+    for path, text in texts.items():
+        if path.startswith(CATALOG_PREFIX) or path.startswith("tests/"):
+            continue
+        for i, ln in enumerate(text.split("\n"), 1):
+            for m in MODEL_ID.finditer(ln):
+                model_id = m.group(0).rstrip(".")
+                if model_id not in status:
+                    problems.append(f"{path}:{i}: model id not in {CATALOG}: {model_id}")
+                elif status[model_id] == "shut_down":
+                    problems.append(f"{path}:{i}: shut-down model id outside {CATALOG}: {model_id}")
+    return problems
+
+
+def check_key_in_url(texts):
+    """The API key goes in the x-goog-api-key header, never in a URL query string."""
+    problems = []
+    for path, text in texts.items():
+        for i, ln in enumerate(text.split("\n"), 1):
+            if KEY_IN_URL.search(ln):
+                problems.append(f"{path}:{i}: key in a URL query string; use the x-goog-api-key header")
+    return problems
+
+
 def main():
-    files = tracked_files()
+    files = repo_files()
     problems = []
     anchor_cache = {}
+    texts = {}
     for f in files:
+        text = read_text(f)
+        if text is None:
+            continue
+        texts[f] = text
         if f.endswith(".md"):
-            problems += check_markdown(f, read(f), anchor_cache)
+            problems += check_markdown(f, text, anchor_cache)
     numbering, patterns, templates = check_numbering()
     problems += numbering
-    print(f"tracked markdown files: {sum(f.endswith('.md') for f in files)}")
+    try:
+        catalog = json.loads(texts[CATALOG])
+    except (KeyError, json.JSONDecodeError):
+        catalog = None
+        problems.append(f"{CATALOG}: missing or not valid JSON")
+    if catalog is not None:
+        problems += check_model_ids(texts, catalog)
+        age = (date.today() - date.fromisoformat(catalog["verified_on"])).days
+        if age > STALE_DAYS:
+            print(f"warning: {CATALOG} was verified {age} days ago; re-check the official pages")
+    problems += check_key_in_url(texts)
+    print(f"markdown files: {sum(f.endswith('.md') for f in files)}")
     print(f"patterns: {patterns}, templates: {templates}")
     for p in problems:
         print(f"  {p}")

@@ -85,7 +85,7 @@ mkdir -p ~/.claude/skills/prompt-techniques/references
 base=https://raw.githubusercontent.com/rianprei/claude-prompt-techniques/master
 curl -fL $base/SKILL.md -o ~/.claude/skills/prompt-techniques/SKILL.md
 curl -fL $base/README.md -o ~/.claude/skills/prompt-techniques/README.md
-for f in tool-routing patterns templates persuasion taxonomy defenses image-styles; do
+for f in tool-routing patterns templates persuasion taxonomy defenses image-styles gemini-image-models; do
   curl -fL $base/references/$f.md -o ~/.claude/skills/prompt-techniques/references/$f.md
 done
 ```
@@ -94,7 +94,7 @@ done
 
 ```bash
 ls ~/.claude/skills/prompt-techniques/ ~/.claude/skills/prompt-techniques/references/
-# Esperado: SKILL.md, README.md e references/ com 7 arquivos .md
+# Esperado: SKILL.md, README.md e references/ com 8 arquivos .md
 ```
 
 **Ativar:** abra uma sessão nova do Claude Code. A skill carrega automaticamente — zero configuração. Pra confirmar, pergunte ao Claude: "qual skill de prompt engineering você tem disponível?"
@@ -164,8 +164,8 @@ prompt-techniques/
 ├── SKILL.md                    # entry point — pequeno, carregado sempre
 ├── scripts/
 │   ├── validate_prompt.py      # checa um prompt contra as regras do skill
-│   └── check_repo.py           # checa links, âncoras e numeração dos arquivos
-├── tests/                      # unittest: validador e golden cases
+│   └── check_repo.py           # checa links, âncoras, numeração e contratos de modelo e chave
+├── tests/                      # unittest: validador, golden cases, catálogo de imagem e contratos
 ├── references/                 # pesados, carregados SÓ sob demanda
 │   ├── tool-routing.md         # regras por ferramenta e modelo
 │   ├── templates.md            # 13 templates estruturais completos
@@ -173,7 +173,9 @@ prompt-techniques/
 │   ├── taxonomy.md             # taxonomia: ~100 nomes em 14 categorias + catálogo de White et al.
 │   ├── persuasion.md           # 7 princípios de persuasão p/ compliance
 │   ├── defenses.md             # defesas para conteúdo não confiável (conceitual)
-│   └── image-styles.md         # nomes de estilo para prompts de imagem
+│   ├── image-styles.md         # nomes de estilo para prompts de imagem
+│   ├── gemini-image-models.md  # IDs, status, tamanhos, proporções e preços do Nano Banana (2026-10-12)
+│   └── gemini-image-models.json # mesmos dados em JSON, lidos pelos testes
 ├── evals/
 │   ├── protocol.md             # protocolo manual de A/B + log de re-prompts
 │   └── golden_cases.json       # 12 casos fixos para o validador
@@ -271,15 +273,16 @@ Tudo em biblioteca padrão do Python, sem instalar nada:
 # agente sem condição de parada e linguagem vaga.
 python3 scripts/validate_prompt.py --target gpt-6-astra prompt.txt
 
-# Checa links, âncoras e a numeração de padrões e templates.
+# Checa links, âncoras, numeração de padrões e templates, IDs de modelo contra o catálogo e chave fora da URL.
 python3 scripts/check_repo.py
 
-# Roda os testes, inclusive os 12 golden cases.
+# Roda os testes: validador, 12 golden cases, catálogo de imagem e contratos.
 python3 -m unittest discover -s tests -v
 ```
 
 - **O que o validador não faz:** não julga se a resposta do modelo é boa. Ele lê só o texto do prompt. A qualidade continua no A/B manual de [`evals/protocol.md`](evals/protocol.md).
 - **Golden cases** (`evals/golden_cases.json`): 12 prompts fixos, cada um com o resultado esperado do validador. Eles testam o validador, não as respostas dos modelos. Se um caso quebrar, ou a regra mudou de propósito (atualize o caso) ou houve regressão.
+- **Catálogo de imagem e contratos** (`references/gemini-image-models.json`): IDs, status, tamanhos, proporções e preços do Nano Banana, com data de verificação (2026-10-12). Os testes conferem que IDs, preços e proporções do JSON aparecem no Markdown, que proporções, tamanhos e níveis de pensamento são os valores listados na documentação lida em 2026-10-12, e que a data de verificação é a mesma nos dois arquivos. O `check_repo.py` bloqueia ID de modelo fora do catálogo, ID desligado fora dele e chave em query string. Os testes não chamam a API: se o modelo ainda aceita um valor, só uma chamada real confirma.
 - **Limites conhecidos:** a maioria dos sinais é em inglês, com algumas formas em português (passo a passo, não, sem, formato, lista). Em prompts em português, as checagens de agente, CAPS e linguagem vaga não disparam, então a ausência de aviso não prova que o prompt está certo. A detecção de negação é simples: "Não pule a checagem passo a passo" pede raciocínio e não é marcado. A decisão está em aberto no código, em `requests_cot()`.
 - **Hook opcional:** `git config core.hooksPath .githooks` (uma vez por clone) faz o `check_repo.py` e os testes rodarem antes de cada commit. Não é ativado sozinho.
 
@@ -340,5 +343,6 @@ Sem resíduo — a skill não toca em nenhum outro arquivo.
 - **Princípios de persuasão** de [NeoLabHQ/context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit) (skill prompt-engineering), fundamentados em Meincke et al. (2025). Licença do upstream: GPL-3.0.
 - **Modo referência** (taxonomia de técnicas) é taxonomia própria, inspirada em The Prompt Report (Schulhoff et al., 2024) e no catálogo de padrões de White et al. (2023).
 - **Adições de 2026-10-12** (defesas, validador, nomes de estilo de imagem e nomes de técnicas): ideias de [Valhall-ai/prompt-injection-mitigations](https://github.com/Valhall-ai/prompt-injection-mitigations), [drxvb/apex-prompt-architect](https://github.com/drxvb/apex-prompt-architect), [Hainrixz/claude-banana](https://github.com/Hainrixz/claude-banana), [amerob/ultimate-prompt-engineering-playbook](https://github.com/amerob/ultimate-prompt-engineering-playbook), [FareedKhan-dev/prompt-engineering-cheatsheet](https://github.com/FareedKhan-dev/prompt-engineering-cheatsheet), [KalyanKS-NLP/Prompt-Engineering-Techniques-Hub](https://github.com/KalyanKS-NLP/Prompt-Engineering-Techniques-Hub), [cicero-im/prompting](https://github.com/cicero-im/prompting) e [corralm/awesome-prompting](https://github.com/corralm/awesome-prompting). Licenças e detalhes em `NOTICE`.
+- **Catálogo de modelos de imagem**: fatos (IDs, datas, tamanhos, proporções e preços) da documentação oficial do Google, lida em 2026-10-12. Nenhum texto copiado. Atribuição no `NOTICE`.
 
 Licença do projeto: GPL-3.0 (arquivo `LICENSE`). Avisos e atribuições de terceiros: arquivo `NOTICE`.

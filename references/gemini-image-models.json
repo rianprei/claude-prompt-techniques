@@ -1,0 +1,120 @@
+{
+  "verified_on": "2026-10-12",
+  "scope": "Gemini image models (Nano Banana family) in the Gemini Developer API. Facts from official pages only; no vendor text is reproduced.",
+  "sources": {
+    "image_generation_guide": "https://ai.google.dev/gemini-api/docs/image-generation",
+    "api_reference_generate_content": "https://ai.google.dev/api/generate-content",
+    "pricing": "https://ai.google.dev/gemini-api/docs/pricing",
+    "deprecations": "https://ai.google.dev/gemini-api/docs/deprecations",
+    "prompting_guide_dated_2026_03_05": "https://cloud.google.com/blog/products/ai-machine-learning/ultimate-prompting-guide-for-nano-banana"
+  },
+  "aspect_ratios": ["1:1", "1:4", "4:1", "1:8", "8:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"],
+  "image_sizes": {
+    "values": ["512", "1K", "2K", "4K"],
+    "enum_names": {
+      "512": "IMAGE_SIZE_FIVE_TWELVE",
+      "1K": "IMAGE_SIZE_ONE_K",
+      "2K": "IMAGE_SIZE_TWO_K",
+      "4K": "IMAGE_SIZE_FOUR_K"
+    },
+    "uppercase_k_required": true,
+    "512_documented_for": "gemini-3.1-flash-image",
+    "512_json_value_confirmed": false
+  },
+  "thinking_levels": ["MINIMAL", "LOW", "MEDIUM", "HIGH"],
+  "thinking_default": "model-dependent",
+  "thinking_on_models_before_gemini_3": "error",
+  "batch_discount": 0.5,
+  "grounding_search": {
+    "free_requests_per_month": 5000,
+    "price_per_1000_after_free_usd": 14.0,
+    "scope": "shared across Gemini 3 and newer models"
+  },
+  "safety_finish_reasons": ["PROHIBITED_CONTENT", "IMAGE_SAFETY", "IMAGE_PROHIBITED_CONTENT"],
+  "models": [
+    {
+      "id": "gemini-nano-banana-2.1",
+      "display_name": "Nano Banana 2.1",
+      "status": "current",
+      "label_preview_or_ga": "UNKNOWN",
+      "released": "2026-10-06",
+      "shutdown": null,
+      "replaces": ["gemini-3.1-flash-image-preview", "gemini-2.5-flash-image-preview"],
+      "sizes": ["1K", "2K", "4K"],
+      "prices_usd_per_image": {"1K": 0.0336, "2K": 0.0504, "4K": 0.113},
+      "reference_limits": {"object": 10, "character": 4, "style": null},
+      "video_input": true
+    },
+    {
+      "id": "gemini-3.1-flash-image",
+      "display_name": "Nano Banana 2 (Gemini 3.1 Flash Image)",
+      "status": "active",
+      "released": null,
+      "shutdown": null,
+      "sizes": ["512", "1K", "2K", "4K"],
+      "prices_usd_per_image": {"512": 0.045, "1K": 0.067, "2K": 0.101, "4K": 0.151},
+      "reference_limits": {"object": 10, "character": 4, "style": null},
+      "video_input": true,
+      "input_token_limit": 131072
+    },
+    {
+      "id": "gemini-3.1-flash-lite-image",
+      "display_name": "Nano Banana 2 Lite (Gemini 3.1 Flash Lite Image)",
+      "status": "active",
+      "released": null,
+      "shutdown": null,
+      "sizes": ["1K"],
+      "prices_usd_per_image": {"1K": 0.0336},
+      "reference_limits": {"object": 14, "character": null, "style": null},
+      "video_input": true
+    },
+    {
+      "id": "gemini-3-pro-image",
+      "display_name": "Nano Banana Pro (Gemini 3 Pro Image)",
+      "status": "active",
+      "released": null,
+      "shutdown": null,
+      "sizes": ["1K", "2K", "4K"],
+      "prices_usd_per_image": {"1K": 0.134, "2K": 0.134, "4K": 0.24},
+      "reference_limits": {"object": 6, "character": 5, "style": 3},
+      "video_input": false
+    },
+    {
+      "id": "gemini-2.5-flash-image",
+      "display_name": "Nano Banana (Gemini 2.5 Flash Image)",
+      "status": "deprecated",
+      "released": "2025-10-02",
+      "shutdown": "2027-03-15",
+      "shutdown_conflict": "The pricing page says the model shuts down on 2026-10-02 (pricing page, deprecation notice). Open conflict.",
+      "replacement": "gemini-3.1-flash-lite-image",
+      "replacement_conflict": "The pricing page names Gemini 3.1 Flash Image as the replacement.",
+      "sizes": ["1K"],
+      "prices_usd_per_image": {"1K": 0.039},
+      "video_input": false
+    },
+    {
+      "id": "gemini-3.1-flash-image-preview",
+      "display_name": "Nano Banana 2 preview",
+      "status": "shut_down",
+      "released": "2026-02-26",
+      "shutdown": "2026-06-25",
+      "replacement": "gemini-nano-banana-2.1"
+    },
+    {
+      "id": "gemini-3-pro-image-preview",
+      "display_name": "Nano Banana Pro preview",
+      "status": "shut_down",
+      "released": "2025-11-20",
+      "shutdown": "2026-06-25",
+      "replacement": "gemini-3-pro-image"
+    },
+    {
+      "id": "gemini-2.5-flash-image-preview",
+      "display_name": "Nano Banana preview",
+      "status": "shut_down",
+      "released": "2025-05-07",
+      "shutdown": "2026-01-15",
+      "replacement": "gemini-nano-banana-2.1"
+    }
+  ]
+}

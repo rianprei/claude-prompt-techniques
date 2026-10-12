@@ -80,5 +80,6 @@ adjust ONLY the dimension that failed, deliver a new version. Do not rewrite fro
 - [references/templates.md](references/templates.md) — 13 structural templates A–M (RTF, CO-STAR, RISEN, CRISPE, Auditable Reasoning, Few-Shot, File-Scope, ReAct+Stop, Visual Descriptor, Reference Image Editing, ComfyUI, Prompt Decompiler, Claude Task Brief)
 - [references/defenses.md](references/defenses.md) — defenses for prompts that process untrusted content (conceptual; categories and trade-offs)
 - [references/image-styles.md](references/image-styles.md) — style names for image prompts (Midjourney, GPT Image, Flux, ComfyUI)
+- [references/gemini-image-models.md](references/gemini-image-models.md) — Gemini image model IDs, status, sizes, ratios and prices (verified 2026-10-12; check the official page before use)
 
 Read only the needed tool/category section, not the whole file.
