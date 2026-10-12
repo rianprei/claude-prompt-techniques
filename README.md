@@ -57,7 +57,7 @@ Dois modos numa skill só:
 | **Referência (passivo)** | Automático, quando a skill é carregada | Quando uma técnica influencia a abordagem, o Claude a nomeia em 1 linha **na resposta visível** (ex: "Técnica: Chain-of-Verification"). Você vê, não fica escondido no raciocínio interno. Tarefa trivial não ganha rótulo. |
 | **Gerador (ativo)** | Só quando você pede explicitamente | Gera um prompt pronto pra colar, com regras específicas da ferramenta-alvo (Claude, GPT, Cursor, Midjourney, Claude Code, ElevenLabs, n8n...), e oferece loop de refinamento com o output real. |
 
-Cobre **14 categorias de técnicas**, mais o catálogo de padrões de White et al. (2023) — com **camadas de prioridade** (nem toda técnica pesa igual): alto impacto (role, context, output format, few-shot, grounding), condicionais (CoT só em modelo não-reasoning, ReAct/RAG só com ferramentas reais) e experimentais/legadas em modelos 2025+ (ToT, GoT, Self-Consistency — só sob pedido explícito, risco de fabricação). Inspirada em [The Prompt Report](https://arxiv.org/abs/2406.06608); as regras por modelo vêm das docs oficiais dos fornecedores, com a data de verificação em `references/tool-routing.md`. Inclui **persuasão** (compliance de instrução — ver caveat na [seção própria](#princípios-de-persuasão)).
+Cobre **16 categorias de técnicas**, mais o catálogo de padrões de White et al. (2023) — com **camadas de prioridade** (nem toda técnica pesa igual): alto impacto (role, context, output format, few-shot, grounding), condicionais (CoT só em modelo não-reasoning, ReAct/RAG só com ferramentas reais) e experimentais/legadas em modelos 2025+ (ToT, GoT, Self-Consistency — só sob pedido explícito, risco de fabricação). Inspirada em [The Prompt Report](https://arxiv.org/abs/2406.06608); as regras por modelo vêm das docs oficiais dos fornecedores, com a data de verificação em `references/tool-routing.md`. Inclui **persuasão** (compliance de instrução — ver caveat na [seção própria](#princípios-de-persuasão)).
 
 Antes de entregar qualquer prompt, a skill faz **self-check** contra as regras da ferramenta-alvo e corrige violações em silêncio. Ferramenta que não está no routing: busca best practices na web (se disponível) e oferece o bloco pronto pra você adicionar ao `tool-routing.md`.
 
@@ -86,7 +86,7 @@ mkdir -p ~/.claude/skills/prompt-techniques/references
 base=https://raw.githubusercontent.com/rianprei/claude-prompt-techniques/master
 curl -fL $base/SKILL.md -o ~/.claude/skills/prompt-techniques/SKILL.md
 curl -fL $base/README.md -o ~/.claude/skills/prompt-techniques/README.md
-for f in tool-routing patterns templates persuasion taxonomy defenses image-styles gemini-image-models; do
+for f in tool-routing patterns templates persuasion taxonomy technique-catalog defenses image-styles gemini-image-models; do
   curl -fL $base/references/$f.md -o ~/.claude/skills/prompt-techniques/references/$f.md
 done
 ```
@@ -173,7 +173,8 @@ prompt-techniques/
 │   ├── tool-routing.md         # regras por ferramenta e modelo
 │   ├── templates.md            # 13 templates estruturais completos
 │   ├── patterns.md             # padrões que desperdiçam tokens/créditos
-│   ├── taxonomy.md             # taxonomia: ~100 nomes em 14 categorias + catálogo de White et al.
+│   ├── taxonomy.md             # taxonomia: ~140 nomes em 16 categorias + catálogo de White et al.
+│   ├── technique-catalog.md    # catálogo detalhado: fonte, status, novidade e tipo de cada técnica
 │   ├── persuasion.md           # 7 princípios de persuasão p/ compliance
 │   ├── defenses.md             # defesas para conteúdo não confiável (conceitual)
 │   ├── image-styles.md         # nomes de estilo para prompts de imagem
@@ -186,7 +187,7 @@ prompt-techniques/
     └── pre-commit              # opcional: checador + testes antes do commit
 ```
 
-`SKILL.md` contém só a camada de prioridade (modo passivo) e as regras do gerador (modo ativo), com **links** para os arquivos de `references/` — a taxonomia completa (~100 nomes em 14 categorias, mais o catálogo de White et al.) mora em `references/taxonomy.md`. O Claude lê `tool-routing.md` ou `taxonomy.md` só quando precisa (pedido de prompt, ou técnica fora da camada de prioridade). Isso é *progressive disclosure*: você não paga tokens por conhecimento que não está usando naquele momento.
+`SKILL.md` contém só a camada de prioridade (modo passivo) e as regras do gerador (modo ativo), com **links** para os arquivos de `references/` — a taxonomia completa (~140 nomes em 16 categorias, mais o catálogo de White et al.) mora em `references/taxonomy.md`, e a fonte e o status de cada entrada estão em `references/technique-catalog.md`. O Claude lê `tool-routing.md` ou `taxonomy.md` só quando precisa (pedido de prompt, ou técnica fora da camada de prioridade). Isso é *progressive disclosure*: você não paga tokens por conhecimento que não está usando naquele momento.
 
 Comparação: skills que carregam tudo no início custam milhares de tokens por sessão e causam o efeito "lost in the middle" (modelo ignora regras porque o contexto saturou). Aqui o custo fixo por sessão é só o SKILL.md.
 
@@ -260,7 +261,7 @@ Invioláveis, independente do pedido:
 - **Nova ferramenta:** adicione uma seção em `references/tool-routing.md` seguindo o padrão existente (nome em negrito, bullets curtos com regras específicas do modelo/versão).
 - **Novo template:** adicione em `references/templates.md` com letra nova + linha na tabela de índice.
 - **Nova regra de validação:** adicione a checagem em `scripts/validate_prompt.py`, um caso em `evals/golden_cases.json` e rode `python3 -m unittest discover -s tests`.
-- **Nova técnica (modo passivo):** alto impacto → camada de Prioridade em `SKILL.md`; senão, categoria certa em `references/taxonomy.md`.
+- **Nova técnica (modo passivo):** alto impacto → camada de Prioridade em `SKILL.md`; senão, categoria certa em `references/taxonomy.md`. Com fonte verificada, uma linha em `references/technique-catalog.md`.
 - **Regra pessoal fixa:** edite a seção "Modo gerador" do `SKILL.md`.
 - **Idioma:** `SKILL.md` e `references/` são lidos pelo modelo e ficam em inglês; `README.md` e `evals/` são para você e ficam em português.
 

@@ -1,0 +1,252 @@
+# Technique catalog
+
+Detailed catalog of prompting techniques. Each row gives the source, status, novelty and kind. [taxonomy.md](taxonomy.md) is the short name index; this file holds the sources. It was created on 2026-10-12 from an external survey pass. Each entry's source was checked in that session, as section 1 describes. The corrections to the survey output are listed in section 4, and the explanations are summaries (section 5).
+
+**Status.** VERIFIED: the name, the source and the bibliographic data were checked, as section 1 describes (arXiv metadata, the paper text or abstract, or the page title). The explanation is a summary written for this catalog. It was not compared sentence by sentence with the source. NOT VERIFIED: not established.
+
+**Novelty.** NEW: not named in The Prompt Report (PR-2024, arXiv:2406.06608), in the promptingguide.ai technique index (PEG), or in White et al. 2023 (WP-2023). ALREADY-IN: named in at least one of them. This is a catalog flag. It does not say who invented a method.
+
+**Kind.** PROMPT: a prompt or a prompt pipeline. VENDOR: a feature of a provider API. TRAINING-TIME: needs training, or changes the model's parameters or architecture.
+
+## 1. Sources checked
+
+| ID | Source | How it was checked |
+|---|---|---|
+| PR-2024 | Schulhoff et al. 2024, "The Prompt Report: A Systematic Survey of Prompt Engineering Techniques", [arXiv:2406.06608](https://arxiv.org/abs/2406.06608), 2024-06-06 | arXiv metadata. Full HTML text searched for each technique name. Abstract: "a taxonomy of 58 LLM prompting techniques, and 40 techniques for other modalities". |
+| SS-2024 | Sahoo et al. 2024, "A Systematic Survey of Prompt Engineering in Large Language Models: Techniques and Applications", [arXiv:2402.07927](https://arxiv.org/abs/2402.07927), 2024-02-05 | arXiv metadata only. Its technique text was not searched. |
+| SV-2024 | Vatsal and Dubey 2024, "A Survey of Prompt Engineering Methods in Large Language Models for Different NLP Tasks", [arXiv:2407.12994](https://arxiv.org/abs/2407.12994), 2024-07-17 | arXiv metadata only. |
+| WP-2023 | White et al. 2023, "A Prompt Pattern Catalog to Enhance Prompt Engineering with ChatGPT", [arXiv:2302.11382](https://arxiv.org/abs/2302.11382), 2023-02-21, nine authors | arXiv metadata. The 16 pattern names as recorded in taxonomy.md, which were read from the paper in an earlier session. |
+| PEG | promptingguide.ai technique pages | Each page used in the tables was fetched, and its title matched the technique, except the Graph of Thoughts link (section 4). Page text was not compared with the explanations. |
+| VENDOR | Anthropic: structured outputs, prompt caching, compaction overview. Google: structured outputs, context caching. OpenAI: structured outputs, compaction guide. | The Anthropic compaction overview was read. Other Anthropic and Google pages: titles checked. OpenAI pages: URL resolves, no title or text extracted. |
+
+## 2. Catalog
+
+### 2.1 Agents, retrieval, multi-agent and tool use
+
+| Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
+|---|---|---|---|---|---|---|
+| Retrieval-Augmented Generation (RAG) | Retrieval | Retrieves external documents or data and supplies them with the query. Use when answers depend on specific or changing knowledge; retrieval quality, stale sources and unsupported synthesis remain limits. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Automatic Reasoning and Tool-use (ART) | Tool use | Combines task demonstrations with the selection and execution of tools. Useful for compositional tasks that need external operations; depends on suitable tools and execution reliability. | PEG: ART | VERIFIED | ALREADY-IN | PROMPT |
+| ReAct (Reasoning and Acting) | Agents | Interleaves reasoning, an action such as a tool call, and the observation it returns. Useful for interactive tasks that need evidence; poor actions and wrong observations compound across steps. | PEG: ReAct; PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Reflexion | Agents and self-improvement | Records feedback on an earlier attempt as a reflection that guides later attempts. Helps when retries are allowed and useful feedback exists; reflections can be inaccurate and retries cost more. | PEG: Reflexion; PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Program-Aided Language Models (PAL) | Code and tool use | The model writes executable code and an interpreter does the computation. Useful for exact calculation and symbolic tasks; generated programs can contain errors or unsafe operations. | PEG: PAL; PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Tool-Integrated Reasoning Agent (ToRA) | Code and tool use | Interleaves reasoning with executable tool calls instead of one code-generation step. Supports iterative mathematical and computational problem solving; needs reliable execution and sound tool-use decisions. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| TaskWeaver | Agents and code | Converts user requests into code and can use user-defined plugins. Useful for data-oriented workflows; depends on the available plugins, execution permissions and the correctness of the generated code. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| ReWOO (Reasoning WithOut Observation) | Agent architecture | Plans the tool calls before the observations arrive, then uses the results, so reasoning is detached from observations and token use drops (arXiv abstract). Early plans can fail when real observations differ from expectations. | Xu et al. 2023, [arXiv:2305.18323](https://arxiv.org/abs/2305.18323) | VERIFIED | NEW | PROMPT |
+| Reasoning via Planning (RAP) | Search and planning | Uses the language model as a reasoning agent and as a world model, and explores reasoning paths with Monte Carlo Tree Search. Useful for multi-step planning; search and inference add cost. | Hao et al. 2023, [arXiv:2305.14992](https://arxiv.org/abs/2305.14992) | VERIFIED | NEW | PROMPT |
+| Language Agent Tree Search (LATS) | Search and planning | Combines reasoning, acting and planning with Monte Carlo Tree Search, language-model value functions, self-reflection and environment feedback. Useful for interactive planning and programming; needs search budgets and dependable value estimates. | Zhou et al. 2023, [arXiv:2310.04406](https://arxiv.org/abs/2310.04406) | VERIFIED | NEW | PROMPT |
+| Self-Debugging | Code generation and verification | Teaches the model to debug its own program from few-shot demonstrations, using execution results and its own explanation of the code, without human feedback. Useful for code repair; self-review without an independent correctness signal can keep errors. | Chen et al. 2023, [arXiv:2304.05128](https://arxiv.org/abs/2304.05128) | VERIFIED | NEW | PROMPT |
+| Hypothetical Document Embeddings (HyDE) | Retrieval | An instruction-following model writes a hypothetical document for the query; the document is embedded and used to find real ones. No relevance labels are needed. Useful for zero-shot retrieval; the generated text can be plausible and wrong, and still steer retrieval. | Gao et al. 2022, [arXiv:2212.10496](https://arxiv.org/abs/2212.10496) | VERIFIED | NEW | PROMPT |
+| Interleaving Retrieval with Chain-of-Thought (IRCoT) | Retrieval and reasoning | Interleaves retrieval with chain-of-thought steps: each reasoning step guides the next retrieval, and the retrieved text extends the reasoning. Useful for multi-hop, knowledge-intensive questions; a wrong early step sends retrieval off course. | Trivedi et al. 2022, [arXiv:2212.10509](https://arxiv.org/abs/2212.10509); PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Self-RAG | Retrieval and self-critique | Trains one model to retrieve on demand and to critique retrieved passages and its own output with reflection tokens. Useful when retrieval is not always needed; it needs a model trained for this, so it is not a prompt-only technique. | Asai et al. 2023, [arXiv:2310.11511](https://arxiv.org/abs/2310.11511) | VERIFIED | NEW | TRAINING-TIME |
+| Multi-Agent Debate | Multi-agent | Several model instances propose answers and debate their reasoning over rounds, to improve factuality and reasoning. Useful for fact-heavy or reasoning questions; debating instances can share the same blind spots. | Du et al. 2023, [arXiv:2305.14325](https://arxiv.org/abs/2305.14325); PR-2024 names the concept (ChatEval) | VERIFIED | ALREADY-IN | PROMPT |
+| Communicative agents, role-playing (CAMEL) | Multi-agent | Two role-playing agents cooperate on a task, guided by inception prompts that set their roles and keep the exchange consistent with human intent. Useful for autonomous task completion; the prompts still need an explicit stop condition, which this repo's validator requires for agent prompts. | Li et al. 2023, [arXiv:2303.17760](https://arxiv.org/abs/2303.17760) | VERIFIED | NEW | PROMPT |
+| MetaGPT | Multi-agent | Encodes human standard operating procedures as roles in a multi-agent team, to reduce the cascading errors of naively chained LLMs. Useful when a task splits into role-specific deliverables; the encoding of the procedure must fit the domain. | Hong et al. 2023, [arXiv:2308.00352](https://arxiv.org/abs/2308.00352) | VERIFIED | NEW | PROMPT |
+
+### 2.2 Automatic prompt optimization and control
+
+| Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
+|---|---|---|---|---|---|---|
+| Meta-Prompting | Prompt optimization | Asks a model to generate, rewrite or improve another prompt. Useful for exploring instructions and templates; no improvement is guaranteed without an objective or an evaluation. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Automatic Prompt Engineer (APE) | Prompt optimization | Generates candidate instructions, scores them against an objective and refines the best ones. Automates instruction search; results depend on candidate quality, scoring reliability and evaluation cost. | PEG: APE; PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Gradient-free Instructional Prompt Search (GrIPS) | Prompt optimization | Searches instruction variants with edits such as insertion, deletion, swapping and paraphrasing. Useful when edits can be scored automatically; the search can be costly and is limited by its edit operations. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| AutoPrompt | Training-time prompt optimization | Optimizes discrete trigger tokens with gradient-based signals while the language model stays frozen. Fits research setups that can run that optimization; it is not a natural-language instruction-writing technique. | PR-2024 | VERIFIED | ALREADY-IN | TRAINING-TIME |
+| Directional Stimulus Prompting (DSP) | Prompt optimization and guidance | Supplies directional cues intended to steer generation toward a desired outcome. Can constrain generation or planning; the quality of the cue and its fit with the model decide the effect. | PEG: DSP | VERIFIED | ALREADY-IN | PROMPT |
+| Optimization by PROmpting (OPRO) | Prompt optimization | The LLM proposes new candidate instructions from earlier candidates and their scores; the new candidates are scored and added for the next step. Use when task accuracy can be measured; it needs many evaluations and can overfit a dev set. | Yang et al. 2023, [arXiv:2309.03409](https://arxiv.org/abs/2309.03409); PR-2024 cites it only in references | VERIFIED | NEW | PROMPT |
+| DSPy | Programming model for pipelines | Treats LM pipelines as declarative modules that can learn demonstrations; a compiler optimizes the whole pipeline against a metric. Use for pipelines with a measurable objective; the result depends on the metric and the training data. | Khattab et al. 2023, [arXiv:2310.03714](https://arxiv.org/abs/2310.03714); PR-2024 (case study) | VERIFIED | ALREADY-IN | PROMPT |
+| TextGrad | Prompt and system optimization | Treats LLM-written textual feedback as gradients and backpropagates it to improve the components of a compound AI system. Use for multi-component systems with an evaluable objective; the quality of the feedback limits the optimization. | Yuksekgonul et al. 2024, [arXiv:2406.07496](https://arxiv.org/abs/2406.07496) | VERIFIED | NEW | PROMPT |
+| EvoPrompt | Prompt optimization | Connects LLMs with evolutionary algorithms to evolve a population of discrete prompts scored on a task. Use when candidates can be scored automatically; it needs many evaluations. | Guo et al. 2023, [arXiv:2309.08532](https://arxiv.org/abs/2309.08532) | VERIFIED | NEW | PROMPT |
+| Promptbreeder | Prompt optimization | Self-referential self-improvement: an LLM mutates a population of task prompts and evaluates their fitness on a training set. Use when labeled examples exist; the search is costly and can overfit the training set. | Fernando et al. 2023, [arXiv:2309.16797](https://arxiv.org/abs/2309.16797); PR-2024 cites it only in references | VERIFIED | NEW | PROMPT |
+
+### 2.3 Prompt compression
+
+| Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
+|---|---|---|---|---|---|---|
+| LLMLingua | Prompt compression | Coarse-to-fine compression with a budget controller that keeps the semantic content at high compression ratios; aimed at cutting inference cost. Useful for long prompts such as many exemplars; compression can remove details the task still needs. | Jiang et al. 2023, [arXiv:2310.05736](https://arxiv.org/abs/2310.05736) | VERIFIED | NEW | PROMPT |
+| LongLLMLingua | Prompt compression, long context | Compresses long-context inputs to address cost, performance loss and position bias, making key information easier for the LLM to use. Useful for long retrieved contexts; it can still drop evidence the answer needs. | Jiang et al. 2023, [arXiv:2310.06839](https://arxiv.org/abs/2310.06839) | VERIFIED | NEW | PROMPT |
+| LLMLingua-2 | Prompt compression, task-agnostic | Distills compression knowledge from an LLM and frames compression as token classification, to stay faithful across tasks. Useful when one compressor must serve many tasks; quality depends on the distilled data. | Pan et al. 2024, [arXiv:2403.12968](https://arxiv.org/abs/2403.12968) | VERIFIED | NEW | PROMPT |
+
+### 2.4 Ensembling and self-consistency
+
+| Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
+|---|---|---|---|---|---|---|
+| Self-Consistency | Ensembling | Samples several reasoning paths and selects the answer most of them agree on. Can improve reasoning accuracy; costs more inference and can amplify a shared systematic error. | PEG: Self-Consistency; PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Universal Self-Consistency | Ensembling | Asks the model to synthesize a consensus from several candidate outputs, without requiring exact string matches. Useful for free-form answers; the synthesizer can favor a plausible minority answer. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Meta-Reasoning over Multiple CoTs | Ensembling | Shows several generated reasoning chains to a model and asks for a final answer from their content. Useful when candidates contain complementary reasoning; errors shared by all candidates can survive. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| DiVeRSe | Ensembling and verification | Generates several prompt variants and reasoning paths, scores intermediate steps and selects a final response. Helps when candidates can be checked independently; costs extra generation and scoring, and can still select a flawed path. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Consistency-based Self-Adaptive Prompting (COSP) | Adaptive exemplars | Builds few-shot reasoning examples from agreement across zero-shot samples on unlabeled data. Depends on sample diversity and can reinforce errors when wrong answers agree. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Universal Self-Adaptive Prompting (USP) | Adaptive exemplars | Uses unlabeled data and a scoring procedure to select demonstrations across tasks. Reduces manual example construction; depends on the candidate pool and the selection score. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Prompt Paraphrasing | Ensembling and augmentation | Creates semantically similar prompt variants to vary responses or build an ensemble. Useful for robustness tests; paraphrases can change the task meaning and are not evidence of correctness. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+
+### 2.5 Evaluation, answer extraction and safety
+
+| Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
+|---|---|---|---|---|---|---|
+| LLM-as-a-Judge (LLM-as-judge) | Evaluation | Uses a language model to score or compare outputs against a rubric. Scales evaluation of open-ended tasks; judge bias, position effects, poor calibration and disagreement with human reviewers need checks. | Zheng et al. 2023, [arXiv:2306.05685](https://arxiv.org/abs/2306.05685); PR-2024 does not name the technique (section 4) | VERIFIED | NEW | PROMPT |
+| G-Eval | Evaluation | Combines chain-of-thought evaluation steps with a form-filling score to rate generated text against a criterion. Useful for rubric-based NLG scoring; agreement with human judgments must still be checked. | Liu et al. 2023, [arXiv:2303.16634](https://arxiv.org/abs/2303.16634); PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Regex Answer Extraction | Evaluation and post-processing | Extracts a final answer with a regular expression or another deterministic rule. Useful when outputs follow a stable format; fails when formats change, several candidates appear or the text is unexpected. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Separate-LLM Answer Extraction | Evaluation and post-processing | Uses a second model to find the answer in a longer response. Useful when string matching is unreliable; adds cost and another place for extraction errors. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| SmoothLLM | Safety defense | Randomly perturbs several copies of an input and aggregates the model's outputs to detect adversarial prompts. The abstract reports robustness against several jailbreak attacks, with a small trade-off in nominal performance; robustness depends on the threat model. | Robey et al. 2023, [arXiv:2310.03684](https://arxiv.org/abs/2310.03684) | VERIFIED | NEW | PROMPT |
+
+### 2.6 In-context learning and example selection
+
+| Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
+|---|---|---|---|---|---|---|
+| Zero-Shot Prompting | In-context learning | Gives the instruction and input with no labeled demonstrations. Use when the task is clear and the model follows instructions reliably; it can be weak on unfamiliar tasks or strict output conventions. | PEG: Zero-Shot | VERIFIED | ALREADY-IN | PROMPT |
+| One-Shot Prompting | In-context learning | Supplies one input-output demonstration before the target input. Helps when one example clarifies the mapping or format; one example may not show the task's full variation. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Few-Shot Prompting | In-context learning | Supplies several demonstrations to establish the task, style or mapping. Often teaches more reliably than instructions alone; uses context and is sensitive to example order, selection and label quality. | PEG: Few-Shot; PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Many-Shot Prompting | In-context learning | Supplies many demonstrations within the context window. Gives broader coverage than few-shot but needs substantial context; more examples do not guarantee better results. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Similarity-Based Exemplar Selection (KNN) | In-context learning and retrieval | Selects demonstrations similar to the query, often by embedding similarity. Improves relevance; similarity can miss useful diversity or over-rank superficially similar examples. | PR-2024 (K-Nearest Neighbor) | VERIFIED | ALREADY-IN | PROMPT |
+| Diversity- or Complexity-Based Example Selection | In-context learning and retrieval | Selects demonstrations for variety or reasoning complexity, not only nearest neighbors. Improves coverage of hard cases; may not match the target distribution and adds prompt length. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Active-Prompt | In-context learning and human feedback | Finds examples where model answers disagree or uncertainty is high, and sends those cases for annotation. Improves a few-shot set efficiently; needs an annotation process and a usable uncertainty proxy. | PEG: Active-Prompt | VERIFIED | ALREADY-IN | PROMPT |
+| Memory-of-Thought Prompting | In-context learning and retrieval | Generates reasoning demonstrations from unlabeled examples and retrieves relevant ones for later queries. Automates few-shot reasoning prompts; depends on demonstration quality and retrieval relevance. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Analogical Prompting | In-context learning and reasoning | Has the model generate or retrieve analogous examples that show how to solve the target. Helps when structural similarity matters; a misleading analogy can carry over the wrong solution. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+
+### 2.7 Multilingual prompting
+
+| Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
+|---|---|---|---|---|---|---|
+| Translate-First Prompting | Multilingual | Translates non-English input into English before the task. Can use stronger English-language capability; translation may lose cultural context, terminology or meaning in low-resource languages. | PR-2024 ("Translate First Prompting") | VERIFIED | ALREADY-IN | PROMPT |
+| Cross-Lingual Thought (XLT) Prompting | Multilingual reasoning | Combines cross-lingual instructions with reasoning guidance for problems in several languages. Can help multilingual reasoning; depends on the model's language coverage and on accurate cross-language interpretation. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Multi-Aspect Prompting and Selection (MAPS) | Machine translation | Generates and scores translation candidates using preparatory information such as keywords, topics and demonstrations. Helps choose a better translation; adds inference cost. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Chain-of-Dictionary (CoD) | Machine translation | Retrieves or builds multilingual word meanings and places them in context before translating. Helps terminology; dictionaries may not resolve a word's sense within a sentence. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Dictionary-based Prompting for Machine Translation (DiPMT) | Machine translation | Supplies dictionary definitions of source and target terms to guide translation. Useful for terminology-sensitive text; definitions do not guarantee an idiomatic translation. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Decomposed Prompting for Machine Translation (DecoMT) | Machine translation and decomposition | Translates text in chunks and uses partial translations and context to build the final output. Helps long texts; chunking can break discourse, references or terminology consistency. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Interactive-Chain-Prompting (ICP) | Multilingual and human-in-the-loop | Finds ambiguities in the source text, asks clarification questions and uses the answers in the translation. Useful for ambiguous text; needs user interaction and more time. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Iterative Prompting (translation) | Multilingual and human feedback | Produces a draft translation and revises it from human or automated feedback. Can improve on one draft; limited by feedback quality, reference information and iteration cost. | PR-2024 ("Iterative Prompting") | VERIFIED | ALREADY-IN | PROMPT |
+
+### 2.8 Multimodal prompting
+
+| Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
+|---|---|---|---|---|---|---|
+| Prompt Modifiers | Image generation | Appends modifiers for medium, lighting or visual style to steer the generated image. Useful for visual direction; effects vary by model and can interact unpredictably. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Negative Prompting | Image generation | Specifies concepts the generator should reduce or avoid. Can steer away from unwanted features; negative prompts are not guarantees and depend on the interface and model. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Paired-Image Prompting | Multimodal in-context learning | Demonstrates a transformation with a before and an after image, then applies it to a new image. Useful for image-to-image task demonstration; depends on the model understanding the transformation and on the example being representative. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Image-as-Text Prompting | Multimodal context preparation | Converts an image into a text description for a text-based prompt. Connects image information to text workflows; captions can omit details, misidentify objects or lose spatial relations. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Multimodal Chain-of-Thought (Multimodal CoT) | Multimodal reasoning | Combines an image or other modality with instructions for stepwise solving. Supports visual question answering and image-based math; intermediate reasoning can misread the visual evidence. | PEG: Multimodal CoT; PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Duty Distinct Chain-of-Thought (DDCoT) | Multimodal reasoning | Decomposes a multimodal question into subquestions, solves them and combines the answers. Useful for complex visual reasoning; errors in subquestions or visual grounding propagate into the answer. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Multimodal Graph-of-Thought | Multimodal reasoning | Organizes intermediate multimodal reasoning states, with visual information or captions, as a graph. Useful when dependent steps need organizing; needs extra processing and reliable graph construction. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Chain-of-Images (CoI) | Multimodal reasoning | Uses generated images as intermediate representations in reasoning. Helps when visual intermediate states matter; depends on generation fidelity and on reasoning over the generated images. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Set-of-Mark (SoM) prompting | Multimodal visual grounding | Overlays marks such as alphanumeric labels, masks or boxes on image regions from a segmentation model, so a multimodal model can refer to regions by their marks. Useful for visual grounding questions; the result depends on the segmentation and the marking. | Yang et al. 2023, [arXiv:2310.11441](https://arxiv.org/abs/2310.11441) | VERIFIED | NEW | PROMPT |
+
+### 2.9 Output formatting and vendor API features
+
+| Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
+|---|---|---|---|---|---|---|
+| Output-Format Prompting | Output control | Specifies a required format such as JSON, CSV, Markdown or a fixed template. Useful when downstream systems expect predictable output; instructions alone do not guarantee valid syntax or schema compliance. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Structured Outputs (schema-constrained generation) | Vendor API feature | Uses the provider's schema mechanism to constrain output to a structure. Useful for machine-readable extraction and tool workflows; supported schemas and limits vary by provider and feature. | [Anthropic](https://platform.claude.com/docs/en/build-with-claude/structured-outputs) (title checked); [Google](https://ai.google.dev/gemini-api/docs/structured-output) (title checked); [OpenAI](https://developers.openai.com/api/docs/guides/structured-outputs) (URL resolves, text not extracted) | VERIFIED | NEW | VENDOR |
+| Prompt Caching | Vendor API feature | Reuses eligible prompt prefixes that were already processed, to cut repeated cost and often latency. Useful for stable system instructions or shared material; thresholds, expiry, pricing and invalidation are provider-specific. | [Anthropic prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) (title checked); [Google context caching](https://ai.google.dev/gemini-api/docs/caching) (title checked) | VERIFIED | NEW | VENDOR |
+| Context Compaction | Vendor API feature | Anthropic: the server replaces older turns of a conversation with a summary written by Claude, to keep a long conversation or agent task inside the context window. On-demand and token-threshold modes exist, both marked beta on the page. Context editing is a separate, rule-based mechanism that clears old tool results or thinking blocks. A summary can drop details the task still needs. | [Anthropic compaction overview](https://platform.claude.com/docs/en/build-with-claude/compaction) (read); [OpenAI compaction guide](https://developers.openai.com/api/docs/guides/compaction) (URL resolves, text not extracted) | VERIFIED | NEW | VENDOR |
+
+### 2.10 Reasoning and decomposition
+
+| Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
+|---|---|---|---|---|---|---|
+| Chain-of-Thought (CoT) | Reasoning | Asks for intermediate reasoning steps before the final answer. Can improve multi-step math and reasoning; adds tokens and does not guarantee that the explanation reflects the model's internal computation. Repo rule: not for reasoning-native models (tool-routing.md). | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Zero-Shot CoT | Reasoning | Adds a reasoning cue without worked examples. Useful when no examples exist and the task benefits from steps; gains vary across models and tasks. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Few-Shot CoT | Reasoning and in-context learning | Demonstrations include a problem and its reasoning path. Shows the approach explicitly; needs good demonstrations and can make the model copy wrong reasoning patterns. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Automatic Chain-of-Thought (Auto-CoT) | Reasoning and example generation | Generates reasoning demonstrations automatically and selects them for later prompts. Reduces manual authoring; generated demonstrations can contain errors or lack diversity. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Step-Back Prompting | Reasoning | Asks first for higher-level principles or background, then solves the task. Helps when abstract knowledge organizes the reasoning; an inappropriate abstraction can distract. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Thread-of-Thought (ThoT) | Reasoning and long-context analysis | Examines a complex context in manageable portions before answering. Helps long-context questions and retrieval; still limited by missing evidence and window size. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Tabular Chain-of-Thought (Tab-CoT) | Structured reasoning | Arranges intermediate reasoning in a table. Clarifies comparisons and structured variables; table formatting does not verify the contents. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Contrastive CoT | Reasoning and example selection | Includes correct and incorrect reasoning to separate good patterns from bad ones. Can teach error avoidance; incorrect demonstrations must be labeled and built carefully. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Uncertainty-Routed CoT | Reasoning and ensembling | Samples several reasoning paths and routes uncertain cases by an agreement threshold. Sends uncertain cases to more inference; threshold quality and sampling cost decide its value. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Plan-and-Solve Prompting | Reasoning and decomposition | Separates planning the solution from executing the plan. Helps structured multi-step problems; a flawed initial plan causes consistent downstream errors. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Least-to-Most Prompting | Decomposition | Breaks a problem into simpler subproblems and solves them in order, reusing earlier answers. Useful for compositional reasoning; early errors and poor decomposition propagate. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Decomposed Prompting (DECOMP) | Decomposition and tools | Routes subproblems to specific functions or separate model calls. Useful for modular tasks; depends on correct decomposition, suitable components and reliable interfaces. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Tree of Thoughts (ToT) | Search and reasoning | Explores several candidate intermediate steps in a tree and evaluates which branches continue. Useful for planning and search; branching can be expensive and depends on evaluation quality. | PEG: Tree of Thoughts (ToT); PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Graph of Thoughts (GoT) | Search and reasoning | Models LLM-generated thoughts as an arbitrary graph whose edges are dependencies, so thoughts can be combined, distilled or refined through feedback loops. Useful when alternatives depend on each other; graph management and evaluation of intermediate states add complexity. | [Besta et al. 2023, arXiv:2308.09687](https://arxiv.org/abs/2308.09687); PR-2024 body names Graph-of-Thought (section 4) | VERIFIED | ALREADY-IN | PROMPT |
+| Re-reading (RE2) | Reasoning and prompt structure | Has the model read the problem again before answering. A lightweight intervention for complex questions; gains depend on model and task, and repetition adds little on simple tasks. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Rephrase and Respond (RaR) | Reasoning and query reformulation | Has the model rephrase or expand the question before answering. Clarifies the task representation; the rephrasing can change the request or add assumptions. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Self-Ask | Reasoning and decomposition | Asks whether follow-up questions are needed, answers them, then returns to the original question. Useful for multi-hop reasoning; depends on asking the right subquestions and getting reliable answers. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| SimToM | Reasoning and information filtering | Identifies which facts an entity could know before answering from its perspective. Reduces interference from irrelevant information in multi-entity tasks; depends on separating knowledge from belief. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| System 2 Attention (S2A) | Reasoning and context filtering | Identifies the relevant information and rewrites or filters the prompt before responding. Reduces distraction from irrelevant context; may discard useful evidence if relevance is misjudged. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| "Take a deep breath" (instruction phrase) | Reasoning cue | Found by OPRO with PaLM 2-L-IT as the optimizer, scored by PaLM 2-L, on GSM8K. Table 1 of the paper reports 80.2 test accuracy for it, against 71.8 for the baseline "Let's think step by step." The evidence covers that setting only; it does not show a general reasoning improvement. | [OPRO, arXiv:2309.03409](https://arxiv.org/abs/2309.03409) | VERIFIED | NEW | PROMPT |
+
+### 2.11 Self-criticism, verification and correction
+
+| Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
+|---|---|---|---|---|---|---|
+| Self-Calibration | Self-evaluation | Asks the model to estimate whether its own answer is correct. Useful for studying uncertainty and deciding when more checks are needed; a model's confidence is not an independent accuracy measure. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Self-Refine | Iterative refinement | Generates an answer, gets self-feedback and revises it. Useful for writing, reasoning and code improvement; repeated revisions can reinforce the same mistakes or give diminishing returns. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Reversing Chain-of-Thought (RCoT) | Verification | Reconstructs the original problem from a proposed answer and checks for inconsistencies with the input. Can reveal mismatches in interpretation; its conclusions depend on accurate reconstruction and comparison. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Self-Verification | Verification | Generates candidate solutions and tests their consistency with the problem using a separate verification prompt or scoring. Helps separate plausible solutions; the verifier can share the generator's blind spots. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Chain-of-Verification (CoVe) | Verification and correction | Drafts an answer, writes verification questions, answers them and revises the draft. Useful for fact-sensitive generation; the verification answers can themselves hallucinate. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Cumulative Reasoning | Iterative reasoning and verification | Generates candidate reasoning steps and accepts or rejects each one in an evaluation stage before continuing. Useful for multi-step logic and math; depends on step-evaluation quality and stopping criteria. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Fact Check List Pattern | Output verification | Requires the model to list the factual claims that should be checked independently. Identifies verification work in reports and explanations; a checklist is not evidence that the claims are true. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+| Reflection Pattern | Self-criticism | Asks the model to review its output for flaws or improvements. Useful as an extra review pass; self-criticism without external evidence or tests can miss errors or invent problems. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+| Cognitive Verifier Pattern | Question decomposition | Has the model generate subquestions and combine their answers to solve the original question. Useful for broad or complicated requests; too many or poorly chosen subquestions add effort without improving correctness. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+
+### 2.12 Training-time and long-context methods
+
+| Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
+|---|---|---|---|---|---|---|
+| Sentinel-token chunk summarization ("Taking a Deep Breath") | Long-context modeling | Splits the input into chunks, inserts a special token at the end of each chunk, and changes the attention mask so that the inserted token aggregates its chunk. A modeling change, not a prompt phrase; reproducing it needs model-side changes. | Luo et al. 2024, [arXiv:2406.10985](https://arxiv.org/abs/2406.10985) | VERIFIED | NEW | TRAINING-TIME |
+
+### 2.13 White et al. (2023) prompt pattern catalog
+
+| Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
+|---|---|---|---|---|---|---|
+| Meta Language Creation | Input semantics | Defines a custom notation or mini-language for expressing information to the model. Helps when a compact representation improves clarity; both sides must read the notation the same way. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+| Persona or Role Prompting | Output customization | Assigns a role or perspective to shape style, framing or expertise emphasis. Useful for adapting presentation; a persona does not supply missing knowledge or guarantee expert-level correctness. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+| Visualization Generator | Output customization | Requests text formatted for a visualization or image-generation tool. Useful when the output feeds another renderer; the downstream tool may read the format differently than expected. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+| Recipe Pattern | Output customization and planning | Requests an ordered sequence of steps that reaches a stated outcome. Useful for procedures; the steps can omit prerequisites or assume resources the user does not have. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+| Template Pattern | Output control | Specifies a response template and asks the model to fill its fields. Useful for repeatable outputs and downstream processing; a template does not guarantee that every field is valid or complete. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+| Question Refinement Pattern | Prompt improvement | Rewrites the user's question to make it clearer or more precisely scoped before answering. Useful for ambiguous requests; the rewrite must keep the original intent. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+| Alternative Approaches Pattern | Prompt improvement | Requests several plausible approaches to a task. Useful for comparing methods and trade-offs; the alternatives can be redundant, impractical or share the same wrong assumption. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+| Flipped Interaction Pattern | Interaction control | The model asks the user for the information it needs before attempting the task. Useful when requirements are incomplete; unnecessary questions appear when the task is already specified. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+| Game Play Pattern | Interaction control | Frames the interaction as a game with rules, roles or turns. Useful for interactive learning or simulation; compliance can drift as the exchange grows. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+| Infinite Generation Pattern | Interaction control | Asks the model to keep producing items until a stop condition or an external limit. Useful for enumeration; it can repeat items or continue after the useful material ends. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+| Context Manager Pattern | Context control | Asks the model to manage, summarize or prioritize the conversation context for a continuing task. Useful in long interactions; summaries can lose constraints unless preservation requirements are explicit. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+| Output Automater Pattern | Output-to-action automation | Requests output that scripts or tools can use for the next action. Useful for repetitive workflows; generated actions need validation and permission boundaries before they run. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+| Refusal Breaker Pattern | Safety-sensitive pattern (anti-pattern) | Named in WP-2023 as a way to reframe a request after a refusal. Listed for recognition only: this skill does not use it, and a refusal is not treated as something to get around. | WP-2023 | VERIFIED | ALREADY-IN | PROMPT |
+
+## 3. NOT VERIFIED
+
+These entries were not established. Their absence from the verified rows does not prove that no relevant research exists.
+
+| Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
+|---|---|---|---|---|---|---|
+| Google API context compaction | Vendor API feature | No Google compaction page was looked for. The Google pages that were checked are structured outputs and context caching; caching is not a substitute for compaction. | none checked | NOT VERIFIED | NEW | VENDOR |
+| "Take a deep breath" as a general reasoning improvement | Reasoning cue | The OPRO result covers one optimizer, one scorer and one benchmark. Nothing checked shows that the phrase helps across models or tasks. | OPRO for that single setting only | NOT VERIFIED | NEW | PROMPT |
+| Prompt-compression methods beyond the LLMLingua family | Prompt compression | Other methods were not searched for or checked, so none are listed here. | none checked | NOT VERIFIED | NEW | PROMPT |
+
+## 4. Corrections to the survey output
+
+1. **Counts.** The survey output says 103 rows, 99 verified, 90 already-in and 96 prompt. Its own tables hold 102 rows: 98 verified, 4 not verified, 89 already-in and 95 prompt. Section 6 has the counts for this file.
+2. **PR-2024 title.** The output gives "A Systematic Survey of Prompting Techniques". The arXiv title of 2406.06608 is "A Systematic Survey of Prompt Engineering Techniques".
+3. **Graph of Thoughts link.** The output cited promptingguide.ai/techniques/graph. That page is GraphPrompts (graph prompting), not Graph of Thoughts. The row now cites Besta et al. 2023 (arXiv:2308.09687), whose title and abstract were read. PR-2024's body names "Graph-of-Thought" (citing Zhang et al. 2023d), a different paper.
+4. **LLM-as-a-Judge source.** The output cited PR-2024. PR-2024's body uses "judge" only in other senses and does not name this technique. The row now cites Zheng et al. 2023 and is flagged NEW.
+5. **"Take a deep breath".** The output marked the phrase as not established. Its provenance is established: OPRO's optimization found it for a GSM8K setting, and the paper reports a score (section 2.10). Its general effect is still not established (section 3).
+6. **Anthropic compaction.** The output said that page was not inspected. The page exists and was read, so the compaction row now includes it.
+7. **Prompt compression.** The output left the family unverified. LLMLingua, LongLLMLingua and LLMLingua-2 were checked, and their rows were added.
+8. **PR-2024 abstract wording.** The output says "58 text-based techniques". The abstract says "a taxonomy of 58 LLM prompting techniques, and 40 techniques for other modalities".
+9. **PEG pages.** The output says all 18 linked technique pages were opened. This audit checked the 13 used in its tables, and all 13 resolve. The other five were not checked.
+10. **OPRO.** The output did not include OPRO. taxonomy.md already listed it. It is now a NEW row, because PR-2024 cites the paper only in its references.
+11. **Rows the output did not have.** The output had no rows for G-Eval, multi-agent debate, CAMEL, MetaGPT, DSPy, IRCoT, HyDE, OPRO, TextGrad, EvoPrompt, Promptbreeder, Self-RAG, Set-of-Mark or the LLMLingua family. The user's scope covers them (automatic optimization, retrieval, judging, multi-agent, multimodal, compression), so they were added in section 2 with the sources checked. Their novelty follows PR-2024's body text, not the reference list.
+
+## 5. Gaps
+
+- Full transcription of PR-2024's 58 and 40 techniques was not done. The catalog covers the names in the survey output and the rows added above.
+- The explanations are summaries. They were not compared sentence by sentence with the sources, and the PEG and PR-2024 explanations were not compared with page or paper text.
+- Generic-word matches in PR-2024 (for example "Contrastive", "Diversity", "Regex", "output format") were not confirmed in context. Their rows rely on the survey output.
+- The vendor matrix is incomplete: the OpenAI structured-output and compaction text, and any Google compaction feature, are not verified.
+- Defenses beyond SmoothLLM are in [defenses.md](defenses.md), not in this catalog. Spotlighting and the Instruction Hierarchy are in taxonomy.md with checked IDs.
+- Not covered here: Chain-of-Note, GraphRAG, Visual CoT, Chain-of-Draft, Skeleton-of-Thought, and the other names in taxonomy.md that have no source row yet.
+
+## 6. Counts
+
+Counted from the status, novelty and kind cells of the catalog rows (sections 2 and 3). The source table in section 1 is not counted.
+
+| Metric | Count |
+|---|---|
+| Total rows | 118 |
+| VERIFIED | 115 |
+| NOT VERIFIED | 3 |
+| NEW | 26 |
+| ALREADY-IN | 92 |
+| PROMPT | 111 |
+| VENDOR | 4 |
+| TRAINING-TIME | 3 |
+
+Arithmetic check: 115 + 3 = 118; 26 + 92 = 118; 111 + 4 + 3 = 118.

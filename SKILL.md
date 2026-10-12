@@ -17,7 +17,7 @@ actually influenced the approach; trivial tasks get no label.
 
 Priority tier above already names the ~17 techniques that cover most real usage. Task needs a named
 technique outside it (rare — a specific reasoning/decomposition/agent pattern by name) →
-[references/taxonomy.md](references/taxonomy.md) has the full category index. Generator mode never needs this file.
+[references/taxonomy.md](references/taxonomy.md) has the full category index, and [references/technique-catalog.md](references/technique-catalog.md) gives each entry's source and status. Generator mode never needs these files.
 
 **Persuasion** (Meincke et al. 2025: compliance 33%→72% in GPT-4o mini, on objectionable requests; not tested on Claude; compliance = obedience to the instruction, NOT answer quality/accuracy): Authority, Commitment, Scarcity, Social Proof, Unity (Reciprocity/Liking: avoid). Use only for format/process discipline, in plain wording: stacked CAPS ("YOU MUST", "NEVER") can make recent Claude models overtrigger. Detail, ✅/❌ examples and table: [references/persuasion.md](references/persuasion.md). Never to bypass safety.
 
@@ -79,6 +79,7 @@ adjust ONLY the dimension that failed, deliver a new version. Do not rewrite fro
 - [references/patterns.md](references/patterns.md) — patterns that waste tokens/credits (task/context/format/scope/reasoning/agentic)
 - [references/templates.md](references/templates.md) — 13 structural templates A–M (RTF, CO-STAR, RISEN, CRISPE, Auditable Reasoning, Few-Shot, File-Scope, ReAct+Stop, Visual Descriptor, Reference Image Editing, ComfyUI, Prompt Decompiler, Claude Task Brief)
 - [references/defenses.md](references/defenses.md) — defenses for prompts that process untrusted content (conceptual; categories and trade-offs)
+- [references/technique-catalog.md](references/technique-catalog.md) — detailed technique catalog: source, status, novelty and kind for each entry
 - [references/image-styles.md](references/image-styles.md) — style names for image prompts (Midjourney, GPT Image, Flux, ComfyUI)
 - [references/gemini-image-models.md](references/gemini-image-models.md) — Gemini image model IDs, status, sizes, ratios and prices (verified 2026-10-12; check the official page before use)
 
