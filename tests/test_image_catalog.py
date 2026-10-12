@@ -77,6 +77,17 @@ class ImageCatalogTest(unittest.TestCase):
     def test_markdown_and_json_share_the_verification_date(self):
         self.assertIn(self.catalog["verified_on"], self.md)
 
+    def test_text_to_image_scaffold_matches_in_json_and_markdown(self):
+        line = next(ln for ln in self.md.split("\n") if ln.startswith("**Text-to-image formula"))
+        self.assertEqual(re.findall(r"\[([^\]]+)\]", line), self.catalog["prompt_structure"]["text_to_image"])
+
+    def test_tool_routing_uses_the_official_scaffold(self):
+        with open(os.path.join(ROOT, "references", "tool-routing.md"), encoding="utf-8") as fh:
+            routing = fh.read()
+        line = next(ln for ln in routing.split("\n") if "Nano Banana Pro (Gemini image)" in ln)
+        self.assertIn("subject + action + location/context + composition + style", line)
+        self.assertNotIn("7-component", line)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -25,6 +25,12 @@
   "thinking_default": "model-dependent",
   "thinking_on_models_before_gemini_3": "error",
   "batch_discount": 0.5,
+  "prompt_structure": {
+    "text_to_image": ["Subject", "Action", "Location/context", "Composition", "Style"],
+    "with_reference_images": ["Reference images", "Relationship instruction", "New scenario"],
+    "source": "prompting_guide_dated_2026_03_05",
+    "section": "Image generation: text-to-image without references, and generation with references"
+  },
   "grounding_search": {
     "free_requests_per_month": 5000,
     "price_per_1000_after_free_usd": 14.0,

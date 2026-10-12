@@ -45,7 +45,14 @@ that work's license notice here. Entries below are ideas and names only; no text
   Style names only, in references/image-styles.md (from the catalog's section headings).
 - AgriciDaniel/banana-claude (MIT): https://github.com/AgriciDaniel/banana-claude
   Ideas only: the contract that a key goes in a header and never in a URL (scripts/check_repo.py),
-  and a model catalog with a verification date (references/gemini-image-models.json). No code was copied.
+  a model catalog with a verification date (references/gemini-image-models.json), a single-use
+  approval that expires and is spent before any paid call, with only its token's digest stored, a
+  brief hash that binds an approval to one request, and review verdicts (pass, targeted fix,
+  regenerate, blocked) (studio/core.py, studio/README.md). No code was copied.
+- juliandickie/creators-studio (MIT; the LICENSE file in that repository reads "Copyright (c) 2026
+  AgriciDaniel"): https://github.com/juliandickie/creators-studio
+  Idea only: per-variant ratings from 1 to 5 and preference totals over time, from
+  skills/create-image/scripts/abtester.py (studio/core.py, evaluations and preferences). No code was copied.
 - drxvb/apex-prompt-architect (MIT): https://github.com/drxvb/apex-prompt-architect
   Idea only: a validator script and golden cases. No code was copied.
 - Valhall-ai/prompt-injection-mitigations (Apache-2.0): https://github.com/Valhall-ai/prompt-injection-mitigations

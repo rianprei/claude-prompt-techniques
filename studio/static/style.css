@@ -1,0 +1,63 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  line-height: 1.45;
+}
+
+body {
+  margin: 0 auto;
+  max-width: 62rem;
+  padding: 1rem;
+}
+
+section {
+  border-top: 1px solid #8884;
+  padding: 0.75rem 0;
+}
+
+label {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+textarea,
+select,
+input[type="file"] {
+  display: block;
+  margin-top: 0.25rem;
+  max-width: 100%;
+  width: 100%;
+}
+
+button {
+  margin: 0.25rem 0.25rem 0.25rem 0;
+  padding: 0.35rem 0.75rem;
+}
+
+dl {
+  display: grid;
+  gap: 0.25rem 1rem;
+  grid-template-columns: max-content 1fr;
+}
+
+dd {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+img {
+  margin-top: 0.5rem;
+  max-width: 100%;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  border-bottom: 1px solid #8883;
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+}

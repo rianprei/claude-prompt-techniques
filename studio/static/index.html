@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="studio-token" content="__STUDIO_TOKEN__">
+  <title>Nano Banana studio</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>Nano Banana studio</h1>
+    <p id="provider-status" role="status"></p>
+  </header>
+  <main>
+    <section id="brief-section">
+      <h2>1. Brief</h2>
+      <label>Prompt
+        <textarea id="prompt" rows="5"></textarea>
+      </label>
+      <label>Model
+        <select id="model"></select>
+      </label>
+      <label>Aspect ratio
+        <select id="aspect"></select>
+      </label>
+      <label>Image size
+        <select id="size"></select>
+      </label>
+      <label>Reference images (optional)
+        <input id="references" type="file" accept="image/png,image/jpeg,image/webp" multiple>
+      </label>
+      <button id="plan-button" type="button">Build plan</button>
+      <p id="brief-message" role="status"></p>
+    </section>
+
+    <section id="plan-section">
+      <h2>2. Plan and approval</h2>
+      <dl id="plan"></dl>
+      <ul id="plan-warnings"></ul>
+      <button id="approve-button" type="button" disabled>Approve once</button>
+      <p id="approval-status" role="status">No approval. Build a plan first.</p>
+    </section>
+
+    <section id="run-section">
+      <h2>3. Run</h2>
+      <button id="run-button" type="button" disabled>Run (spends the approval)</button>
+      <p id="run-status" role="status"></p>
+      <img id="output" alt="Generated image" hidden>
+    </section>
+
+    <section id="review-section">
+      <h2>4. Review</h2>
+      <p>Verdict for the last generated image. Targeted fix and blocked need a note.</p>
+      <div id="verdicts">
+        <button type="button" data-verdict="pass" disabled>Pass</button>
+        <button type="button" data-verdict="targeted_fix" disabled>Targeted fix</button>
+        <button type="button" data-verdict="regenerate" disabled>Regenerate</button>
+        <button type="button" data-verdict="blocked" disabled>Blocked</button>
+      </div>
+      <label>Note
+        <textarea id="review-note" rows="2"></textarea>
+      </label>
+      <p id="review-status" role="status"></p>
+    </section>
+
+    <section id="evaluation-section">
+      <h2>5. Evaluation</h2>
+      <label>Rating
+        <select id="rating">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5" selected>5</option>
+        </select>
+      </label>
+      <label>Note
+        <textarea id="evaluation-note" rows="2"></textarea>
+      </label>
+      <button id="evaluate-button" type="button" disabled>Save rating</button>
+      <p id="evaluation-status" role="status"></p>
+    </section>
+
+    <section id="history-section">
+      <h2>6. History and preferences</h2>
+      <table>
+        <thead>
+          <tr><th>Started</th><th>Model</th><th>Size</th><th>Ratio</th><th>Status</th><th>Verdict</th><th>Rating</th></tr>
+        </thead>
+        <tbody id="runs"></tbody>
+      </table>
+      <ul id="preferences"></ul>
+    </section>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>

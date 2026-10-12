@@ -70,5 +70,48 @@
     "target": "claude-sonnet-4-6",
     "prompt": "Do whatever is needed and use prefill to start the JSON. Return JSON.",
     "expect": ["W-VAGUE", "W-PREFILL"]
+  },
+  {
+    "id": "double-negative-cot-on-reasoning-native",
+    "target": "gpt-6-astra",
+    "prompt": "Don't skip the step-by-step check. Return only the final JSON object.",
+    "expect": ["E-COT-REASONING"]
+  },
+  {
+    "id": "double-negative-pt-cot-on-reasoning-native",
+    "target": "o3",
+    "prompt": "Não pule o passo a passo. Responda só com o objeto JSON final.",
+    "expect": ["E-COT-REASONING"]
+  },
+  {
+    "id": "negation-clause-does-not-leak",
+    "target": "o3",
+    "prompt": "Be brief, and do not think step by step. Return only the JSON object.",
+    "forbid": ["E-COT-REASONING"]
+  },
+  {
+    "id": "gemini-official-ratio-is-clean",
+    "target": "gemini-nano-banana-2.1",
+    "prompt": "Create a poster of a quiet harbor at dusk, low-angle camera, soft warm light. Aspect ratio 16:9.",
+    "clean": true
+  },
+  {
+    "id": "gemini-unlisted-ratio-is-flagged",
+    "target": "gemini-nano-banana-2.1",
+    "prompt": "Create a panoramic banner of a quiet harbor at dusk. Aspect ratio 3:1.",
+    "expect": ["W-ASPECT-RATIO"]
+  },
+  {
+    "id": "gemini-common-verb-is-clean",
+    "target": "gemini-nano-banana-2.1",
+    "prompt": "A runner runs down a wet street at dusk, low-angle camera. Aspect ratio 16:9.",
+    "clean": true
+  },
+  {
+    "id": "text-gemini-gets-the-text-checks",
+    "target": "gemini-2.5-pro",
+    "prompt": "Explain DNS to a beginner.",
+    "expect": ["W-OUTPUT-FORMAT"],
+    "forbid": ["W-MODEL-UNKNOWN"]
   }
 ]

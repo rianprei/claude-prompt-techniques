@@ -61,6 +61,14 @@ The guide gives the limits as "up to 14 / 10 / 6 images of objects", "up to 4 / 
 - Video input: supported by `gemini-nano-banana-2.1`, `gemini-3.1-flash-image` and `gemini-3.1-flash-lite-image`. Not listed for `gemini-3-pro-image`.
 - Languages with the best performance: EN, ar-EG, de-DE, es-MX, fr-FR, hi-IN, id-ID, it-IT, ja-JP, ko-KR, pt-BR, ru-RU, ua-UA, vi-VN, zh-CN.
 
+## Prompt structure
+
+**Text-to-image formula:** [Subject] + [Action] + [Location/context] + [Composition] + [Style]
+
+**Generation with reference images:** [Reference images] + [Relationship instruction] + [New scenario]
+
+Source: prompting guide, dated 2026-03-05, section "Image generation". The guide presents these as formulas for the two cases. Its example labels each part with the name used in the formula.
+
 ## Prompting facts from the official pages
 
 - Describe the scene in narrative form. The prompting guide says a plain list of keywords is not enough.

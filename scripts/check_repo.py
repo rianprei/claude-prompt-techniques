@@ -13,6 +13,8 @@ import subprocess
 import sys
 from datetime import date
 
+from contracts import KEY_IN_URL, MODEL_ID
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LINK = re.compile(r"\]\(([^)\s]+)\)")
 MARKER = re.compile(r"\b(TODO|FIXME|XXX|TBD)\b")
@@ -20,9 +22,6 @@ TEMPLATES = "ABCDEFGHIJKLM"
 CATALOG = "references/gemini-image-models.json"
 CATALOG_PREFIX = "references/gemini-image-models."
 STALE_DAYS = 90  # the catalog is a snapshot; past this age, the script only warns
-MODEL_ID = re.compile(r"gemini-(?:nano-banana|\d)[a-z0-9.\-]*")
-# Built from two parts so that this file does not contain the forbidden text itself.
-KEY_IN_URL = re.compile(r"[?&]" + "key=")
 
 
 def read(rel):
