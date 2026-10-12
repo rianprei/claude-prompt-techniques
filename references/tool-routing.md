@@ -1,12 +1,12 @@
 Reference file for the `prompt-techniques` skill. Loaded on demand by SKILL.md's active generator mode — not a standalone skill entry point.
 
-> Last verified: 2026-07-28 (Claude section). Other sections last verified 2026-07-07 — model-specific rules age fast; if the target tool/model is newer than that or absent below, do NOT guess version-specific behavior, apply generic rules (explicit instruction, output contract, format lock) and say the entry may be stale.
+> Last verified: 2026-10-12 for the Claude, GPT-6, and Grok sections, against official vendor docs. The Codex section follows the GPT-6 docs plus workflow notes. Midjourney and Flux rules were checked against secondary sources only. All other sections were last checked 2026-07-07 and may be stale. Model-specific rules age fast: if the target model is newer than the verification date or absent below, do NOT guess version-specific behavior; apply generic rules (explicit instruction, output contract, format lock) and say the entry may be stale.
 
 **Contents** (jump to the section you need, don't read the whole file):
-- Text/chat LLMs: Claude, ChatGPT/GPT-5.x, Gemini, Qwen 2.5/3, Ollama, Llama/Mistral, DeepSeek-R1, MiniMax
-- Coding agents: Claude Code, Antigravity, Cursor/Windsurf, Cline, GitHub Copilot, Bolt/v0/Lovable/Figma Make/Stitch, Devin/SWE-agent
+- Text/chat LLMs: Claude, ChatGPT/GPT-6.x, Grok, Gemini, Qwen 2.5/3, Ollama, Llama/Mistral, DeepSeek-R1, MiniMax
+- Coding agents: Claude Code, Codex CLI, Antigravity, Cursor/Windsurf, Cline, GitHub Copilot, Bolt/v0/Lovable/Figma Make/Stitch, Devin/SWE-agent
 - Research/browser agents: Perplexity/Manus, Comet/Atlas/Claude in Chrome
-- Image: Generation, Reference Editing, ComfyUI
+- Image: Generation, Reference Editing, ComfyUI, 3D (Text to 3D, In-Engine AI)
 - Video/Voice/Music: Sora/Runway/Kling/etc, ElevenLabs, Suno
 - Workflow automation: Zapier/Make/n8n
 - Safety: Credential Safety, Input Sanitization, Sandwich Defense
@@ -33,7 +33,7 @@ Identify the tool and route accordingly. Read full templates from [templates.md]
 
 **Claude (claude.ai, Claude API, Claude Code)**
 
-Current model family: Claude 5 (Sonnet 5, Opus 5, Haiku 4.5). Do not assume a specific point version — ask or check current docs if the user names one; do not hardcode a "default" version number in generated prompts.
+Current family (Anthropic docs, 2026-10-12): Fable 5.1 and Mythos 5.1, Fable 5 and Mythos 5, Opus 5.5 and Opus 5, Sonnet 5.5 and Sonnet 5, Haiku 5.5 and Haiku 4.5. Opus 4.6–4.8 and Sonnet 4.6 remain selectable. Do not assume a specific point version — ask or check current docs if the user names one; do not hardcode a "default" version number in generated prompts.
 
 *Durable across Claude 4.x/5.x:*
 - Be explicit and specific — Claude follows instructions literally. It does exactly what you say, nothing more. Missing context = narrow literal output, not a smart guess.
@@ -42,25 +42,33 @@ Current model family: Claude 5 (Sonnet 5, Opus 5, Haiku 4.5). Do not assume a sp
 - Provide context and reasoning WHY, not just WHAT — Claude generalizes better from explanations
 - Always specify output format and length explicitly
 - For complex or multi-step tasks: front-load everything in one turn — intent, constraints, acceptance criteria, relevant files. Every extra back-and-forth turn adds reasoning overhead and token cost.
-- Do NOT add "think step by step" or fixed thinking-budget instructions — current Opus/Sonnet models use adaptive thinking and calibrate depth automatically. To influence depth: "Think carefully before responding" (more) or "Prioritize responding quickly" (less).
+- Do not hardcode a thinking budget: `budget_tokens` returns 400 from Claude 4.7. Depth is set with `effort`. Thinking is on by default on Opus 5, Sonnet 5, Sonnet 5.5, and Haiku 5.5; always on for Fable 5.1, Fable 5, Mythos 5.1, Mythos 5, and Opus 5.5; off by default on Opus 4.6–4.8 and Sonnet 4.6. To discourage unneeded thinking, use the doc's wording: "Thinking adds latency and should only be used when it will meaningfully improve answer quality… When in doubt, respond directly." For manual step-by-step, see the per-model rule in Safe Techniques.
 - Use Template M for agentic or multi-step tasks.
 
 *Current-generation notes:*
 - Literalism and adaptive thinking hold across recent generations — front-loading discipline applies regardless of exact version. Treat the first turn as the only turn for complex work: intent, scope, constraints, acceptance criteria up front.
 - Large context windows (six figures to 1M tokens depending on model/tier) — large multi-file context can go in a single prompt, but keep it relevant; padding still dilutes attention.
-- API-only, not claude.ai/Claude Code: prefill the assistant turn to force output shape and skip preamble — e.g. start the assistant message with `` ```json `` or `{` and Claude continues from there instead of writing "Sure, here is..." first. Only mention this when the user says they're integrating via the Claude API directly.
-- Effort/thinking depth is calibrated automatically on current models — do not specify an effort level or thinking budget unless the harness explicitly exposes one. Claude Code exposes two real levers: `/fast` (session-level speed mode) and an in-context keyword the user can drop directly into a prompt — "think", "think hard", "think harder", "ultrathink" — that nudges reasoning depth up without changing the model. This is different from the banned "think step by step" (that's CoT scaffolding on an adaptive-thinking model, which degrades output); the keyword doesn't ask for visible step-by-step, it asks the harness for more budget. Safe to include the keyword in a generated Claude Code prompt when the task is genuinely hard (architecture, subtle bugs) — not on routine tasks, where it's a no-op that just costs more.
+- API only: prefilling the last assistant turn is not supported from Claude 4.6 on (HTTP 400; also Mythos Preview). For output shape, use Structured Outputs, a tool with an enum field, or a direct instruction ("Respond directly without preamble…"). Mention this only when the user integrates via the API.
+- Effort is set by the harness or API (`effort`), not in the prompt. In Claude Code, `/fast` toggles faster output (confirmed in the session context). Keyword triggers such as "think hard" or "ultrathink" are reported by third-party sources with conflicting mappings and are not verified against official docs; do not rely on them in generated prompts until checked.
 - For a system prompt or any prompt reused across repeated calls (API integration, RAG, multi-document analysis): put static content first (identity, rules, instructions) and dynamic content last (retrieved documents, session data, the actual query). Most API providers cache the shared prefix — reordering this way turns repeated calls cheaper and faster for free.
+- Verbosity differs by model: Opus 5 writes longer user-facing answers than earlier models, so ask for conciseness explicitly. Fable 5.1 writes fewer progress updates between tool calls, so ask for them when you need them.
+- Format: say what to produce ("Write flowing prose paragraphs") instead of what to avoid, and reduce markdown with an explicit instruction. Use XML tags to lock the output shape.
+- Code tasks: add an investigate-first rule: "Never speculate about code you have not opened. Read the file before answering questions about it." (Anthropic's sample prompt.)
+- Long agentic work: ground every progress claim in tool results. On Opus 5, drop instructions that ask for repeated double-checks, which cause over-verification; on models other than Opus 5 (for example Sonnet 5.5 and Haiku 5.5), a final self-check line helps for coding and math.
+- API only: a response with `stop_reason: "refusal"` is a normal HTTP 200, returned by the safety classifiers of Fable 5.1, Fable 5, Opus 5.5, Opus 5, Sonnet 5.5, and Haiku 5.5. Retry on another Claude model. `reasoning_extraction` refusals have no fallback: change the prompt. Keep assistant turns and thinking blocks unchanged when rebuilding history.
 
 ---
 
-**ChatGPT / GPT-5.x / OpenAI GPT models**
+**ChatGPT / GPT-6 / OpenAI GPT models**
 - Start with the smallest prompt that achieves the goal — add structure only when needed
 - Be explicit about the output contract: what format, what length, what "done" looks like
 - State tool-use expectations explicitly if the model has access to tools
-- Use compact structured outputs — GPT-5.x handles dense instruction well
+- Use compact structured outputs; the model follows dense instructions well.
 - Constrain verbosity when needed: "Respond in under 150 words. No preamble. No caveats."
-- GPT-5.x is strong at long-context synthesis and tone adherence — leverage these
+- Models: GPT-6 Astra (`gpt-6-astra`, highest intelligence), GPT-6.1 Sol (`gpt-6.1-sol`, balanced), GPT-6 Luna (`gpt-6-luna`, fastest and most cost-effective). GPT-5.x is the prior generation.
+- `reasoning.effort` for GPT-6.1 Sol: low, medium (default), high, xhigh, max. Astra and Sol do not support `none`; use `low` instead.
+- GPT-6 is reasoning-native: do not add "think step by step". Ask for conclusion, assumptions, evidence, and checks instead.
+- The GPT-6 guide says the model tends toward detailed, formatted responses: ask for concise paragraphs when you want less. Prompt it to ask for approval only after preparing a concrete, reviewable result, and make the priority of user instructions and skills explicit.
 
 ---
 
@@ -120,6 +128,17 @@ Current model family: Claude 5 (Sonnet 5, Opus 5, Haiku 4.5). Do not assume a sp
 
 ---
 
+**Grok (xAI) — grok-4.7**
+- Current model: `grok-4.7` (xAI guide). A "Grok 4.7 Fast" variant is offered in Cursor and Grok Build, not in the public xAI API.
+- Reasoning effort: low, medium, high (default), xhigh. Use `low` for latency-sensitive or simple tool work; `xhigh` only for deep exploration.
+- Keep prompts outcome-focused: Goal, Context/Input, Constraints, Tools/Permissions, Done. Name the tools and the evidence the task needs.
+- For current facts, require web search or X search, with citations.
+- Long tool-heavy loops: define stop conditions, approval boundaries, retry limits, and compaction checkpoints. Put stable instructions first to keep the prompt cache warm.
+- API: xAI strongly recommends a `prompt_cache_key` (Responses API) or an `x-grok-conv-id` header (Chat Completions), so one conversation keeps hitting the same server. Without it, cache hits are often missed.
+- Consumer Grok apps expose different controls than the API. There, put behavioral requirements in the prompt instead of settings.
+
+---
+
 **MiniMax (M3 / M2.7)**
 - OpenAI-compatible API — prompts that work with GPT models transfer directly
 - Strong at instruction following, structured output, and long-context synthesis — 1M context window on M3; M2.7/M2.7-highspeed is 204,800 tokens, not 1M
@@ -135,17 +154,26 @@ Current model family: Claude 5 (Sonnet 5, Opus 5, Haiku 4.5). Do not assume a sp
 **Claude Code**
 - Agentic — runs tools, edits files, executes commands autonomously
 - Starting state + target state + allowed actions + forbidden actions + stop conditions + checkpoints
-- Stop conditions are MANDATORY — runaway loops are the biggest credit killer
-- Default model is set by the Claude Code harness (currently Sonnet 5, with Opus 5 selectable) — do not hardcode a version number; effort and thinking depth are managed by the harness on current models, do NOT hardcode an effort level or thinking budget in prompts.
+- Stop conditions are required — runaway loops are the biggest credit killer
+- The model is set by the Claude Code harness. Do not hardcode a version number, an effort level, or a thinking budget in prompts.
 - Current models are more literal than older generations — vague first turns produce narrower results. Front-load everything: intent, file scope, constraints, acceptance criteria, session strategy.
-- Current models use fewer tool calls by default and reason more between calls — explicitly instruct tool use when needed: "Read all files in /src/auth/ before starting"
-- Current models spawn fewer subagents by default — explicitly request when needed: "Use a subagent to investigate X so it stays out of main context"
+- Claude's latest models need explicit direction to act: "Can you suggest changes?" often gets suggestions only, so say "Make these edits…" when you want changes. For inspection, name the scope: "Read all files in /src/auth/ before starting"
+- Opus 4.6 and Opus 5 delegate to subagents readily, sometimes where a grep is enough. Add a damping rule: "Use subagents when tasks can run in parallel, require isolated context, or involve independent workstreams. For simple tasks, sequential operations, or single-file edits, work directly."
 - Claude Opus over-engineers — add "Only make changes directly requested. Do not add extra files, abstractions, or features."
 - Always scope to specific files and directories — never give a global instruction without a path anchor
 - Human review triggers required: "Stop and ask before deleting any file, adding any dependency, or affecting the database schema"
 - Highest-ROI single line for nontrivial tasks: "Before writing any code, make a plan and show it to me for approval." Prefer short prompts pointing at existing code ("see how X is implemented") over long descriptions; persistent context belongs in CLAUDE.md, not the prompt.
 - Session hygiene matters: new task = new session. Use /rewind instead of correcting mid-conversation. /compact at ~50% context, not 90%.
 - For complex tasks: use Template M. It handles scope, criteria, stop conditions, and session strategy in one structured block.
+
+---
+
+**Codex CLI / Codex IDE** (OpenAI coding agent)
+- Apply the GPT-6 rules above. Which model Codex uses depends on the surface; confirm the model picker before writing model-specific prompts.
+- Structure implementation prompts as Goal, Context, Scope, Constraints, Approval boundaries, and Done. Include verification commands when known.
+- Name the actions that need confirmation (external writes, deletions, dependency changes).
+- Ask for a concise rationale, a changed-file summary, and verification results, not hidden reasoning.
+- Start at the default reasoning effort; raise it only for work that needs deeper planning or checking.
 
 ---
 
@@ -228,12 +256,12 @@ Current model family: Claude 5 (Sonnet 5, Opus 5, Haiku 4.5). Do not assume a sp
 **Image AI — Generation** (Midjourney, GPT Image, Stable Diffusion, SeeDream, Flux, Ideogram)
 First detect: generation from scratch or editing an existing image?
 
-- **Midjourney**: Comma-separated descriptors, not prose. Subject first, then style, mood, lighting, composition. Parameters at end: `--ar 16:9 --v <current>` (check current default, do not hardcode a version) `--style raw`. Negative prompts via `--no [unwanted elements]`
+- **Midjourney**: Comma-separated descriptors, not prose. Subject first, then style, mood, lighting, composition. Parameters at end: `--ar 16:9 --v <current>` (check current default, do not hardcode a version) `--style raw`. Negative prompts via `--no [unwanted elements]`. Character or object reference: `--oref` on V7+ (Omni-Reference; `--cref` is the older syntax; secondary sources).
 - **GPT Image (ChatGPT / gpt-image, successor to the now-retired DALL-E 3)**: Prose description works for a single-subject scene. Add "do not include text in the image unless specified." For a text-heavy, multi-region layout — poster, infographic, exploded-view diagram, map, slide — switch to a JSON prompt instead: nest `header`/`layout`/`callout_labels`/`footer` (or whatever regions the design needs) as object keys, put each label's exact text as a string value. This gives the model a structural map of where each piece of text belongs, which prose reliably loses once there are more than 3-4 labeled regions.
-- **Stable Diffusion**: `(word:weight)` syntax. CFG 7-12. Negative prompt is MANDATORY. Steps 20-30 for drafts, 40-50 for finals.
+- **Stable Diffusion**: `(word:weight)` syntax. CFG 7-12. Use a negative prompt (standard for SD 1.5 and SDXL; Flux usually ignores it at CFG 1). Steps 20-30 for drafts, 40-50 for finals.
 - **SeeDream**: Strong at artistic and stylized generation. Specify art style explicitly (anime, cinematic, painterly) before scene content. Mood and atmosphere descriptors work well. Negative prompt recommended.
 - **Nano Banana Pro (Gemini image)**: Prose descriptions work best — no weight syntax, no comma-soup. Use the 7-component formula: subject + style + environment + lighting + action + camera framing + texture. Strong at text rendering inside images and photo editing via natural language. Pick an expertise mode to shape the formula: cinema, product, portrait, fashion, UI/web, logo, landscape, abstract, infographic.
-- **Flux**: Pure natural language, no parameter syntax at all — everything must be in the description, including camera and lens for photorealism. Longer, more descriptive prompts outperform short ones here (opposite of Midjourney). Strong at text rendering.
+- **Flux**: Pure natural language, no parameter syntax at all — everything must be in the description, including camera and lens for photorealism. Longer, more descriptive prompts outperform short ones here (opposite of Midjourney). Strong at text rendering. In ComfyUI, Flux dev runs at CFG 1.0 with guidance set on the FluxGuidance node; a negative prompt usually has no effect (secondary sources).
 - **Ideogram**: Best-in-class text rendering — wrap the exact text to render in quotation marks inside the prompt. Style tags guide aesthetic direction separately from the text-rendering instruction. Best pick when the request is a logo, poster, or social graphic with specific on-image text.
 
 ---
@@ -276,7 +304,7 @@ Read references/templates.md Template K for the full ComfyUI template.
 - Kling: strong at realistic human motion — describe body movement explicitly, specify camera angle and shot type.
 - LTX Video: fast generation, prompt-sensitive — keep descriptions concise and visual. Specify resolution and motion intensity explicitly.
 - Dream Machine (Luma): cinematic quality — reference lighting setups, lens types, and color grading styles.
-- Seedance 2.0: multi-shot mode produces real cuts, not one flowing take. Sweet spot is 5-6 shots per 15s (~2.5-3s each) — under that wastes the multi-shot capability, over 7 shots drops consistency and needs budget for re-rolls. Front-load character/subject identity in the first 20-30 words — the model weights opening tokens heaviest for character anchoring across cuts. One clip with one audio decision beats stitching two renders — music won't match tempo/key across separate generations.
+- Seedance 2.0: multi-shot mode produces real cuts, not one flowing take. Sweet spot is 5-6 shots per 15s (~2.5-3s each) — under that wastes the multi-shot capability, over 7 shots drops consistency and needs budget for re-rolls (community observation, not verified). Front-load character/subject identity in the first 20-30 words — the model weights opening tokens heaviest for character anchoring across cuts. One clip with one audio decision beats stitching two renders — music won't match tempo/key across separate generations.
 
 ---
 
@@ -397,10 +425,10 @@ to those IDs rather than inline prose links — "Tag each provided document with
 your answer, list every ID actually used to produce it — not what was merely read, what was used."
 This survives reformatting and is easy to consume programmatically, unlike inline citation prose.
 
-**Chain of Thought** — for logic, math, and debugging on non-adaptive-thinking models ONLY (GPT-5.x non-reasoning, Gemini non-thinking, Qwen2.5, Llama). Never on o3/o4-mini/R1/Qwen3-thinking. For current Claude, use the soft depth phrases above instead of literal step-by-step.
+**Chain of Thought (manual)** — for logic, math, and debugging only where the model's thinking is off or absent: non-reasoning models (GPT-4o-class, Gemini non-thinking, Qwen2.5, Llama) and Claude models with thinking off by default (Opus 4.6–4.8, Sonnet 4.6). Never on o3/o4-mini/R1/Qwen3-thinking or the GPT-6 family. On Claude 5.x, rely on thinking and `effort`; do not ask for visible reasoning blocks, which can be declined. See Template E for the auditable format.
 "Think through this step by step before answering."
 
-**Token-budget CoT** — when the task is simple enough that unconstrained CoT would ramble (basic arithmetic, short logic chains) on a non-adaptive-thinking model: add an explicit token ceiling to the CoT instruction. "Think through this step by step in under 50 words before answering." Forces the same reasoning path more concisely — measured to cut output tokens substantially with accuracy held roughly steady, but only below the task's real reasoning-complexity floor; on genuinely hard tasks a tight ceiling truncates reasoning before it's done and accuracy drops. Don't apply this reflexively — only when the task is simple enough that the model would otherwise pad.
+**Token-budget CoT** — when the task is simple enough that unconstrained CoT would ramble (basic arithmetic, short logic chains) on a model without native thinking: add an explicit token ceiling to the CoT instruction. "Think through this step by step in under 50 words before answering." Forces the same reasoning path more concisely — a heuristic for cutting output tokens (no measurement checked for this skill), but only below the task's real reasoning-complexity floor; on genuinely hard tasks a tight ceiling truncates reasoning before it's done and accuracy drops. Don't apply this reflexively — only when the task is simple enough that the model would otherwise pad.
 
 ---
 
@@ -418,7 +446,7 @@ For prompts targeting agentic tools (Claude Code, Devin, Cursor, Windsurf, Cline
 
 1. Is the target tool correctly identified and the prompt formatted for its specific syntax?
 2. Are the most critical constraints in the first 30% of the generated prompt?
-3. Does every instruction use the strongest signal word? MUST over should. NEVER over avoid.
+3. Are hard gates stated plainly ("Stop and ask before…")? Avoid stacked CAPS and "NEVER"; current Claude models can overtrigger on emphatic wording.
 4. Has every fabricated technique been removed?
 5. Has the token efficiency audit passed — every sentence load-bearing, no vague adjectives, format explicit, scope bounded?
 6. Would this prompt produce the right output on the first attempt?

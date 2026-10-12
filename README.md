@@ -52,10 +52,10 @@ Dois modos numa skill só:
 
 | Modo | Quando ativa | O que faz |
 |---|---|---|
-| **Referência (passivo)** | Sempre, automático | Quando uma técnica influencia a abordagem, o Claude a nomeia em 1 linha **na resposta visível** (ex: "Técnica: Chain-of-Verification"). Você vê, não fica escondido no raciocínio interno. Tarefa trivial não ganha rótulo. |
+| **Referência (passivo)** | Automático, quando a skill é carregada | Quando uma técnica influencia a abordagem, o Claude a nomeia em 1 linha **na resposta visível** (ex: "Técnica: Chain-of-Verification"). Você vê, não fica escondido no raciocínio interno. Tarefa trivial não ganha rótulo. |
 | **Gerador (ativo)** | Só quando você pede explicitamente | Gera um prompt pronto pra colar, com regras específicas da ferramenta-alvo (Claude, GPT, Cursor, Midjourney, Claude Code, ElevenLabs, n8n...), e oferece loop de refinamento com o output real. |
 
-Cobre **13 categorias de técnicas** — com **camadas de prioridade** (nem toda técnica pesa igual): alto impacto (role, context, output format, few-shot, grounding), condicionais (CoT só em modelo não-reasoning, ReAct/RAG só com ferramentas reais) e experimentais/legadas em modelos 2025+ (ToT, GoT, Self-Consistency — só sob pedido explícito, risco de fabricação). Base: [The Prompt Report](https://arxiv.org/abs/2406.06608) + docs oficiais dos vendors. Inclui **persuasão** (compliance de instrução — ver caveat na [seção própria](#princípios-de-persuasão)).
+Cobre **13 categorias de técnicas** — com **camadas de prioridade** (nem toda técnica pesa igual): alto impacto (role, context, output format, few-shot, grounding), condicionais (CoT só em modelo não-reasoning, ReAct/RAG só com ferramentas reais) e experimentais/legadas em modelos 2025+ (ToT, GoT, Self-Consistency — só sob pedido explícito, risco de fabricação). Inspirada em [The Prompt Report](https://arxiv.org/abs/2406.06608); as regras por modelo vêm das docs oficiais dos fornecedores, com a data de verificação em `references/tool-routing.md`. Inclui **persuasão** (compliance de instrução — ver caveat na [seção própria](#princípios-de-persuasão)).
 
 Antes de entregar qualquer prompt, a skill faz **self-check** contra as regras da ferramenta-alvo e corrige violações em silêncio. Ferramenta que não está no routing: busca best practices na web (se disponível) e oferece o bloco pronto pra você adicionar ao `tool-routing.md`.
 
@@ -125,7 +125,7 @@ O que acontece internamente:
 5. **Usa o template estrutural certo** de `references/templates.md` se o tipo de tarefa casar.
 6. **Oferece refinamento:** você testa o prompt na ferramenta e cola o output de volta; o Claude diagnostica a falha via `references/patterns.md` (6 eixos: task/context/format/scope/reasoning/agentic) e ajusta só a dimensão que falhou. Gerar → testar → refinar, não gerar-e-tchau.
 
-**Formato da resposta:** 1 bloco de prompt copiável + `🎯 Target: <ferramenta>` + 1 frase explicando o que foi otimizado + oferta de refinamento. Fluxo completo (não fast-path) também mostra `Score: N/6 eixos` (mesmos 6 do refinamento) — número checável, não decorativo.
+**Formato da resposta:** 1 bloco de prompt copiável + `🎯 Target: <ferramenta>` + 1 frase explicando o que foi otimizado + oferta de refinamento. Fluxo completo (não fast-path) também mostra `Score: N/6 eixos` (mesmos 6 do refinamento) — autoavaliação que mostra quais eixos o prompt cobre, não uma medição.
 
 **Esclarecimento (pra não parecer contradição):** "sem nome de framework" vale pro **texto do prompt gerado** — o que você cola no Midjourney não vem rotulado "CO-STAR". A frase de otimização e o modo passivo podem nomear técnica normalmente; são canais diferentes.
 
@@ -162,7 +162,7 @@ Claude pergunta a ferramenta-alvo e o contexto que falta (máx 3 perguntas), dep
 prompt-techniques/
 ├── SKILL.md                    # entry point — pequeno, carregado sempre
 └── references/                 # pesados, carregados SÓ sob demanda
-    ├── tool-routing.md         # regras específicas de 30+ ferramentas (~430 linhas)
+    ├── tool-routing.md         # regras por ferramenta e modelo
     ├── templates.md            # 13 templates estruturais completos
     ├── patterns.md             # padrões que desperdiçam tokens/créditos
     ├── taxonomy.md            # taxonomia completa: ~80 técnicas em 13 categorias, só sob demanda
@@ -181,10 +181,10 @@ Regras específicas em `references/tool-routing.md`:
 
 | Categoria | Ferramentas |
 |---|---|
-| LLMs de texto | Claude (Opus/Sonnet atuais), ChatGPT/GPT-5.x, Gemini 2.x/3 Pro, Qwen 2.5, Llama/Mistral, MiniMax M3/M2.7 |
-| Reasoning-native | o3, o4-mini, DeepSeek-R1, Qwen3 thinking (regra: NUNCA adicionar CoT) |
+| LLMs de texto | Claude (família 5.x), ChatGPT/GPT-6.x, Grok 4.7, Gemini 2.x/3 Pro, Qwen 2.5, Llama/Mistral, MiniMax M3/M2.7 |
+| Reasoning-native | o3, o4-mini, GPT-6, DeepSeek-R1, Qwen3 thinking (regra: NUNCA adicionar CoT) |
 | Local | Ollama (pergunta qual modelo antes de gerar) |
-| Agentes de código | Claude Code, Cursor, Windsurf, Cline, GitHub Copilot, Devin, SWE-agent, Antigravity |
+| Agentes de código | Claude Code, Codex CLI, Cursor, Windsurf, Cline, GitHub Copilot, Devin, SWE-agent, Antigravity |
 | Geradores full-stack | Bolt, v0, Lovable, Figma Make, Google Stitch |
 | Pesquisa/orquestração | Perplexity, Manus AI |
 | Browser/computer-use | Comet, Atlas, Claude in Chrome |
@@ -207,7 +207,7 @@ Ferramenta fora da lista: o Claude aplica regras genéricas (instrução explíc
 | B — CO-STAR | documento profissional, escrita de negócio |
 | C — RISEN | projeto complexo multi-etapa |
 | D — CRISPE | trabalho criativo, brand voice |
-| E — Chain of Thought | lógica, matemática, debug (NUNCA em modelo reasoning) |
+| E — Auditable Reasoning | lógica, matemática, debug (pede conclusão, premissas, evidências e checagens; CoT manual só em modelo sem thinking) |
 | F — Few-Shot | formato mais fácil de mostrar que descrever |
 | G — File-Scope | Cursor/Windsurf/Copilot — edição de código |
 | H — ReAct + Stop Conditions | Claude Code/Devin — agentes autônomos |
@@ -215,15 +215,15 @@ Ferramenta fora da lista: o Claude aplica regras genéricas (instrução explíc
 | J — Reference Image Editing | editar imagem existente (só descreve o delta) |
 | K — ComfyUI | workflow nodal (positive + negative separados) |
 | L — Prompt Decompiler | quebrar/adaptar/dividir prompt existente |
-| M — Opus Task Brief | tarefa complexa/agentic em Claude Opus |
+| M — Claude Task Brief | tarefa complexa/agentic em modelos Claude atuais |
 
 ## Princípios de persuasão
 
-`references/persuasion.md` — baseado em Meincke et al. (2025), estudo reportado com N=28.000 conversas: técnicas de persuasão humana teriam **dobrado** a taxa de compliance de LLMs (33% → 72%). Número reportado pela fonte upstream, não verificado de forma independente neste repo.
+`references/persuasion.md` — baseado em Meincke et al. (2025), "Call Me A Jerk" (N=28.000 conversas). No estudo, princípios de persuasão elevaram a compliance de **33,3% para 72,0%**, mas o teste foi feito no **GPT-4o mini**, com pedidos objetáveis, e não em modelos Claude. Mede compliance com a instrução, não qualidade da resposta, e não prova o efeito em Claude.
 
 **Aviso importante:** compliance = obediência à instrução, **não** qualidade ou veracidade da resposta. Um prompt mais "obedecido" não é automaticamente um prompt melhor. Por isso o escopo aqui é estreito: disciplina de formato e processo (seguir checklist, anunciar skill, não pular verificação) — não "melhorar respostas" em geral.
 
-Os 7 princípios com exemplos ✅/❌ prontos: **Authority** ("YOU MUST, no exceptions"), **Commitment** (exigir anúncio/escolha explícita), **Scarcity** ("IMMEDIATELY before proceeding"), **Social Proof** ("X without Y = failure. Every time."), **Unity** ("we're colleagues"), mais Reciprocity e Liking (documentados como **evitar** — geram sycophancy).
+Os 7 princípios com exemplos ✅/❌ prontos: **Authority** (linguagem firme, sem CAPS), **Commitment** (exigir anúncio/escolha explícita), **Scarcity** (prazo explícito, sem CAPS), **Social Proof** ("X sem Y = falha"), **Unity** ("we're colleagues"), mais Reciprocity e Liking (documentados como **evitar** — geram sycophancy).
 
 Inclui tabela de qual combinação usar por tipo de prompt (disciplina/guidance/colaborativo/referência) e teste ético: "a técnica serviria o interesse genuíno do usuário se ele a entendesse por completo?".
 
@@ -246,6 +246,7 @@ Invioláveis, independente do pedido:
 - **Novo template:** adicione em `references/templates.md` com letra nova + linha na tabela de índice.
 - **Nova técnica (modo passivo):** alto impacto → camada de Prioridade em `SKILL.md`; senão, categoria certa em `references/taxonomy.md`.
 - **Regra pessoal fixa:** edite a seção "Modo gerador" do `SKILL.md`.
+- **Idioma:** `SKILL.md` e `references/` são lidos pelo modelo e ficam em inglês; `README.md` e `evals/` são para você e ficam em português.
 
 Mantenha o `SKILL.md` enxuto — detalhe pesado vai pra `references/`, senão você perde o benefício de contexto.
 
@@ -253,7 +254,7 @@ Mantenha o `SKILL.md` enxuto — detalhe pesado vai pra `references/`, senão vo
 
 Documentadas de propósito — melhor você saber antes de instalar:
 
-1. **Sem benchmarks automatizados.** Não há evals automáticos nem A/B tests cegos dos prompts gerados. As regras vêm de documentação oficial dos vendors e prática da comunidade. O que existe: [`evals/protocol.md`](evals/protocol.md) — protocolo manual de A/B (seu prompt vs. prompt da skill, métrica = re-prompts até funcionar) com log de resultados. Barato, honesto, sem fingir ciência.
+1. **Sem benchmarks automatizados.** Não há evals automáticos nem A/B tests cegos dos prompts gerados. As regras vêm de documentação oficial dos vendors e prática da comunidade. O que existe: [`evals/protocol.md`](evals/protocol.md) — protocolo manual de A/B (seu prompt vs. prompt da skill, métrica = re-prompts até funcionar) com log de resultados, ainda sem nenhum registro. Barato, honesto, sem fingir ciência.
 2. **Regras de routing envelhecem.** Modelos novos saem toda semana. `tool-routing.md` carrega uma data **"Last verified"**; se a ferramenta/modelo for mais novo que a data ou não estiver listado, a skill aplica regras genéricas e avisa em vez de chutar comportamento de versão. PRs de atualização são bem-vindos.
 3. **Nativa do Claude Code.** O carregamento sob demanda depende de `~/.claude/skills/`. Uso parcial em outros agentes é possível — ver [Uso fora do Claude Code](#uso-fora-do-claude-code).
 4. **Agregação, não invenção.** O valor está na curadoria, fusão e arquitetura de contexto — as fontes estão todas nos [Créditos](#créditos). Se você prefere as fontes originais separadas, use-as.
@@ -264,7 +265,7 @@ Documentadas de propósito — melhor você saber antes de instalar:
 ## Troubleshooting / FAQ
 
 **A skill não ativa quando peço um prompt.**
-O pedido precisa ser explícito: "escreve/melhora/adapta/cria um prompt pra X". Pedidos implícitos ("me ajuda com o Midjourney") podem não disparar o modo gerador — reformule.
+O pedido precisa ser explícito: "escreve/melhora/adapta/cria um prompt pra X". Formas naturais como "como peço ao Midjourney X?" disparam; pedidos vagos ("me ajuda com o Midjourney") podem não disparar. Reformule.
 
 **A skill ativa demais / interfere em tarefas normais.**
 Não deveria: o modo gerador só dispara com pedido explícito de prompt, e o modo passivo só rotula quando a técnica influenciou de fato a abordagem (tarefa trivial não ganha rótulo). Se ainda incomodar, remova a linha da categoria em `SKILL.md`.
@@ -301,9 +302,9 @@ Sem resíduo — a skill não toca em nenhum outro arquivo.
 
 ## Créditos
 
-- **Modo gerador** baseado em [nidhinjs/prompt-master](https://github.com/nidhinjs/prompt-master) (tool routing, templates A–M, patterns, intent extraction).
+- **Modo gerador** baseado em [nidhinjs/prompt-master](https://github.com/nidhinjs/prompt-master) (tool routing, templates A–M, patterns, intent extraction), licença MIT.
 - **Fórmula de 7 componentes para imagem + modos de expertise** inspirados em [Hainrixz/claude-banana](https://github.com/Hainrixz/claude-banana) e [AgriciDaniel/banana-claude](https://github.com/AgriciDaniel/banana-claude).
-- **Princípios de persuasão** de [NeoLabHQ/context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit) (skill prompt-engineering), fundamentados em Meincke et al. (2025).
-- **Modo referência** (taxonomia de 13 categorias de técnicas) é lista própria.
+- **Princípios de persuasão** de [NeoLabHQ/context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit) (skill prompt-engineering), fundamentados em Meincke et al. (2025). Licença do upstream: GPL-3.0.
+- **Modo referência** (taxonomia de 13 categorias de técnicas) é taxonomia própria, inspirada em The Prompt Report.
 
-Licenças das fontes upstream aplicam-se ao conteúdo derivado delas.
+Licença do projeto: GPL-3.0 (arquivo `LICENSE`). Avisos e atribuições de terceiros: arquivo `NOTICE`.

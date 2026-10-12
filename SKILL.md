@@ -10,7 +10,7 @@ Do not recite the list unless asked. Pick the technique that serves the task.
 - **High impact, always consider**: Role, Context, Output Formatting, Few-shot, Grounding, Delimiters.
 - **Conditional**: CoT (only NON-reasoning models), ReAct/RAG/Function Calling (only with real tools), Reflexion/CoVe (factual/verifiable task).
 - **Experimental/legacy on 2025+ models**: ToT, GoT, simulated MoE, Self-Consistency, layered chaining — gain not proven on modern models, fabrication risk; only on explicit request.
-Base: The Prompt Report (arXiv:2406.06608) + official vendor docs — not own evaluation. When applying one,
+Base: inspired by The Prompt Report (arXiv:2406.06608); model-specific rules come from official vendor docs, dated in references/tool-routing.md — not own evaluation. When applying one,
 name it in 1 short line **in the visible reply** (e.g. "Technique: Chain-of-Verification"), not only
 in internal reasoning — the user needs to see it for auditability. Only name when the technique
 actually influenced the approach; trivial tasks get no label.
@@ -19,7 +19,7 @@ Priority tier above already names the ~17 techniques that cover most real usage.
 technique outside it (rare — a specific reasoning/decomposition/agent pattern by name) →
 [references/taxonomy.md](references/taxonomy.md) has the full category index. Generator mode never needs this file.
 
-**Persuasion** (Meincke et al. 2025 — doubles compliance 33%→72%; compliance = obedience to the instruction, NOT answer quality/accuracy): Authority, Commitment, Scarcity, Social Proof, Unity (Reciprocity/Liking: avoid). Use only for format/process discipline. Detail, ✅/❌ examples and table: [references/persuasion.md](references/persuasion.md). Never to bypass safety.
+**Persuasion** (Meincke et al. 2025: compliance 33%→72% in GPT-4o mini, on objectionable requests; not tested on Claude; compliance = obedience to the instruction, NOT answer quality/accuracy): Authority, Commitment, Scarcity, Social Proof, Unity (Reciprocity/Liking: avoid). Use only for format/process discipline, in plain wording: stacked CAPS ("YOU MUST", "NEVER") can make recent Claude models overtrigger. Detail, ✅/❌ examples and table: [references/persuasion.md](references/persuasion.md). Never to bypass safety.
 
 ## Generator mode (active — when the request clearly wants a prompt for another tool)
 
@@ -32,7 +32,7 @@ Do not explain prompt engineering theory unless asked. Do not show framework nam
 Prefer simple techniques (role, few-shot, grounding) over complex frameworks (Mixture-of-Experts,
 Tree/Graph-of-Thought, Self-Consistency, layered prompt chaining) — those have higher fabrication risk
 in a single prompt; only use if explicitly requested and the tool supports them.
-Never add CoT on reasoning-native models (o3, o4-mini, DeepSeek-R1, Qwen3 thinking) — they already think
+Never add CoT on reasoning-native models (o3, o4-mini, DeepSeek-R1, Qwen3 thinking, GPT-6 family) — they already think
 internally; CoT degrades output.
 
 **Fast path**: simple, unambiguous request (clear tool, clear task, no exotic format) →
@@ -62,7 +62,7 @@ for the user to paste into tool-routing.md. Without web search → generic rules
 **Output**: 1 copyable prompt block + `🎯 Target: <tool>` + 1 sentence on what was optimized and why
 + refinement offer: "Test it in the tool and paste the result here if you want me to refine."
 Full path only, add 1 line: `Score: N/6 axes addressed (task/context/format/scope/reasoning/agentic)`
-— same 6 axes as the refinement loop below, so the number is checkable, not decorative. Skip
+— same 6 axes as the refinement loop below. It is a self-assessment showing which axes the prompt covers, not a measured score. Skip
 on fast path — it's the whole point of taking the fast path. For a target with its own session
 state (Claude Code, Cursor, Copilot): count an axis as addressed if the target's own environment
 already supplies it (open file, git diff, project structure) — a short prompt isn't missing
@@ -77,6 +77,6 @@ adjust ONLY the dimension that failed, deliver a new version. Do not rewrite fro
 **Per-tool detail and templates — do not load here, read on demand**:
 - [references/tool-routing.md](references/tool-routing.md) — rules specific to Claude/GPT/Cursor/Midjourney/coding agent
 - [references/patterns.md](references/patterns.md) — patterns that waste tokens/credits (task/context/format/scope/reasoning/agentic)
-- [references/templates.md](references/templates.md) — 13 structural templates A–M (RTF, CO-STAR, RISEN, CRISPE, CoT, Few-Shot, File-Scope, ReAct+Stop, Visual Descriptor, Reference Image Editing, ComfyUI, Prompt Decompiler, Opus Task Brief)
+- [references/templates.md](references/templates.md) — 13 structural templates A–M (RTF, CO-STAR, RISEN, CRISPE, Auditable Reasoning, Few-Shot, File-Scope, ReAct+Stop, Visual Descriptor, Reference Image Editing, ComfyUI, Prompt Decompiler, Claude Task Brief)
 
 Read only the needed tool/category section, not the whole file.

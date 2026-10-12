@@ -10,7 +10,7 @@ Full template library for the prompt-techniques skill. Read the relevant templat
 | [B — CO-STAR](#template-b--co-star) | Professional documents, business writing |
 | [C — RISEN](#template-c--risen) | Complex multi-step projects |
 | [D — CRISPE](#template-d--crispe) | Creative work, brand voice |
-| [E — Chain of Thought](#template-e--chain-of-thought) | Logic, math, analysis, debugging |
+| [E — Auditable Reasoning](#template-e--auditable-reasoning) | Logic, math, analysis, debugging |
 | [F — Few-Shot](#template-f--few-shot) | Consistent structured output, pattern replication |
 | [G — File-Scope](#template-g--file-scope) | Cursor, Windsurf, Copilot — code editing AI |
 | [H — ReAct + Stop Conditions](#template-h--react--stop-conditions) | Claude Code, Devin — autonomous agents |
@@ -18,7 +18,7 @@ Full template library for the prompt-techniques skill. Read the relevant templat
 | [J — Reference Image Editing](#template-j--reference-image-editing) | Editing an existing image with a reference |
 | [K — ComfyUI](#template-k--comfyui) | ComfyUI node-based image workflows |
 | [L — Prompt Decompiler](#template-l--prompt-decompiler) | Breaking down, adapting, or splitting existing prompts |
-| [M — Opus Task Brief](#template-m--opus-task-brief) | Complex, multi-step, or agentic task on current Claude Opus |
+| [M — Claude Task Brief](#template-m--claude-task-brief) | Complex, multi-step, or agentic task on current Claude models |
 
 ---
 
@@ -121,24 +121,23 @@ Experiment: Give 3 variants ranging from minimal to bold.
 
 ---
 
-## Template E — Chain of Thought
+## Template E — Auditable Reasoning
 
-*Use for logic-heavy tasks, math, debugging, and multi-factor analysis where the AI needs to reason carefully before committing to an answer.*
+*Use for logic-heavy tasks, math, debugging, and multi-factor analysis where the result must be checkable. Works on every model. It asks for conclusions, assumptions, evidence, and checks, not for private reasoning.*
 
-**Important:** Only use explicit "think step by step" CoT on non-adaptive-thinking models (GPT-4o-class, Gemini non-thinking, Qwen2.5 instruct, Llama). Do NOT add it to o1/o3/o4-mini/DeepSeek-R1/Qwen3-thinking or current Claude — reasoning-native models reason internally and it degrades output; for current Claude, depth is adjusted only with the soft phrases in tool-routing.md ("Think carefully before responding" / "Prioritize responding quickly").
+**Models without native thinking only** (GPT-4o-class, Gemini non-thinking, Qwen2.5 instruct, Llama): add "Think through this step by step before answering." and put the final answer in `<answer>` tags so it can be extracted. Claude models with thinking off by default (Opus 4.6–4.8, Sonnet 4.6) use the same fallback. Never add it to o1/o3/o4-mini/DeepSeek-R1/Qwen3-thinking or GPT-6. On Claude 5.x, rely on thinking and `effort`: a prompt that asks for reasoning in `<thinking>` tags can be declined.
 
 ```
 [Task statement]
 
-Before answering, think through this carefully:
-<thinking>
-1. What is the actual problem being asked?
-2. What constraints must the solution respect?
-3. What are the possible approaches?
-4. Which approach is best and why?
-</thinking>
+Return:
+1. Conclusion
+2. Assumptions
+3. Evidence or intermediate results needed to audit the conclusion
+4. Verification checks performed
+5. Remaining uncertainty, if any
 
-Give your final answer in <answer> tags only.
+Keep the rationale concise and decision-relevant.
 ```
 
 **When to use:**
@@ -148,9 +147,9 @@ Give your final answer in <answer> tags only.
 - Analysis where a wrong first impression is likely
 
 **When NOT to use:**
-- o1 / o3 / reasoning models (they think internally — adding CoT hurts)
 - Simple tasks where the answer is clear (unnecessary overhead)
-- Creative tasks (CoT can kill natural voice)
+- Reasoning-native models (o3, GPT-6, Claude 5.x with thinking on): they think internally, so step-by-step instructions hurt
+- Creative tasks (structured audit fields can flatten natural voice)
 
 ---
 
@@ -316,7 +315,7 @@ fields; use these as a starting point, not an exhaustive list:
 "Attach your reference image to [tool name] before sending this prompt."
 
 **Detect the tool's editing capability:**
-- Midjourney: use `--cref [image URL]` for character reference or `--sref` for style reference
+- Midjourney V7+: use `--oref [image URL]` (Omni-Reference) for character or object reference, and `--sref` for style reference. Check the current version's syntax; `--cref` is the older form.
 - GPT Image (ChatGPT): use the Edit capability in ChatGPT's image tool, not a fresh Generate request
 - Stable Diffusion: use img2img mode, not txt2img. Set denoising strength 0.3-0.6 to preserve the original
 
@@ -340,7 +339,7 @@ Negative prompt: no new elements, no style changes, no background changes
 ```
 
 **Multi-image composition variant** — user attaches 2+ reference images to combine, not one to
-edit (Nano Banana, GPT Image, and Midjourney `--cref`/`--sref` all support this):
+edit (check each tool's current multi-reference syntax; not re-verified here):
 ```
 Reference images: [image 1 — what it contributes], [image 2 — what it contributes], ...
 Combination: [exactly what comes from which image — subject from image 1, background from
@@ -372,20 +371,20 @@ Do not distort or regenerate the original center image
 **Model-specific notes:**
 - SD 1.5: shorter prompts work better, under 75 tokens per block, use (word:weight) syntax
 - SDXL: handles longer prompts, supports more natural language alongside weighted syntax
-- Flux: natural language works well, less reliance on weighted syntax, very responsive to style descriptions
+- Flux: natural language works well, less reliance on weighted syntax, very responsive to style descriptions. For Flux dev in ComfyUI, use CFG 1.0 and set guidance on the FluxGuidance node.
 
 ```
 POSITIVE PROMPT:
 [subject], [style], [mood], [lighting], [composition], [quality boosters: highly detailed, sharp focus, 8k]
 
-NEGATIVE PROMPT:
+NEGATIVE PROMPT (SD/SDXL; leave empty for Flux dev):
 [what to exclude: blurry, low quality, watermark, extra limbs, bad anatomy, distorted, oversaturated]
 
 CHECKPOINT: [model name]
 SAMPLER: Euler a (recommended starting point)
-CFG SCALE: 7 (increase for stricter prompt adherence)
+CFG SCALE: 7 for SD/SDXL (higher = stricter adherence); Flux dev: 1.0
 STEPS: 20-30
-RESOLUTION: [width x height — must be divisible by 64]
+RESOLUTION: [width x height — multiple of 64 for SD/SDXL]
 ```
 
 ---
@@ -462,9 +461,9 @@ Run these in order. Each output feeds the next.
 ```
 ---
 
-## Template M — Opus Task Brief
+## Template M — Claude Task Brief
 
-*Use for any complex, multi-step, or agentic task on current Claude Opus models — claude.ai, API, or Claude Code. These read prompts literally and produce narrow output when context is missing. This template front-loads everything so the first turn is the only turn.*
+*Use for any complex, multi-step, or agentic task on current Claude models — claude.ai, API, or Claude Code. These read prompts literally and produce narrow output when context is missing. This template front-loads everything so the first turn is the only turn.*
 
 ```
 ## Objective
@@ -497,12 +496,12 @@ Stop and ask before:
 - Touching anything outside Scope
 
 ## Progress
-After each completed step: ✅ [what was done] — [file(s) affected]
+After each completed step: ✅ [what was done] — [file(s) affected]. Back every completion claim with the tool output or changed file it rests on.
 ```
 
 **Thinking depth** — add only when needed, delete otherwise:
 - Hard multi-step task: `"Think carefully before starting."`
-- Simple targeted change: `"Prioritize responding quickly. This is a scoped change."`
+- Simple targeted change: `"Respond directly; this is a scoped change."`
 - Default: say nothing — adaptive thinking calibrates itself.
 
 **Claude Code only — add Session Strategy block when relevant:**
@@ -515,4 +514,4 @@ After each completed step: ✅ [what was done] — [file(s) affected]
 - Compact first — run /compact [focus on X] then begin
 ```
 
-**When to use:** Current Claude Opus models on any surface — claude.ai, API, Claude Code — when the task is complex, multi-file, ambiguous, or agentic. Not needed for simple one-shot tasks.
+**When to use:** Current Claude models on any surface — claude.ai, API, Claude Code — when the task is complex, multi-file, ambiguous, or agentic. Not needed for simple one-shot tasks.

@@ -1,14 +1,14 @@
 # Persuasion Principles for Prompt Compliance
 
-Source: NeoLabHQ/context-engineering-kit, citing Meincke et al. (2025) — 7 principles reportedly tested on N=28,000 conversations; persuasion said to double compliance: 33% → 72%, p < .001. No DOI/arXiv link verified in this repo — treat as reported by the upstream source, not independently measured here. Use: increase instruction/format compliance in prompts and skills. Never to bypass safety.
+Source: adapted from NeoLabHQ/context-engineering-kit (GPL-3.0), which cites Meincke, L., Shapiro, D., Duckworth, A., Mollick, E. R., Mollick, L., and Cialdini, R. (2025), "Call Me A Jerk: Persuading AI to Comply with Objectionable Requests", SSRN 5357179 (preregistration: OSF kj863). The study tested seven principles on GPT-4o mini, with two objectionable requests (an insult, and the synthesis of a regulated drug) and N=28,000 conversations. Reported compliance: 33.3% for controls vs. 72.0% with a principle (p < .001). Not tested on Claude models. It measures compliance with the instruction, not answer quality or safety. Use: format and process discipline in prompts and skills. Never to bypass safety.
 
 ## The 7 principles
 
 ### 1. Authority
-Deference to expertise/official rule. Imperative language: "YOU MUST", "Never", "Always", "No exceptions". Removes decision fatigue and rationalization.
+Deference to expertise or an official rule. Use plain, firm wording for gates ("Stop and ask before…", "Do not…"). Avoid stacked CAPS ("YOU MUST", "NEVER", "No exceptions"): recent Claude models can overtrigger on emphatic wording. Removes decision fatigue and rationalization.
 Use for: discipline skills (TDD, verification), safety-critical practices.
 ```
-✅ Write code before test? Delete it. Start over. No exceptions.
+✅ Code written before its test: delete it and start over.
 ❌ Consider writing tests first when feasible.
 ```
 
@@ -16,7 +16,7 @@ Use for: discipline skills (TDD, verification), safety-critical practices.
 Consistency with a prior declaration. Require announcement ("Announce skill usage"), explicit choice ("Choose A, B, or C"), tracking (TodoWrite for checklist).
 Use for: ensuring a skill is followed, multi-step processes, accountability.
 ```
-✅ When you find a skill, you MUST announce: "I'm using [Skill Name]"
+✅ When you find a skill, announce: "I'm using [Skill Name]"
 ❌ Consider letting your partner know which skill you're using.
 ```
 
@@ -24,7 +24,7 @@ Use for: ensuring a skill is followed, multi-step processes, accountability.
 Urgency via temporal/sequential limit: "Before proceeding", "Immediately after X". Prevents "I'll do it later".
 Use for: immediate verification, order-sensitive workflow.
 ```
-✅ After completing a task, IMMEDIATELY request code review before proceeding.
+✅ After completing a task, request code review before proceeding.
 ❌ You can review code when convenient.
 ```
 
@@ -32,7 +32,7 @@ Use for: immediate verification, order-sensitive workflow.
 Universal norm: "Every time", "Always", explicit failure mode ("X without Y = failure").
 Use for: documenting universal practice, warning about common failure.
 ```
-✅ Checklists without TodoWrite tracking = steps get skipped. Every time.
+✅ Checklists without tracking get their steps skipped.
 ❌ Some people find TodoWrite helpful for checklists.
 ```
 
@@ -63,7 +63,7 @@ Do not combine all 7 in one prompt.
 
 ## Why it works
 
-Bright-line rules reduce rationalization: "YOU MUST" removes decision fatigue; absolute language eliminates "is this an exception?"; explicit counter-rationalization closes a specific loophole.
+Explicit gates reduce rationalization: a clear rule removes the "is this an exception?" question, and an explicit counter-rationalization closes a specific loophole. The evidence for the mechanism comes from the GPT-4o mini study above; it has not been shown for Claude models.
 
 ## Ethical test
 

@@ -22,6 +22,8 @@ Adicione 1 linha por teste em `evals/results.md` (crie se não existir):
 | data | ferramenta | tarefa (curta) | re-prompts A (manual) | re-prompts B (skill) | vencedor | nota |
 ```
 
+Status em 2026-10-12: nenhum teste registrado ainda.
+
 ## O que o log responde com o tempo
 
 - Skill ganha em qual categoria de ferramenta e perde em qual

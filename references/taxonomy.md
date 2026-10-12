@@ -18,4 +18,4 @@ covered there and never reaches this file.
 **Multimodal**: Image/Vision/Multimodal Prompting, Image+Text Reasoning.
 **Experimental**: Active Prompt, DSP, Generated Knowledge, Faithful CoT, Tree Search, Selection-Inference, Emotion Prompting.
 
-Base: The Prompt Report (arXiv:2406.06608) + official vendor docs — not own evaluation.
+Inspired by The Prompt Report (arXiv:2406.06608). This list is not a reproduction of that taxonomy; model-specific rules live in tool-routing.md.
