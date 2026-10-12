@@ -39,10 +39,25 @@ CONCEPTUAL REFERENCES
 ---------------------
 Credited in README.md as inspiration for the image prompt formula and the
 expertise modes. If any text is copied from these works in the future, add
-that work's license notice here.
+that work's license notice here. Entries below are ideas and names only; no text was copied from them unless a notice says so.
 
 - Hainrixz/claude-banana (MIT): https://github.com/Hainrixz/claude-banana
+  Style names only, in references/image-styles.md (from the catalog's section headings).
 - AgriciDaniel/banana-claude (MIT): https://github.com/AgriciDaniel/banana-claude
+- drxvb/apex-prompt-architect (MIT): https://github.com/drxvb/apex-prompt-architect
+  Idea only: a validator script and golden cases. No code was copied.
+- Valhall-ai/prompt-injection-mitigations (Apache-2.0): https://github.com/Valhall-ai/prompt-injection-mitigations
+  Defense categories and trade-off axes, rewritten in references/defenses.md.
+- amerob/ultimate-prompt-engineering-playbook (MIT): https://github.com/amerob/ultimate-prompt-engineering-playbook
+  Technique names checked against references/taxonomy.md. No notebook text was copied.
+- FareedKhan-dev/prompt-engineering-cheatsheet (MIT): https://github.com/FareedKhan-dev/prompt-engineering-cheatsheet
+  The name "Output Priming" in references/taxonomy.md.
+- KalyanKS-NLP/Prompt-Engineering-Techniques-Hub (Apache-2.0): https://github.com/KalyanKS-NLP/Prompt-Engineering-Techniques-Hub
+  The name "Batch Prompting" in references/taxonomy.md.
+- cicero-im/prompting (MIT): https://github.com/cicero-im/prompting
+  The question of where critical instructions go in long prompts (references/tool-routing.md).
+- corralm/awesome-prompting (CC0): https://github.com/corralm/awesome-prompting
+  A pointer to the White et al. categories. The categories were checked in the paper itself.
 
 ACADEMIC REFERENCES (cited, no text reproduced)
 -----------------------------------------------
@@ -50,12 +65,27 @@ ACADEMIC REFERENCES (cited, no text reproduced)
   Prompting Techniques. arXiv:2406.06608.
 - Meincke, L. et al. (2025). Call Me A Jerk: Persuading AI to Comply with
   Objectionable Requests. SSRN 5357179.
+- Cheng, Z. et al. (2023). Batch Prompting: Efficient Inference with Large Language Model APIs. arXiv:2301.08721.
+- Khot, T. et al. (2022). Decomposed Prompting: A Modular Approach for Solving Complex Tasks. arXiv:2210.02406.
+- Zhao, T. Z. et al. (2021). Calibrate Before Use: Improving Few-Shot Performance of Language Models. arXiv:2102.09690.
+- Tian, K. et al. (2023). Just Ask for Calibration: Strategies for Eliciting Calibrated Confidence Scores from Language Models Fine-Tuned with Human Feedback. arXiv:2305.14975.
+- Manakul, P. et al. (2023). SelfCheckGPT: Zero-Resource Black-Box Hallucination Detection for Generative Large Language Models. arXiv:2303.08896.
+- Perez, E. et al. (2022). Red Teaming Language Models with Language Models. arXiv:2202.03286.
+- White, J. et al. (2023). A Prompt Pattern Catalog to Enhance Prompt Engineering with ChatGPT. arXiv:2302.11382.
+- Hines, K. et al. (2024). Defending Against Indirect Prompt Injection Attacks With Spotlighting. arXiv:2403.14720.
+- Wallace, E. et al. (2024). The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions. arXiv:2404.13208.
+- Yang, C. et al. (2023). Large Language Models as Optimizers. arXiv:2309.03409.
+- Ma, X. et al. (2023). Query Rewriting for Retrieval-Augmented Large Language Models. arXiv:2305.14283.
+- Rubin, O. et al. (2021). Learning To Retrieve Prompts for In-Context Learning. arXiv:2112.08633.
+- Lu, Y. et al. (2021). Fantastically Ordered Prompts and Where to Find Them: Overcoming Few-Shot Prompt Order Sensitivity. arXiv:2104.08786.
+- Zheng, L. et al. (2023). Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena. arXiv:2306.05685.
+- Bisconti, P. et al. (2025). Adversarial Poetry as a Universal Single-Turn Jailbreak Mechanism in Large Language Models. arXiv:2511.15304.
 
 VENDOR DOCUMENTATION
 --------------------
 Model-routing rules were checked against public documentation from Anthropic,
 OpenAI, and xAI. The rules are stated in this project's own words, and no
-vendor text is reproduced.
+vendor text is reproduced, except short quoted sentences, which are attributed where used. Anthropic, "Prompting best practices" (platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices), section "Long context prompting", read 2026-10-12.
 
 MIT LICENSE (nidhinjs/prompt-master)
 ------------------------------------

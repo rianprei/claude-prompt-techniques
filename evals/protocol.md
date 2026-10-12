@@ -34,6 +34,10 @@ Status em 2026-10-12: nenhum teste registrado ainda.
 
 Não é benchmark científico: N pequeno, avaliador é você, sem cegamento. É trilha de evidência pessoal — suficiente pra decidir se a skill paga o próprio custo no SEU uso.
 
+## Testes automatizados (o que existe)
+
+`evals/golden_cases.json` tem 12 prompts fixos, cada um com o resultado esperado do validador (`scripts/validate_prompt.py`). Eles testam o validador: se uma regra mudar sem querer, um caso quebra. Não medem se a ferramenta-alvo responde bem; isso continua sendo o A/B manual acima. Rode com `python3 -m unittest discover -s tests -v`.
+
 ## Toda claim carrega sua limitação junto, não separada
 
 Se um resultado do log virar afirmação em README/SKILL.md ("a skill reduz re-prompts em X%"),

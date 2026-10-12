@@ -1,0 +1,74 @@
+[
+  {
+    "id": "clean-format-no-caps",
+    "target": "claude-sonnet-5-5",
+    "prompt": "Summarize the attached meeting notes in five bullet points. Return a markdown list.",
+    "clean": true
+  },
+  {
+    "id": "cot-on-reasoning-native",
+    "target": "gpt-6-astra",
+    "prompt": "Think step by step and show your reasoning, then return the final answer as JSON.",
+    "expect": ["E-COT-REASONING"]
+  },
+  {
+    "id": "cot-allowed-on-non-reasoning",
+    "target": "gpt-4o",
+    "prompt": "Think step by step and show your reasoning, then return the final answer as JSON.",
+    "forbid": ["E-COT-REASONING"]
+  },
+  {
+    "id": "negated-cot-allowed",
+    "target": "o3",
+    "prompt": "Do not use chain-of-thought. Return only the final JSON object.",
+    "forbid": ["E-COT-REASONING"]
+  },
+  {
+    "id": "cot-pt-on-reasoning-native",
+    "target": "o3",
+    "prompt": "Pense passo a passo e depois responda em JSON.",
+    "expect": ["E-COT-REASONING"]
+  },
+  {
+    "id": "cot-pt-negated-allowed",
+    "target": "o3",
+    "prompt": "Não pense passo a passo. Responda em JSON.",
+    "forbid": ["E-COT-REASONING"]
+  },
+  {
+    "id": "thinking-tags-claude-5",
+    "target": "claude-opus-5-5",
+    "prompt": "Write your reasoning inside <thinking> tags, then give the answer. Return the answer as plain text.",
+    "expect": ["E-THINKING-TAG"]
+  },
+  {
+    "id": "stacked-caps",
+    "target": "claude-sonnet-5-5",
+    "prompt": "YOU MUST cite sources. NEVER invent a URL. ALWAYS check the date. CRITICAL: return a markdown table.",
+    "expect": ["W-CAPS"]
+  },
+  {
+    "id": "no-output-format",
+    "target": "",
+    "prompt": "Explain how DNS works to a beginner.",
+    "expect": ["W-OUTPUT-FORMAT"]
+  },
+  {
+    "id": "agent-without-stop",
+    "target": "claude-sonnet-5-5",
+    "prompt": "Use the tools to refactor the parser and run the tests, then commit the change. Return a short summary.",
+    "expect": ["E-AGENT-NO-STOP"]
+  },
+  {
+    "id": "agent-with-stop",
+    "target": "claude-sonnet-5-5",
+    "prompt": "Use the tools to refactor the parser. Stop after three failed test runs and ask before committing. Return a short summary.",
+    "forbid": ["E-AGENT-NO-STOP"]
+  },
+  {
+    "id": "vague-and-prefill",
+    "target": "claude-sonnet-4-6",
+    "prompt": "Do whatever is needed and use prefill to start the JSON. Return JSON.",
+    "expect": ["W-VAGUE", "W-PREFILL"]
+  }
+]

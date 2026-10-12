@@ -78,5 +78,7 @@ adjust ONLY the dimension that failed, deliver a new version. Do not rewrite fro
 - [references/tool-routing.md](references/tool-routing.md) — rules specific to Claude/GPT/Cursor/Midjourney/coding agent
 - [references/patterns.md](references/patterns.md) — patterns that waste tokens/credits (task/context/format/scope/reasoning/agentic)
 - [references/templates.md](references/templates.md) — 13 structural templates A–M (RTF, CO-STAR, RISEN, CRISPE, Auditable Reasoning, Few-Shot, File-Scope, ReAct+Stop, Visual Descriptor, Reference Image Editing, ComfyUI, Prompt Decompiler, Claude Task Brief)
+- [references/defenses.md](references/defenses.md) — defenses for prompts that process untrusted content (conceptual; categories and trade-offs)
+- [references/image-styles.md](references/image-styles.md) — style names for image prompts (Midjourney, GPT Image, Flux, ComfyUI)
 
 Read only the needed tool/category section, not the whole file.

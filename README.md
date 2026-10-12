@@ -4,7 +4,7 @@
 
 Você pede "escreve um prompt pra Midjourney gerar um gato samurai" e recebe um prompt pronto pra colar, com a sintaxe e as regras específicas do Midjourney. Ou trabalha normalmente e o Claude aplica (e nomeia na resposta) a técnica de prompt engineering relevante.
 
-> **Honestidade primeiro:** essa skill é uma agregação curada de fontes upstream (ver [Créditos](#créditos)) + taxonomia própria, organizada pra economizar contexto. **Não tem eval automatizado nem A/B cego** — as regras de routing vêm de docs oficiais e prática da comunidade, não de avaliação formal minha; o que existe é só um protocolo manual de A/B ([`evals/protocol.md`](evals/protocol.md)). Trate como framework de trabalho bem organizado, não como verdade medida. Detalhe em [Limitações](#limitações-conhecidas).
+> **Honestidade primeiro:** essa skill é uma agregação curada de fontes upstream (ver [Créditos](#créditos)) + taxonomia própria, organizada pra economizar contexto. **Não tem eval automatizado da qualidade dos prompts gerados nem A/B cego.** Tem um validador estático e testes que checam o próprio validador ([Validação e testes](#validação-e-testes)). As regras de routing vêm de docs oficiais e prática da comunidade, não de avaliação formal minha; o protocolo manual de A/B está em [`evals/protocol.md`](evals/protocol.md). Trate como framework de trabalho bem organizado, não como verdade medida. Detalhe em [Limitações](#limitações-conhecidas).
 
 ---
 
@@ -37,6 +37,7 @@ Pronto. O resto deste README é detalhe — leia quando precisar.
 - [Templates incluídos](#templates-incluídos)
 - [Princípios de persuasão](#princípios-de-persuasão)
 - [Regras fixas](#regras-fixas)
+- [Validação e testes](#validação-e-testes)
 - [Limitações conhecidas](#limitações-conhecidas)
 - [Uso fora do Claude Code](#uso-fora-do-claude-code)
 - [Customizar e estender](#customizar-e-estender)
@@ -55,7 +56,7 @@ Dois modos numa skill só:
 | **Referência (passivo)** | Automático, quando a skill é carregada | Quando uma técnica influencia a abordagem, o Claude a nomeia em 1 linha **na resposta visível** (ex: "Técnica: Chain-of-Verification"). Você vê, não fica escondido no raciocínio interno. Tarefa trivial não ganha rótulo. |
 | **Gerador (ativo)** | Só quando você pede explicitamente | Gera um prompt pronto pra colar, com regras específicas da ferramenta-alvo (Claude, GPT, Cursor, Midjourney, Claude Code, ElevenLabs, n8n...), e oferece loop de refinamento com o output real. |
 
-Cobre **13 categorias de técnicas** — com **camadas de prioridade** (nem toda técnica pesa igual): alto impacto (role, context, output format, few-shot, grounding), condicionais (CoT só em modelo não-reasoning, ReAct/RAG só com ferramentas reais) e experimentais/legadas em modelos 2025+ (ToT, GoT, Self-Consistency — só sob pedido explícito, risco de fabricação). Inspirada em [The Prompt Report](https://arxiv.org/abs/2406.06608); as regras por modelo vêm das docs oficiais dos fornecedores, com a data de verificação em `references/tool-routing.md`. Inclui **persuasão** (compliance de instrução — ver caveat na [seção própria](#princípios-de-persuasão)).
+Cobre **14 categorias de técnicas**, mais o catálogo de padrões de White et al. (2023) — com **camadas de prioridade** (nem toda técnica pesa igual): alto impacto (role, context, output format, few-shot, grounding), condicionais (CoT só em modelo não-reasoning, ReAct/RAG só com ferramentas reais) e experimentais/legadas em modelos 2025+ (ToT, GoT, Self-Consistency — só sob pedido explícito, risco de fabricação). Inspirada em [The Prompt Report](https://arxiv.org/abs/2406.06608); as regras por modelo vêm das docs oficiais dos fornecedores, com a data de verificação em `references/tool-routing.md`. Inclui **persuasão** (compliance de instrução — ver caveat na [seção própria](#princípios-de-persuasão)).
 
 Antes de entregar qualquer prompt, a skill faz **self-check** contra as regras da ferramenta-alvo e corrige violações em silêncio. Ferramenta que não está no routing: busca best practices na web (se disponível) e oferece o bloco pronto pra você adicionar ao `tool-routing.md`.
 
@@ -84,7 +85,7 @@ mkdir -p ~/.claude/skills/prompt-techniques/references
 base=https://raw.githubusercontent.com/rianprei/claude-prompt-techniques/master
 curl -fL $base/SKILL.md -o ~/.claude/skills/prompt-techniques/SKILL.md
 curl -fL $base/README.md -o ~/.claude/skills/prompt-techniques/README.md
-for f in tool-routing patterns templates persuasion taxonomy; do
+for f in tool-routing patterns templates persuasion taxonomy defenses image-styles; do
   curl -fL $base/references/$f.md -o ~/.claude/skills/prompt-techniques/references/$f.md
 done
 ```
@@ -93,7 +94,7 @@ done
 
 ```bash
 ls ~/.claude/skills/prompt-techniques/ ~/.claude/skills/prompt-techniques/references/
-# Esperado: SKILL.md, README.md e references/ com 5 arquivos .md
+# Esperado: SKILL.md, README.md e references/ com 7 arquivos .md
 ```
 
 **Ativar:** abra uma sessão nova do Claude Code. A skill carrega automaticamente — zero configuração. Pra confirmar, pergunte ao Claude: "qual skill de prompt engineering você tem disponível?"
@@ -161,17 +162,26 @@ Claude pergunta a ferramenta-alvo e o contexto que falta (máx 3 perguntas), dep
 ```
 prompt-techniques/
 ├── SKILL.md                    # entry point — pequeno, carregado sempre
-└── references/                 # pesados, carregados SÓ sob demanda
-    ├── tool-routing.md         # regras por ferramenta e modelo
-    ├── templates.md            # 13 templates estruturais completos
-    ├── patterns.md             # padrões que desperdiçam tokens/créditos
-    ├── taxonomy.md            # taxonomia completa: ~80 técnicas em 13 categorias, só sob demanda
-    └── persuasion.md           # 7 princípios de persuasão p/ compliance
-evals/
-└── protocol.md                 # protocolo manual de A/B + log de re-prompts
+├── scripts/
+│   ├── validate_prompt.py      # checa um prompt contra as regras do skill
+│   └── check_repo.py           # checa links, âncoras e numeração dos arquivos
+├── tests/                      # unittest: validador e golden cases
+├── references/                 # pesados, carregados SÓ sob demanda
+│   ├── tool-routing.md         # regras por ferramenta e modelo
+│   ├── templates.md            # 13 templates estruturais completos
+│   ├── patterns.md             # padrões que desperdiçam tokens/créditos
+│   ├── taxonomy.md             # taxonomia: ~100 nomes em 14 categorias + catálogo de White et al.
+│   ├── persuasion.md           # 7 princípios de persuasão p/ compliance
+│   ├── defenses.md             # defesas para conteúdo não confiável (conceitual)
+│   └── image-styles.md         # nomes de estilo para prompts de imagem
+├── evals/
+│   ├── protocol.md             # protocolo manual de A/B + log de re-prompts
+│   └── golden_cases.json       # 12 casos fixos para o validador
+└── .githooks/
+    └── pre-commit              # opcional: checador + testes antes do commit
 ```
 
-`SKILL.md` contém só a camada de prioridade (modo passivo) e as regras do gerador (modo ativo), com **links** para os arquivos de `references/` — a taxonomia completa das ~80 técnicas mora em `references/taxonomy.md`. O Claude lê `tool-routing.md` ou `taxonomy.md` só quando precisa (pedido de prompt, ou técnica fora da camada de prioridade). Isso é *progressive disclosure*: você não paga tokens por conhecimento que não está usando naquele momento.
+`SKILL.md` contém só a camada de prioridade (modo passivo) e as regras do gerador (modo ativo), com **links** para os arquivos de `references/` — a taxonomia completa (~100 nomes em 14 categorias, mais o catálogo de White et al.) mora em `references/taxonomy.md`. O Claude lê `tool-routing.md` ou `taxonomy.md` só quando precisa (pedido de prompt, ou técnica fora da camada de prioridade). Isso é *progressive disclosure*: você não paga tokens por conhecimento que não está usando naquele momento.
 
 Comparação: skills que carregam tudo no início custam milhares de tokens por sessão e causam o efeito "lost in the middle" (modelo ignora regras porque o contexto saturou). Aqui o custo fixo por sessão é só o SKILL.md.
 
@@ -244,17 +254,40 @@ Invioláveis, independente do pedido:
 
 - **Nova ferramenta:** adicione uma seção em `references/tool-routing.md` seguindo o padrão existente (nome em negrito, bullets curtos com regras específicas do modelo/versão).
 - **Novo template:** adicione em `references/templates.md` com letra nova + linha na tabela de índice.
+- **Nova regra de validação:** adicione a checagem em `scripts/validate_prompt.py`, um caso em `evals/golden_cases.json` e rode `python3 -m unittest discover -s tests`.
 - **Nova técnica (modo passivo):** alto impacto → camada de Prioridade em `SKILL.md`; senão, categoria certa em `references/taxonomy.md`.
 - **Regra pessoal fixa:** edite a seção "Modo gerador" do `SKILL.md`.
 - **Idioma:** `SKILL.md` e `references/` são lidos pelo modelo e ficam em inglês; `README.md` e `evals/` são para você e ficam em português.
 
 Mantenha o `SKILL.md` enxuto — detalhe pesado vai pra `references/`, senão você perde o benefício de contexto.
 
+## Validação e testes
+
+Tudo em biblioteca padrão do Python, sem instalar nada:
+
+```bash
+# Checa um prompt contra as regras do skill: CoT em modelo reasoning-native,
+# bloco de pensamento em Claude 5.x, prefill, CAPS empilhados, formato ausente,
+# agente sem condição de parada e linguagem vaga.
+python3 scripts/validate_prompt.py --target gpt-6-astra prompt.txt
+
+# Checa links, âncoras e a numeração de padrões e templates.
+python3 scripts/check_repo.py
+
+# Roda os testes, inclusive os 12 golden cases.
+python3 -m unittest discover -s tests -v
+```
+
+- **O que o validador não faz:** não julga se a resposta do modelo é boa. Ele lê só o texto do prompt. A qualidade continua no A/B manual de [`evals/protocol.md`](evals/protocol.md).
+- **Golden cases** (`evals/golden_cases.json`): 12 prompts fixos, cada um com o resultado esperado do validador. Eles testam o validador, não as respostas dos modelos. Se um caso quebrar, ou a regra mudou de propósito (atualize o caso) ou houve regressão.
+- **Limites conhecidos:** a maioria dos sinais é em inglês, com algumas formas em português (passo a passo, não, sem, formato, lista). Em prompts em português, as checagens de agente, CAPS e linguagem vaga não disparam, então a ausência de aviso não prova que o prompt está certo. A detecção de negação é simples: "Não pule a checagem passo a passo" pede raciocínio e não é marcado. A decisão está em aberto no código, em `requests_cot()`.
+- **Hook opcional:** `git config core.hooksPath .githooks` (uma vez por clone) faz o `check_repo.py` e os testes rodarem antes de cada commit. Não é ativado sozinho.
+
 ## Limitações conhecidas
 
 Documentadas de propósito — melhor você saber antes de instalar:
 
-1. **Sem benchmarks automatizados.** Não há evals automáticos nem A/B tests cegos dos prompts gerados. As regras vêm de documentação oficial dos vendors e prática da comunidade. O que existe: [`evals/protocol.md`](evals/protocol.md) — protocolo manual de A/B (seu prompt vs. prompt da skill, métrica = re-prompts até funcionar) com log de resultados, ainda sem nenhum registro. Barato, honesto, sem fingir ciência.
+1. **Sem benchmarks automatizados da qualidade.** Não há evals automáticos nem A/B tests cegos dos prompts gerados. O validador e os golden cases testam só as regras do próprio skill ([Validação e testes](#validação-e-testes)). As regras vêm de documentação oficial dos vendors e prática da comunidade. O que existe: [`evals/protocol.md`](evals/protocol.md) — protocolo manual de A/B (seu prompt vs. prompt da skill, métrica = re-prompts até funcionar) com log de resultados, ainda sem nenhum registro. Barato, honesto, sem fingir ciência.
 2. **Regras de routing envelhecem.** Modelos novos saem toda semana. `tool-routing.md` carrega uma data **"Last verified"**; se a ferramenta/modelo for mais novo que a data ou não estiver listado, a skill aplica regras genéricas e avisa em vez de chutar comportamento de versão. PRs de atualização são bem-vindos.
 3. **Nativa do Claude Code.** O carregamento sob demanda depende de `~/.claude/skills/`. Uso parcial em outros agentes é possível — ver [Uso fora do Claude Code](#uso-fora-do-claude-code).
 4. **Agregação, não invenção.** O valor está na curadoria, fusão e arquitetura de contexto — as fontes estão todas nos [Créditos](#créditos). Se você prefere as fontes originais separadas, use-as.
@@ -305,6 +338,7 @@ Sem resíduo — a skill não toca em nenhum outro arquivo.
 - **Modo gerador** baseado em [nidhinjs/prompt-master](https://github.com/nidhinjs/prompt-master) (tool routing, templates A–M, patterns, intent extraction), licença MIT.
 - **Fórmula de 7 componentes para imagem + modos de expertise** inspirados em [Hainrixz/claude-banana](https://github.com/Hainrixz/claude-banana) e [AgriciDaniel/banana-claude](https://github.com/AgriciDaniel/banana-claude).
 - **Princípios de persuasão** de [NeoLabHQ/context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit) (skill prompt-engineering), fundamentados em Meincke et al. (2025). Licença do upstream: GPL-3.0.
-- **Modo referência** (taxonomia de 13 categorias de técnicas) é taxonomia própria, inspirada em The Prompt Report.
+- **Modo referência** (taxonomia de técnicas) é taxonomia própria, inspirada em The Prompt Report (Schulhoff et al., 2024) e no catálogo de padrões de White et al. (2023).
+- **Adições de 2026-10-12** (defesas, validador, nomes de estilo de imagem e nomes de técnicas): ideias de [Valhall-ai/prompt-injection-mitigations](https://github.com/Valhall-ai/prompt-injection-mitigations), [drxvb/apex-prompt-architect](https://github.com/drxvb/apex-prompt-architect), [Hainrixz/claude-banana](https://github.com/Hainrixz/claude-banana), [amerob/ultimate-prompt-engineering-playbook](https://github.com/amerob/ultimate-prompt-engineering-playbook), [FareedKhan-dev/prompt-engineering-cheatsheet](https://github.com/FareedKhan-dev/prompt-engineering-cheatsheet), [KalyanKS-NLP/Prompt-Engineering-Techniques-Hub](https://github.com/KalyanKS-NLP/Prompt-Engineering-Techniques-Hub), [cicero-im/prompting](https://github.com/cicero-im/prompting) e [corralm/awesome-prompting](https://github.com/corralm/awesome-prompting). Licenças e detalhes em `NOTICE`.
 
 Licença do projeto: GPL-3.0 (arquivo `LICENSE`). Avisos e atribuições de terceiros: arquivo `NOTICE`.
