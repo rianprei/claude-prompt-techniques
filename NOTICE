@@ -1,0 +1,83 @@
+prompt-techniques
+Copyright (c) 2026 rianprei
+
+This project is distributed under the GNU General Public License, version 3
+(GPL-3.0). The full license text is in the LICENSE file.
+
+THIRD-PARTY NOTICES
+===================
+
+This project contains material adapted from, or derived from, the works listed
+below. Each work remains under its own license and copyright holders. The
+notices here are provided as those licenses require.
+
+1. nidhinjs/prompt-master
+   Source:        https://github.com/nidhinjs/prompt-master
+   License:       MIT
+   Relation:      Adapted. Basis of the generator mode and of the tool routing,
+                  template, and pattern references.
+   Files:         SKILL.md (generator mode), references/tool-routing.md,
+                  references/templates.md, references/patterns.md
+   Notice:        Copyright (c) 2026 Nidhin Joseph Nelson
+   Modifications: The files above were reworked and differ from the upstream
+                  versions. The change history is in git.
+   The MIT license text for this work is reproduced at the end of this file.
+
+2. NeoLabHQ/context-engineering-kit
+   Source:        https://github.com/NeoLabHQ/context-engineering-kit
+   License:       GNU General Public License v3.0
+   Relation:      Derived. The persuasion principles, examples, and combination
+                  table were adapted from the upstream prompt-engineering skill.
+   Files:         references/persuasion.md
+   Notice:        As stated by the upstream project. Its LICENSE file contains
+                  the standard GPL-3.0 text and no copyright line.
+   Modifications: The file above was adapted and differs from the upstream
+                  version.
+   This work is covered by the GPL-3.0 text in the LICENSE file.
+
+CONCEPTUAL REFERENCES
+---------------------
+Credited in README.md as inspiration for the image prompt formula and the
+expertise modes. If any text is copied from these works in the future, add
+that work's license notice here.
+
+- Hainrixz/claude-banana (MIT): https://github.com/Hainrixz/claude-banana
+- AgriciDaniel/banana-claude (MIT): https://github.com/AgriciDaniel/banana-claude
+
+ACADEMIC REFERENCES (cited, no text reproduced)
+-----------------------------------------------
+- Schulhoff, S. et al. (2024). The Prompt Report: A Systematic Survey of
+  Prompting Techniques. arXiv:2406.06608.
+- Meincke, L. et al. (2025). Call Me A Jerk: Persuading AI to Comply with
+  Objectionable Requests. SSRN 5357179.
+
+VENDOR DOCUMENTATION
+--------------------
+Model-routing rules were checked against public documentation from Anthropic,
+OpenAI, and xAI. The rules are stated in this project's own words, and no
+vendor text is reproduced.
+
+MIT LICENSE (nidhinjs/prompt-master)
+------------------------------------
+
+MIT License
+
+Copyright (c) 2026 Nidhin Joseph Nelson
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
