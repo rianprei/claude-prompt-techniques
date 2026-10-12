@@ -1,6 +1,6 @@
 # Technique catalog
 
-Detailed catalog of prompting techniques. Each row gives the source, status, novelty and kind. [taxonomy.md](taxonomy.md) is the short name index; this file holds the sources. It was created on 2026-10-12 from an external survey pass. Each entry's source was checked in that session, as section 1 describes. The corrections to the survey output are listed in section 4, and the explanations are summaries (section 5).
+Detailed catalog of prompting techniques. Each row gives the source, status, novelty and kind. [taxonomy.md](taxonomy.md) is the short name index; this file holds the sources. It was created on 2026-10-12 from an external survey pass. Each entry's source was checked in that session, as section 1 describes. The corrections to the external survey outputs are listed in section 4, and the explanations are summaries (section 5).
 
 **Status.** VERIFIED: the name, the source and the bibliographic data were checked, as section 1 describes (arXiv metadata, the paper text or abstract, or the page title). The explanation is a summary written for this catalog. It was not compared sentence by sentence with the source. NOT VERIFIED: not established.
 
@@ -17,7 +17,7 @@ Detailed catalog of prompting techniques. Each row gives the source, status, nov
 | SV-2024 | Vatsal and Dubey 2024, "A Survey of Prompt Engineering Methods in Large Language Models for Different NLP Tasks", [arXiv:2407.12994](https://arxiv.org/abs/2407.12994), 2024-07-17 | arXiv metadata only. |
 | WP-2023 | White et al. 2023, "A Prompt Pattern Catalog to Enhance Prompt Engineering with ChatGPT", [arXiv:2302.11382](https://arxiv.org/abs/2302.11382), 2023-02-21, nine authors | arXiv metadata. The 16 pattern names as recorded in taxonomy.md, which were read from the paper in an earlier session. |
 | PEG | promptingguide.ai technique pages | Each page used in the tables was fetched, and its title matched the technique, except the Graph of Thoughts link (section 4). Page text was not compared with the explanations. |
-| VENDOR | Anthropic: structured outputs, prompt caching, compaction overview. Google: structured outputs, context caching. OpenAI: structured outputs, compaction guide. | The Anthropic compaction overview was read. Other Anthropic and Google pages: titles checked. OpenAI pages: URL resolves, no title or text extracted. |
+| VENDOR | Anthropic: structured outputs, prompt caching, compaction overview. Google: structured outputs, context caching. OpenAI: structured outputs, compaction guide. | The Anthropic compaction overview was read. The Anthropic and Google caching pages were searched for their caching modes, and the Google caching page for compaction (no match). Other Anthropic and Google pages: titles checked. OpenAI pages: URL resolves, no title or text extracted. |
 
 ## 2. Catalog
 
@@ -135,7 +135,7 @@ Detailed catalog of prompting techniques. Each row gives the source, status, nov
 |---|---|---|---|---|---|---|
 | Output-Format Prompting | Output control | Specifies a required format such as JSON, CSV, Markdown or a fixed template. Useful when downstream systems expect predictable output; instructions alone do not guarantee valid syntax or schema compliance. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
 | Structured Outputs (schema-constrained generation) | Vendor API feature | Uses the provider's schema mechanism to constrain output to a structure. Useful for machine-readable extraction and tool workflows; supported schemas and limits vary by provider and feature. | [Anthropic](https://platform.claude.com/docs/en/build-with-claude/structured-outputs) (title checked); [Google](https://ai.google.dev/gemini-api/docs/structured-output) (title checked); [OpenAI](https://developers.openai.com/api/docs/guides/structured-outputs) (URL resolves, text not extracted) | VERIFIED | NEW | VENDOR |
-| Prompt Caching | Vendor API feature | Reuses eligible prompt prefixes that were already processed, to cut repeated cost and often latency. Useful for stable system instructions or shared material; thresholds, expiry, pricing and invalidation are provider-specific. | [Anthropic prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) (title checked); [Google context caching](https://ai.google.dev/gemini-api/docs/caching) (title checked) | VERIFIED | NEW | VENDOR |
+| Prompt Caching | Vendor API feature | Reuses eligible prompt prefixes that were already processed, to cut repeated cost and often latency. Anthropic offers automatic caching and explicit `cache_control` breakpoints, with 5-minute or 1-hour TTLs. Google offers implicit caching, enabled by default, and explicit cache objects through generateContent; the Interactions API supports implicit caching only. Useful for stable system instructions or shared material; thresholds, expiry, pricing and invalidation are provider-specific. | [Anthropic prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) (searched for modes); [Google context caching](https://ai.google.dev/gemini-api/docs/caching) (searched for modes) | VERIFIED | NEW | VENDOR |
 | Context Compaction | Vendor API feature | Anthropic: the server replaces older turns of a conversation with a summary written by Claude, to keep a long conversation or agent task inside the context window. On-demand and token-threshold modes exist, both marked beta on the page. Context editing is a separate, rule-based mechanism that clears old tool results or thinking blocks. A summary can drop details the task still needs. | [Anthropic compaction overview](https://platform.claude.com/docs/en/build-with-claude/compaction) (read); [OpenAI compaction guide](https://developers.openai.com/api/docs/guides/compaction) (URL resolves, text not extracted) | VERIFIED | NEW | VENDOR |
 
 ### 2.10 Reasoning and decomposition
@@ -153,6 +153,7 @@ Detailed catalog of prompting techniques. Each row gives the source, status, nov
 | Uncertainty-Routed CoT | Reasoning and ensembling | Samples several reasoning paths and routes uncertain cases by an agreement threshold. Sends uncertain cases to more inference; threshold quality and sampling cost decide its value. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
 | Plan-and-Solve Prompting | Reasoning and decomposition | Separates planning the solution from executing the plan. Helps structured multi-step problems; a flawed initial plan causes consistent downstream errors. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
 | Least-to-Most Prompting | Decomposition | Breaks a problem into simpler subproblems and solves them in order, reusing earlier answers. Useful for compositional reasoning; early errors and poor decomposition propagate. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
+| Prompt Chaining (prompt chain) | Decomposition | Splits a task into two or more prompt templates used in succession, where the output of one step is the input of the next. Useful when a task is too large for one prompt; the state passed between steps must be managed, and an error in an early step propagates. | PR-2024 (vocabulary: "prompt chaining"); PEG: Prompt Chaining | VERIFIED | ALREADY-IN | PROMPT |
 | Decomposed Prompting (DECOMP) | Decomposition and tools | Routes subproblems to specific functions or separate model calls. Useful for modular tasks; depends on correct decomposition, suitable components and reliable interfaces. | PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
 | Tree of Thoughts (ToT) | Search and reasoning | Explores several candidate intermediate steps in a tree and evaluates which branches continue. Useful for planning and search; branching can be expensive and depends on evaluation quality. | PEG: Tree of Thoughts (ToT); PR-2024 | VERIFIED | ALREADY-IN | PROMPT |
 | Graph of Thoughts (GoT) | Search and reasoning | Models LLM-generated thoughts as an arbitrary graph whose edges are dependencies, so thoughts can be combined, distilled or refined through feedback loops. Useful when alternatives depend on each other; graph management and evaluation of intermediate states add complexity. | [Besta et al. 2023, arXiv:2308.09687](https://arxiv.org/abs/2308.09687); PR-2024 body names Graph-of-Thought (section 4) | VERIFIED | ALREADY-IN | PROMPT |
@@ -207,11 +208,11 @@ These entries were not established. Their absence from the verified rows does no
 
 | Technique (aliases) | Category | Explanation | Source | Status | Novelty | Kind |
 |---|---|---|---|---|---|---|
-| Google API context compaction | Vendor API feature | No Google compaction page was looked for. The Google pages that were checked are structured outputs and context caching; caching is not a substitute for compaction. | none checked | NOT VERIFIED | NEW | VENDOR |
+| Google API context compaction | Vendor API feature | No Google compaction page was looked for. The Google caching page was searched for compaction and has no match, so caching does not stand in for it. | none checked | NOT VERIFIED | NEW | VENDOR |
 | "Take a deep breath" as a general reasoning improvement | Reasoning cue | The OPRO result covers one optimizer, one scorer and one benchmark. Nothing checked shows that the phrase helps across models or tasks. | OPRO for that single setting only | NOT VERIFIED | NEW | PROMPT |
 | Prompt-compression methods beyond the LLMLingua family | Prompt compression | Other methods were not searched for or checked, so none are listed here. | none checked | NOT VERIFIED | NEW | PROMPT |
 
-## 4. Corrections to the survey output
+## 4. Corrections to the external survey outputs
 
 1. **Counts.** The survey output says 103 rows, 99 verified, 90 already-in and 96 prompt. Its own tables hold 102 rows: 98 verified, 4 not verified, 89 already-in and 95 prompt. Section 6 has the counts for this file.
 2. **PR-2024 title.** The output gives "A Systematic Survey of Prompting Techniques". The arXiv title of 2406.06608 is "A Systematic Survey of Prompt Engineering Techniques".
@@ -224,6 +225,16 @@ These entries were not established. Their absence from the verified rows does no
 9. **PEG pages.** The output says all 18 linked technique pages were opened. This audit checked the 13 used in its tables, and all 13 resolve. The other five were not checked.
 10. **OPRO.** The output did not include OPRO. taxonomy.md already listed it. It is now a NEW row, because PR-2024 cites the paper only in its references.
 11. **Rows the output did not have.** The output had no rows for G-Eval, multi-agent debate, CAMEL, MetaGPT, DSPy, IRCoT, HyDE, OPRO, TextGrad, EvoPrompt, Promptbreeder, Self-RAG, Set-of-Mark or the LLMLingua family. The user's scope covers them (automatic optimization, retrieval, judging, multi-agent, multimodal, compression), so they were added in section 2 with the sources checked. Their novelty follows PR-2024's body text, not the reference list.
+12. **Gemini output: novelty flags.** Prompt Caching, Structured Outputs and Context Caching / Context Compaction are marked ALREADY-IN. None of them is named in PR-2024, PEG or WP-2023, so they are NEW.
+13. **Gemini output: counts.** Its counts (18 rows, 12 verified, 6 not verified, 6 NEW, 12 ALREADY-IN) follow its own rows. With the flags corrected, the same 18 rows give 9 NEW and 9 ALREADY-IN.
+14. **Gemini output: rows marked NOT VERIFIED.** LATS, RAP, ReWOO, Self-Debugging and SmoothLLM are VERIFIED here: their arXiv metadata and abstracts were read in this audit (sections 2.1 and 2.5). "Not directly read" describes that one session only.
+15. **Gemini output: "Take a Deep Breath".** The folklore claim matches section 3. The provenance is verified (OPRO, section 2.10).
+16. **Gemini output: caching "contradiction".** Not a contradiction. Anthropic offers automatic caching and explicit `cache_control` breakpoints; Google offers implicit caching, enabled by default, and explicit cache objects. Each provider documents both kinds (section 2.9).
+17. **Gemini output: variance figure.** The output says "up to 40%" and attributes it to Schulhoff et al. (2024). PR-2024 has no 40% figure. It reports Zhao et al. (2021b): minor changes can alter GPT-3's accuracy by up to 30%.
+18. **Gemini output: "2024–2026 systematic surveys".** No 2026 survey is identified in this catalog. The systematic surveys checked (PR-2024, SS-2024, SV-2024) are all from 2024.
+19. **Gemini output: context caching and compaction.** One row joins two features. Caching reuses prompt prefixes; compaction (Anthropic) replaces older turns with a summary. The Google caching page does not mention compaction, so the output's Google source for compaction is not supported.
+20. **Gemini output: sources.** LlamaIndex documentation is not a provider source. Its caching claims are covered by the Anthropic and Google pages in section 1.
+21. **Gemini output: gaps wording.** SmoothLLM is an open research method (arXiv:2310.03684), not a proprietary defense. LATS is an agent search framework (arXiv:2310.04406), not a defense.
 
 ## 5. Gaps
 
@@ -240,13 +251,13 @@ Counted from the status, novelty and kind cells of the catalog rows (sections 2 
 
 | Metric | Count |
 |---|---|
-| Total rows | 118 |
-| VERIFIED | 115 |
+| Total rows | 119 |
+| VERIFIED | 116 |
 | NOT VERIFIED | 3 |
 | NEW | 26 |
-| ALREADY-IN | 92 |
-| PROMPT | 111 |
+| ALREADY-IN | 93 |
+| PROMPT | 112 |
 | VENDOR | 4 |
 | TRAINING-TIME | 3 |
 
-Arithmetic check: 115 + 3 = 118; 26 + 92 = 118; 111 + 4 + 3 = 118.
+Arithmetic check: 116 + 3 = 119; 26 + 93 = 119; 112 + 4 + 3 = 119.

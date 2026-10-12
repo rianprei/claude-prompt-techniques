@@ -45,7 +45,7 @@ Checked on arXiv (title, first author, and date read in session):
 - 2404.13208 (Wallace et al., 2024-04-19): The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions
 - 2306.05685 (Zheng et al., 2023-06-09): Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena
 
-The rows added on 2026-10-12 (ReWOO, RAP, LATS, Self-Debugging, HyDE, IRCoT, Self-RAG, the LLMLingua family, OPRO, DSPy, TextGrad, EvoPrompt, Promptbreeder, G-Eval, multi-agent debate, CAMEL, MetaGPT, Set-of-Mark, Sentinel tokens, Graph of Thoughts, Anthropic compaction) have their sources and checks in [technique-catalog.md](technique-catalog.md), sections 1 and 2.
+The rows added on 2026-10-12 (ReWOO, RAP, LATS, Self-Debugging, HyDE, IRCoT, Self-RAG, the LLMLingua family, OPRO, DSPy, TextGrad, EvoPrompt, Promptbreeder, G-Eval, multi-agent debate, CAMEL, MetaGPT, Set-of-Mark, Sentinel tokens, Graph of Thoughts, Anthropic compaction, Prompt Chaining) have their sources and checks in [technique-catalog.md](technique-catalog.md), sections 1 and 2.
 
 Not verified. Do not cite these as established:
 - Output Priming: named in amerob and in FareedKhan's cheatsheet; no primary source found. The prefill form is API-only and returns 400 on Claude 4.6+.
