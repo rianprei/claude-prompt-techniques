@@ -12,7 +12,7 @@ SCRIPT = os.path.join(ROOT, "scripts", "validate_prompt.py")
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 from contracts import load_catalog  # noqa: E402
-from validate_prompt import exit_status, main, requests_cot, validate  # noqa: E402
+from validate_prompt import exit_status, main, reasoning_native, requests_cot, validate  # noqa: E402
 
 # Built from two parts so that this file does not contain the forbidden text itself.
 KEY_PARAM = "?" + "key="
@@ -183,6 +183,20 @@ class CatalogFailure(unittest.TestCase):
         with (mock.patch("validate_prompt.load_catalog", side_effect=OSError("missing")),
               contextlib.redirect_stderr(io.StringIO())):
             self.assertEqual(main(["--json", "-"]), 2)
+
+
+class ReasoningNativeTargetTests(unittest.TestCase):
+    def test_a_family_that_starts_the_name_matches(self):
+        for target in ("gpt-6-astra", "gpt-6.1-sol", "o3", "o3-mini", "o4-mini", "deepseek-r1",
+                       "claude-opus-5-5", "claude-fable-5-1", "openai/gpt-6-luna",
+                       "deepseek-r1:8b", "ollama/deepseek-r1", "openrouter/deepseek/deepseek-r1", "together/o3-mini"):
+            with self.subTest(target=target):
+                self.assertTrue(reasoning_native(target))
+
+    def test_a_name_that_only_contains_a_family_does_not_match(self):
+        for target in ("my-project-gpt-6-test", "gpt-60", "notgpt-6", "gemini-nano-banana-2.1", "claude-sonnet-4-6"):
+            with self.subTest(target=target):
+                self.assertFalse(reasoning_native(target))
 
 
 if __name__ == "__main__":

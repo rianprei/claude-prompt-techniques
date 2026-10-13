@@ -42,7 +42,7 @@ The page opens at http://127.0.0.1:8765/. Options: `--port` and `--data-dir`
 - **Failure.** A failed provider call keeps its approval spent. Nothing retries on its own, and nothing rephrases
   a blocked prompt, as the catalog's safety section asks.
 - **Missing key.** Refused before any approval is spent.
-- **Runs cut off by a stop.** When the studio starts, a run still `running` that began 30 minutes or more earlier is marked `failed` with error `interrupted`. Younger runs are left alone, because a live run from another studio process looks the same in the record. A run record that cannot be read is skipped, so it does not stop the studio from starting.
+- **Runs cut off by a stop.** When the studio starts, a run still `running` that began 30 minutes or more earlier is marked `failed` with error `interrupted`. Younger runs are left alone, because a live run from another studio process looks the same in the record. A run record that cannot be read is skipped by the start-up reconciliation, and the listing leaves it out with a line on stderr that names it. One damaged file therefore does not stop the studio from starting or blank the page.
 
 ## Security
 

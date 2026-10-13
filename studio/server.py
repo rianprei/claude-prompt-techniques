@@ -112,6 +112,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path == "/":
                 with open(os.path.join(STATIC_DIR, "index.html"), encoding="utf-8") as handle:
+                    # token_urlsafe gives only A-Z, a-z, 0-9, "-" and "_", so the HTML needs no escaping here.
                     page = handle.read().replace("__STUDIO_TOKEN__", self.studio.token)
                 return self._send(200, page.encode("utf-8"), "text/html; charset=utf-8")
             if path in STATIC_FILES:

@@ -23,6 +23,7 @@ from contracts import KEY_IN_URL, MODEL_ID, find_model, load_catalog, nearest_ra
 
 # Models that always reason internally (references/tool-routing.md).
 REASONING_NATIVE = ("o3", "o4-mini", "deepseek-r1", "gpt-6", "fable-5", "mythos-5", "opus-5-5")
+VENDOR_PREFIX = re.compile(r"^(?:claude|anthropic|openai|google|xai)-")
 CLAUDE_5 = re.compile(r"claude-(fable|mythos|opus|sonnet|haiku)-5")
 # Image models only: Gemini image IDs and the Nano Banana names. Text models such as gemini-2.5-pro do not match.
 IMAGE_TARGET = re.compile(r"gemini-.*-image|nano[- ]?banana")
@@ -100,8 +101,19 @@ def requests_cot(sentence):
     return len(NEGATOR.findall(clause)) % 2 == 0
 
 
+# A target counts when one of these families starts its model name and is followed by "-", "." or ":" (version,
+# size or Ollama tag). A substring test would also match names such as "my-gpt-6-wrapper" or "gpt-60".
+def reasoning_native(target):
+    # Gateways write "provider/model" and "provider/vendor/model", so the model is the part after the last slash.
+    model = target.rsplit("/", 1)[-1]
+    # "deepseek-r1" is itself a family name, so the model is also tried without a vendor prefix such as "claude-".
+    names = (model, VENDOR_PREFIX.sub("", model, count=1))
+    return any(name == key or any(name.startswith(key + sep) for sep in "-.:")
+               for name in names for key in REASONING_NATIVE)
+
+
 def check_cot(sentences, target):
-    if not any(key in target for key in REASONING_NATIVE):
+    if not reasoning_native(target):
         return []
     if any(requests_cot(s) for s in sentences):
         return [finding("ERROR", "E-COT-REASONING",

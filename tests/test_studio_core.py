@@ -1,5 +1,6 @@
 import datetime as dt
 import hashlib
+import io
 import os
 import stat
 import sys
@@ -439,6 +440,18 @@ class InterruptAndListingTests(StoreCase):
         record["status"] = "failed"
         self.store.write_run(record)
         self.assertEqual(self.store.list_runs()[0]["status"], "failed")
+
+    def test_a_damaged_run_is_left_out_and_named_once(self):
+        self.execute()
+        name = "run_" + "9" * 16 + ".json"
+        with open(self.store._path("runs", name), "w", encoding="utf-8") as handle:
+            handle.write("{not json")
+        with mock.patch("sys.stderr", new_callable=io.StringIO) as err:
+            first = self.store.list_runs(limit=None)
+            second = self.store.list_runs(limit=None)
+        self.assertEqual((len(first), len(second)), (1, 1))
+        self.assertEqual(err.getvalue().count("cannot be read"), 1)
+        self.assertIn(name, err.getvalue())
 
 
 if __name__ == "__main__":

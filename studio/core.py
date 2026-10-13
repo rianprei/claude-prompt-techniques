@@ -17,6 +17,7 @@ import json
 import os
 import re
 import secrets
+import sys
 import tempfile
 import threading
 from datetime import datetime, timedelta, timezone
@@ -189,6 +190,7 @@ class Store:
             os.makedirs(os.path.join(root, sub), mode=0o700, exist_ok=True)
         self._runs_cache = {}  # run file name -> (file identity, record); see list_runs
         self._runs_lock = threading.Lock()
+        self._runs_warned = set()  # (file name, identity) of each unreadable run record already reported
 
     def _path(self, *parts):
         return os.path.join(self.root, *parts)
@@ -352,8 +354,9 @@ class Store:
         """Newest first. limit=None returns every run.
 
         A file whose identity (inode, mtime, size) has not changed since the last call is not parsed again.
-        Every write adds keys or entries to a record, so its size changes on each write. The returned records
-        are shared with the cache, so callers must not change them.
+        Every write adds keys or entries to a record, so its size changes on each write. A record that cannot be
+        read is left out and named once on stderr, so one damaged file does not blank the listing. The returned
+        records are shared with the cache, so callers must not change them.
         """
         with self._runs_lock:
             records, cache = [], {}
@@ -370,6 +373,11 @@ class Store:
                             hit = (identity, json.load(handle))
                 except FileNotFoundError:  # removed since listdir
                     continue
+                except ValueError:  # not valid JSON: named once per version of the file, then left out
+                    if (name, identity) not in self._runs_warned:
+                        self._runs_warned.add((name, identity))
+                        sys.stderr.write(f"studio: run record {name} cannot be read and is left out of the listing\n")
+                    continue
                 cache[name] = hit
                 records.append(hit[1])
             self._runs_cache = cache
@@ -381,8 +389,8 @@ class Store:
 
         Only runs started at least STALE_RUN_AFTER ago are touched. A live run should be younger than that:
         one provider call has no retry and a 300 s socket timeout. A record that cannot be read is skipped
-        and left as it is, so a damaged file does not stop the studio from starting. GET /api/state still
-        fails on it.
+        and left as it is, so a damaged file does not stop the studio from starting; the listing leaves it out
+        and names it on stderr.
         """
         now = now or utcnow()
         changed = 0

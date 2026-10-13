@@ -59,7 +59,7 @@ Dois modos numa skill só:
 
 Cobre **19 categorias de técnicas**, mais o catálogo de padrões de White et al. (2023) — com **camadas de prioridade** (nem toda técnica pesa igual): alto impacto (role, context, output format, few-shot, grounding), condicionais (CoT só em modelo não-reasoning, ReAct/RAG só com ferramentas reais) e experimentais/legadas em modelos 2025+ (ToT, GoT, Self-Consistency — só sob pedido explícito, risco de fabricação). Inspirada em [The Prompt Report](https://arxiv.org/abs/2406.06608); as regras por modelo vêm das docs oficiais dos fornecedores, com a data de verificação em `references/tool-routing.md`. Inclui **persuasão** (compliance de instrução — ver caveat na [seção própria](#princípios-de-persuasão)).
 
-Antes de entregar qualquer prompt, a skill faz **self-check** contra as regras da ferramenta-alvo e corrige violações em silêncio. Ferramenta que não está no routing: busca best practices na web (se disponível) e oferece o bloco pronto pra você adicionar ao `tool-routing.md`.
+Antes de entregar qualquer prompt, a skill instrui o modelo a conferir o próprio prompt contra as regras da ferramenta-alvo e corrigir violações antes de mostrá-lo. Isso é uma instrução ao modelo, não um validador automático: o `scripts/validate_prompt.py` é uma ferramenta separada, que você roda à mão. Ferramenta que não está no routing: busca best practices na web (se disponível) e oferece o bloco pronto pra você adicionar ao `tool-routing.md`.
 
 ## Por que ela existe
 
@@ -170,7 +170,7 @@ prompt-techniques/
 ├── scripts/
 │   ├── contracts.py            # catálogo, IDs, proporções e regex compartilhados
 │   ├── validate_prompt.py      # checa um prompt contra as regras do skill
-│   └── check_repo.py           # checa links e âncoras locais, formatação, numeração e contratos de modelo e chave
+│   └── check_repo.py           # checa links e âncoras locais, formatação, marcadores de pendência, numeração e contratos de modelo e chave; avisa se o catálogo tem mais de 90 dias
 ├── studio/                     # GUI local: brief, aprovação de uso única, revisão (README próprio)
 ├── tests/                      # unittest: validador, golden cases, catálogo, contagens, contratos e studio
 ├── references/                 # pesados, carregados SÓ sob demanda
@@ -282,7 +282,7 @@ Tudo em biblioteca padrão do Python, sem pacotes externos. Os scripts vêm do c
 # e proporção fora das 14 oficiais (Gemini).
 python3 scripts/validate_prompt.py --target gpt-6-astra prompt.txt
 
-# Checa links e âncoras locais, formatação, numeração de padrões e templates, IDs de modelo contra o catálogo e chave fora da URL. URLs externas não são checadas.
+# Checa links e âncoras locais, formatação, marcadores de pendência, numeração de padrões e templates, IDs de modelo contra o catálogo e chave fora da URL, e avisa se o catálogo tiver mais de 90 dias. URLs externas não são checadas.
 python3 scripts/check_repo.py
 
 # Roda os testes: validador, 19 golden cases, catálogo de imagem, contagens, contratos e studio.
