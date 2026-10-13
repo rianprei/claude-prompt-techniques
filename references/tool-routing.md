@@ -33,7 +33,7 @@ Identify the tool and route accordingly. Read full templates from [templates.md]
 
 **Claude (claude.ai, Claude API, Claude Code)**
 
-Current family (Anthropic docs, 2026-10-12): Fable 5.1 and Mythos 5.1, Fable 5 and Mythos 5, Opus 5.5 and Opus 5, Sonnet 5.5 and Sonnet 5, Haiku 5.5 and Haiku 4.5. Opus 4.6–4.8 and Sonnet 4.6 remain selectable. Do not assume a specific point version — ask or check current docs if the user names one; do not hardcode a "default" version number in generated prompts.
+Current models (Anthropic models overview, read 2026-10-12; lifecycle "active"): Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5. Specialized models in the same docs: Mythos 5.1 and Mythos 5. Legacy models in the docs navigation: Fable 5, Opus 5, Sonnet 5, Opus 4.8 to 4.5, Sonnet 4.6, Sonnet 4.5 and Haiku 4.5. Do not assume a specific point version — ask or check current docs if the user names one; do not hardcode a "default" version number in generated prompts.
 
 *Durable across Claude 4.x/5.x:*
 - Be explicit and specific — Claude follows instructions literally. It does exactly what you say, nothing more. Missing context = narrow literal output, not a smart guess.

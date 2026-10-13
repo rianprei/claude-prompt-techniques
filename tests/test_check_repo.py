@@ -8,7 +8,7 @@ import unittest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
-from check_repo import check_key_in_url, check_model_ids  # noqa: E402
+from check_repo import check_key_in_url, check_model_ids, repo_files  # noqa: E402
 
 CATALOG = {
     "models": [
@@ -89,6 +89,17 @@ class OutsideGitTest(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stderr)
         self.assertIn("needs a git clone", result.stderr)
         self.assertNotIn("Traceback", result.stderr)
+
+
+class FileListingTest(unittest.TestCase):
+    def test_names_with_spaces_are_listed_whole(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            subprocess.run(["git", "init", "-q", tmp], check=True)
+            for name in ("a b.md", "c.md"):
+                with open(os.path.join(tmp, name), "w", encoding="utf-8") as fh:
+                    fh.write("x\n")
+            subprocess.run(["git", "-C", tmp, "add", "-A"], check=True)
+            self.assertEqual(repo_files(tmp), ["a b.md", "c.md"])
 
 
 if __name__ == "__main__":

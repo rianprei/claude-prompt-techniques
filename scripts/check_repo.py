@@ -37,21 +37,23 @@ def read_text(rel):
         return None
 
 
-def repo_files():
+def repo_files(root=ROOT):
     """Tracked files plus new files that git does not ignore, so new files are checked before commit.
 
     A file deleted from disk but still in the index is left out instead of crashing the run.
     A copy without .git has no index to read, so the run stops with a message, not a traceback.
+    Names are read NUL-separated, so a name that contains a space is kept whole.
     """
     try:
         out = subprocess.check_output(
-            ["git", "ls-files", "--cached", "--others", "--exclude-standard"],
-            cwd=ROOT, text=True, stderr=subprocess.DEVNULL,
+            ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
+            cwd=root, stderr=subprocess.DEVNULL,
         )
     except (OSError, subprocess.CalledProcessError):
         raise SystemExit("check_repo.py needs a git clone that git can read: it lists files with "
                          "git ls-files. A copy without .git cannot run it.") from None
-    return sorted(f for f in set(out.split()) if os.path.exists(os.path.join(ROOT, f)))
+    names = {os.fsdecode(name) for name in out.split(b"\0") if name}
+    return sorted(f for f in names if os.path.exists(os.path.join(root, f)))
 
 
 def slugify(text):

@@ -170,7 +170,7 @@ prompt-techniques/
 ├── scripts/
 │   ├── contracts.py            # catálogo, IDs, proporções e regex compartilhados
 │   ├── validate_prompt.py      # checa um prompt contra as regras do skill
-│   └── check_repo.py           # checa links, âncoras, formatação, numeração e contratos de modelo e chave
+│   └── check_repo.py           # checa links e âncoras locais, formatação, numeração e contratos de modelo e chave
 ├── studio/                     # GUI local: brief, aprovação de uso única, revisão (README próprio)
 ├── tests/                      # unittest: validador, golden cases, catálogo, contratos e studio
 ├── references/                 # pesados, carregados SÓ sob demanda
@@ -251,7 +251,7 @@ Inclui tabela de qual combinação usar por tipo de prompt (disciplina/guidance/
 
 ## Regras fixas
 
-Invioláveis, independente do pedido:
+Regras do gerador, válidas em todo pedido. São instruções ao modelo. O validador só as verifica, por heurística textual, nas regras 2 e 6 (`check_cot` e `check_agent_stop`); as demais não têm verificação automática:
 
 1. **Nunca gera prompt sem confirmar a ferramenta-alvo** — prompt genérico é prompt ruim.
 2. **Nunca adiciona CoT em modelo reasoning-native** (o3, o4-mini, DeepSeek-R1, Qwen3 thinking) — eles já pensam internamente; CoT explícito degrada a saída.
@@ -282,7 +282,7 @@ Tudo em biblioteca padrão do Python, sem instalar nada:
 # e proporção fora das 14 oficiais (Gemini).
 python3 scripts/validate_prompt.py --target gpt-6-astra prompt.txt
 
-# Checa links, âncoras, formatação, numeração de padrões e templates, IDs de modelo contra o catálogo e chave fora da URL.
+# Checa links e âncoras locais, formatação, numeração de padrões e templates, IDs de modelo contra o catálogo e chave fora da URL. URLs externas não são checadas.
 python3 scripts/check_repo.py
 
 # Roda os testes: validador, 19 golden cases, catálogo de imagem, contratos e studio.
