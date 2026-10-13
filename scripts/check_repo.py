@@ -41,10 +41,16 @@ def repo_files():
     """Tracked files plus new files that git does not ignore, so new files are checked before commit.
 
     A file deleted from disk but still in the index is left out instead of crashing the run.
+    A copy without .git has no index to read, so the run stops with a message, not a traceback.
     """
-    out = subprocess.check_output(
-        ["git", "ls-files", "--cached", "--others", "--exclude-standard"], cwd=ROOT, text=True
-    )
+    try:
+        out = subprocess.check_output(
+            ["git", "ls-files", "--cached", "--others", "--exclude-standard"],
+            cwd=ROOT, text=True, stderr=subprocess.DEVNULL,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        raise SystemExit("check_repo.py needs a git clone that git can read: it lists files with "
+                         "git ls-files. A copy without .git cannot run it.") from None
     return sorted(f for f in set(out.split()) if os.path.exists(os.path.join(ROOT, f)))
 
 

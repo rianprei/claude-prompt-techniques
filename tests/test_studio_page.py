@@ -19,11 +19,14 @@ HARNESS = os.path.join(ROOT, "tests", "studio_page_check.mjs")
 NODE = shutil.which("node")
 
 
-@unittest.skipUnless(NODE, "node is not installed; the page script check is skipped")
 class PageScriptTest(unittest.TestCase):
     """Runs static/app.js against the real server, through a small DOM stub. Localhost only."""
 
     def test_page_script_drives_the_real_api(self):
+        if NODE is None:
+            if os.environ.get("STUDIO_REQUIRE_NODE") == "1":
+                self.fail("node is not installed, and STUDIO_REQUIRE_NODE=1 makes that a failure")
+            self.skipTest("node is not installed; the page script check is skipped")
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         quiet = mock.patch("sys.stderr", new=io.StringIO())

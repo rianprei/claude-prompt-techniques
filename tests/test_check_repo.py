@@ -1,6 +1,8 @@
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
 import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -72,6 +74,21 @@ class RepositoryContractTest(unittest.TestCase):
             cwd=ROOT, capture_output=True, text=True,
         )
         self.assertEqual(result.returncode, 0, result.stdout)
+
+
+class OutsideGitTest(unittest.TestCase):
+    def test_copy_without_git_stops_with_a_message(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, "scripts"))
+            for name in ("check_repo.py", "contracts.py"):
+                shutil.copy(os.path.join(ROOT, "scripts", name), os.path.join(tmp, "scripts", name))
+            result = subprocess.run(
+                [sys.executable, os.path.join(tmp, "scripts", "check_repo.py")],
+                cwd=tmp, capture_output=True, text=True,
+            )
+        self.assertEqual(result.returncode, 1, result.stderr)
+        self.assertIn("needs a git clone", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
 
 
 if __name__ == "__main__":

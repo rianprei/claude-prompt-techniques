@@ -47,6 +47,7 @@ The page opens at http://127.0.0.1:8765/. Options: `--port` and `--data-dir`
 
 - The server listens on 127.0.0.1 only. Any Host header other than 127.0.0.1 or localhost is refused (DNS rebinding).
 - Every POST needs the per-process token in `X-Studio-Token` and a JSON body. No CORS headers are sent.
+- Only POST needs the token. `GET /api/state` and the generated images (`/api/runs/<id>/image`) need only the Host check, so any process on this machine can connect to 127.0.0.1 and read run history and images. Browsers on other sites cannot read them: no CORS headers are sent, and the Host check blocks DNS rebinding.
 - The API key is read from `GEMINI_API_KEY` on each run. It goes only in the `x-goog-api-key` header. It is never in a URL,
   never stored, never shown in the page or the state, and redacted from provider error messages. Redirects are refused, so the header never reaches a second address.
 - The server sends a strict Content-Security-Policy. The page uses no inline scripts and builds no HTML from data.
@@ -82,7 +83,7 @@ timeout (the client uses 300 s, our own choice). No live call was made while thi
 - `test_studio_client.py`: the request and response shapes, with a fake transport.
 - `test_studio_server.py`: the HTTP server end to end with the fake provider, plus the missing-key case.
 - `test_studio_page.py`: runs `tests/studio_page_check.mjs` against the real server, through a small DOM stub,
-  when Node is installed. It is skipped otherwise.
+  when Node is installed. It is skipped otherwise. Set `STUDIO_REQUIRE_NODE=1` (for example in CI) to make a missing Node a failure instead.
 
 No test calls Google's API. The tests use localhost only.
 

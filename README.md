@@ -86,18 +86,20 @@ mkdir -p ~/.claude/skills/prompt-techniques/references
 base=https://raw.githubusercontent.com/rianprei/claude-prompt-techniques/master
 curl -fL $base/SKILL.md -o ~/.claude/skills/prompt-techniques/SKILL.md
 curl -fL $base/README.md -o ~/.claude/skills/prompt-techniques/README.md
+curl -fL $base/LICENSE -o ~/.claude/skills/prompt-techniques/LICENSE
+curl -fL $base/NOTICE -o ~/.claude/skills/prompt-techniques/NOTICE
 for f in tool-routing patterns templates persuasion taxonomy technique-catalog defenses image-styles gemini-image-models; do
   curl -fL $base/references/$f.md -o ~/.claude/skills/prompt-techniques/references/$f.md
 done
 ```
 
-Sem git, a instalação traz só o skill: `SKILL.md`, `README.md` e os 9 arquivos `.md` de `references/`. `scripts/`, `studio/`, `tests/` e `evals/` não entram nessa instalação; para o validador, o Studio ou os testes, use a instalação via git.
+Sem git, a instalação traz o skill, a licença e o NOTICE: `SKILL.md`, `README.md`, `LICENSE`, `NOTICE` e os 9 arquivos `.md` de `references/`. Ficam de fora `scripts/`, `studio/`, `tests/`, `evals/` e `references/gemini-image-models.json`, que só os scripts, o Studio e os testes usam; para eles, use a instalação via git.
 
 **Verificar:**
 
 ```bash
 ls ~/.claude/skills/prompt-techniques/ ~/.claude/skills/prompt-techniques/references/
-# Esperado: SKILL.md, README.md e references/ com 9 arquivos .md
+# Esperado: SKILL.md, README.md, LICENSE, NOTICE e references/ com 9 arquivos .md
 ```
 
 **Ativar:** abra uma sessão nova do Claude Code. A skill carrega automaticamente — zero configuração. Pra confirmar, pergunte ao Claude: "qual skill de prompt engineering você tem disponível?"
@@ -302,7 +304,7 @@ python3 -m studio serve --fake-provider      # imagens de teste, sem rede e sem 
 GEMINI_API_KEY=... python3 -m studio serve   # API real; a chave é lida em cada execução
 ```
 
-- Escuta só em 127.0.0.1, com token por processo. A chave nunca vai para a página nem para uma URL.
+- Escuta só em 127.0.0.1. O token por processo protege as escritas (POST); as leituras (GET) não pedem token, então qualquer processo local as alcança. A chave nunca vai para a página nem para uma URL.
 - Precisa de locks POSIX (`fcntl`): em Windows o store recusa operar. Plataforma e catálogo: [`studio/README.md`](studio/README.md).
 - Estado: P1 do plano da GUI. Nenhuma chamada real à API foi feita. O formato da resposta, além dos exemplos do guia, fica UNKNOWN até a primeira chamada real.
 
