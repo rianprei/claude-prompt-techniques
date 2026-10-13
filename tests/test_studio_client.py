@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 from studio.client import (  # noqa: E402
     ENDPOINT, FakeClient, GeminiClient, build_request, find_image, parse_response, placeholder_png,
-    urllib_transport,
+    real_client, urllib_transport,
 )
 from studio.core import ProviderError, StudioError  # noqa: E402
 
@@ -70,6 +70,20 @@ class GenerateTests(unittest.TestCase):
         self.assertNotIn(SECRET, seen["url"])
         self.assertEqual(result["data"], PNG)
         self.assertEqual(seen["timeout"], 300)
+
+    def test_the_configured_timeout_reaches_the_transport(self):
+        seen = {}
+
+        def transport(url, headers, body, timeout):
+            seen["timeout"] = timeout
+            return 200, image_payload()
+
+        GeminiClient(SECRET, transport=transport, timeout=45).generate(BRIEF, [])
+        self.assertEqual(seen["timeout"], 45)
+
+    def test_real_client_takes_the_configured_timeout(self):
+        with mock.patch.dict(os.environ, {"GEMINI_API_KEY": SECRET}):
+            self.assertEqual(real_client(timeout=45)._timeout, 45)
 
     def test_missing_key_is_refused_before_any_call(self):
         with self.assertRaises(StudioError) as ctx:

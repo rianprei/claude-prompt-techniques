@@ -18,7 +18,7 @@ from urllib.parse import urlsplit
 
 from .core import (APPROVAL_TTL, MAX_REFERENCE_BYTES, Store, StudioError, build_brief, offered_models,
                    preferences, record_evaluation, record_review, run_brief, summarize_run)
-from .client import KEY_ENV, FakeClient, api_key_from_env, real_client
+from .client import KEY_ENV, TIMEOUT_SECONDS, FakeClient, api_key_from_env, real_client
 from contracts import load_catalog  # studio/__init__.py put scripts/ on sys.path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -199,13 +199,18 @@ def main(argv=None):
     serve.add_argument("--port", type=int, default=8765, help="port on 127.0.0.1 (default 8765)")
     serve.add_argument("--data-dir", default=DEFAULT_DATA_DIR,
                        help="where briefs, images and approvals are kept (default studio/data)")
+    serve.add_argument("--timeout", type=int, default=TIMEOUT_SECONDS,
+                       help=f"seconds to wait for the live provider on each paid run (default {TIMEOUT_SECONDS}; "
+                            "no effect with --fake-provider)")
     serve.add_argument("--fake-provider", action="store_true",
                        help="placeholder images, with no network call and no cost")
     args = parser.parse_args(argv)
+    if args.timeout <= 0:
+        parser.error("--timeout must be a positive number of seconds")
     if args.fake_provider:
         studio = Studio(args.data_dir, client_factory=FakeClient, provider="fake")
     else:
-        studio = Studio(args.data_dir, client_factory=real_client, provider="gemini")
+        studio = Studio(args.data_dir, client_factory=lambda: real_client(timeout=args.timeout), provider="gemini")
     httpd = make_server(studio, port=args.port)
     print(f"Studio at http://127.0.0.1:{httpd.server_address[1]}/ (provider: {studio.provider})")
     if studio.provider == "fake":

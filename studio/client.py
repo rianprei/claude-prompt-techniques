@@ -119,16 +119,17 @@ def parse_response(status, payload, api_key=""):
 
 
 class GeminiClient:
-    def __init__(self, api_key, transport=urllib_transport):
+    def __init__(self, api_key, transport=urllib_transport, timeout=TIMEOUT_SECONDS):
         if not api_key:
             raise StudioError("missing_api_key", f"{KEY_ENV} is not set where the studio runs.", 412)
         self._api_key = api_key
         self._transport = transport
+        self._timeout = timeout
 
     def generate(self, brief, references):
         url, headers, body = build_request(brief, references)
         headers["x-goog-api-key"] = self._api_key
-        status, payload = self._transport(url, headers, body, TIMEOUT_SECONDS)
+        status, payload = self._transport(url, headers, body, self._timeout)
         return parse_response(status, payload, self._api_key)
 
 
@@ -152,6 +153,6 @@ def placeholder_png(width=64, height=64):
             + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b""))
 
 
-def real_client():
+def real_client(timeout=TIMEOUT_SECONDS):
     """Client for the live API, built from the environment at run time and never from a file."""
-    return GeminiClient(api_key_from_env())
+    return GeminiClient(api_key_from_env(), timeout=timeout)

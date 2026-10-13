@@ -10,8 +10,7 @@ NOTICE. Stdlib only. Nothing runs at import time.
     python3 -m studio serve --fake-provider      # placeholder images, no network, no cost
     GEMINI_API_KEY=... python3 -m studio serve   # live provider; the key is read on each run
 
-The page opens at http://127.0.0.1:8765/. Options: `--port` and `--data-dir`
-(default `studio/data`, which git ignores).
+The page opens at http://127.0.0.1:8765/. Options: `--port` (default 8765), `--data-dir` (default `studio/data`, which git ignores) and `--timeout` (seconds to wait for the live provider on each paid run; default 300; no effect with `--fake-provider`).
 
 ## Flow
 
@@ -61,7 +60,7 @@ The client calls the Interactions endpoint shown in the official image guide (lo
 block in `steps[].content`.
 
 UNKNOWN until a live call is made: the response field names beyond the guide's examples, and the upstream
-timeout (the client uses 300 s, our own choice). No live call was made while this was built.
+timeout (the client waits 300 s by default, our own choice; `--timeout` changes it). No live call was made while this was built.
 
 ## Data (`studio/data`, ignored by git, created with mode 0700)
 

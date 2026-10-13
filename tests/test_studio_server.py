@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 from studio.client import FakeClient, placeholder_png  # noqa: E402
 from studio.core import Store, iso  # noqa: E402
-from studio.server import Studio, make_server  # noqa: E402
+from studio.server import Studio, main, make_server  # noqa: E402
 
 PNG = placeholder_png()
 SECRET = "test-secret-value-123"
@@ -228,6 +228,13 @@ class StartupTests(ServerCase):
         Studio(self.data_dir, client_factory=FakeClient, provider="fake")
         record = Store(self.data_dir).load_run(run_id)
         self.assertEqual((record["status"], record["error"]), ("failed", "interrupted"))
+
+
+class CommandLineTests(unittest.TestCase):
+    def test_timeout_must_be_a_positive_number_of_seconds(self):
+        with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit) as ctx:
+            main(["serve", "--timeout", "0"])
+        self.assertEqual(ctx.exception.code, 2)
 
 
 if __name__ == "__main__":
