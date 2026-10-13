@@ -18,6 +18,7 @@ import os
 import re
 import secrets
 import tempfile
+import threading
 from datetime import datetime, timedelta, timezone
 
 try:
@@ -30,6 +31,7 @@ from validate_prompt import validate  # noqa: E402
 APPROVAL_TTL = timedelta(minutes=30)  # approval window; the single-use design is credited in NOTICE
 APPROVAL_RETENTION = timedelta(hours=24)  # finished approvals stay this long, so a reuse says "used"
 STALE_RUN_AFTER = timedelta(minutes=30)  # longer than one provider call can take: no retry, 300 s socket timeout
+INTERRUPTED_MESSAGE = "The studio stopped before this run finished. The approval stays used."
 MAX_LIVE_APPROVALS = 64
 MAX_PROMPT_CHARS = 8000  # local cap; no official limit was found
 MAX_NOTE_CHARS = 2000  # local cap for review and evaluation notes
@@ -185,6 +187,8 @@ class Store:
         os.makedirs(root, mode=0o700, exist_ok=True)
         for sub in ("briefs", "inputs", "outputs", "runs"):
             os.makedirs(os.path.join(root, sub), mode=0o700, exist_ok=True)
+        self._runs_cache = {}  # run file name -> (file identity, record); see list_runs
+        self._runs_lock = threading.Lock()
 
     def _path(self, *parts):
         return os.path.join(self.root, *parts)
@@ -345,12 +349,30 @@ class Store:
             raise StudioError("run_unknown", "Unknown run.", 404) from None
 
     def list_runs(self, limit=MAX_RUNS_LISTED):
-        """Newest first. limit=None returns every run."""
-        records = []
-        for name in os.listdir(self._path("runs")):
-            if name.endswith(".json"):
-                with open(self._path("runs", name), encoding="utf-8") as handle:
-                    records.append(json.load(handle))
+        """Newest first. limit=None returns every run.
+
+        A file whose identity (inode, mtime, size) has not changed since the last call is not parsed again.
+        Every write adds keys or entries to a record, so its size changes on each write. The returned records
+        are shared with the cache, so callers must not change them.
+        """
+        with self._runs_lock:
+            records, cache = [], {}
+            for name in os.listdir(self._path("runs")):
+                if not name.endswith(".json"):
+                    continue
+                path = self._path("runs", name)
+                try:
+                    info = os.stat(path)
+                    identity = (info.st_ino, info.st_mtime_ns, info.st_size)
+                    hit = self._runs_cache.get(name)
+                    if hit is None or hit[0] != identity:
+                        with open(path, encoding="utf-8") as handle:
+                            hit = (identity, json.load(handle))
+                except FileNotFoundError:  # removed since listdir
+                    continue
+                cache[name] = hit
+                records.append(hit[1])
+            self._runs_cache = cache
         records.sort(key=lambda r: r["started_at"], reverse=True)
         return records if limit is None else records[:limit]
 
@@ -376,9 +398,7 @@ class Store:
                     continue
                 if record.get("status") != "running" or started + STALE_RUN_AFTER > now:
                     continue
-                record.update(status="failed", error="interrupted",
-                              error_message="The studio stopped before this run finished. "
-                                            "The approval stays used.")
+                record.update(status="failed", error="interrupted", error_message=INTERRUPTED_MESSAGE)
                 record["finished_at"] = iso(now)
                 self.write_run(record)
                 changed += 1
@@ -456,6 +476,11 @@ def run_brief(catalog, store, client_factory, brief_sha, approval_id, now=None):
         record.update(status="failed", error=exc.code, error_message=exc.message)
     except Exception:
         record.update(status="failed", error="internal", error_message="Unexpected error. The approval stays used.")
+        record["finished_at"] = iso(utcnow())
+        store.write_run(record)
+        raise
+    except BaseException:  # Ctrl+C or a stop during the call: the run must not stay "running"
+        record.update(status="failed", error="interrupted", error_message=INTERRUPTED_MESSAGE)
         record["finished_at"] = iso(utcnow())
         store.write_run(record)
         raise

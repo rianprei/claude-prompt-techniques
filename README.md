@@ -239,7 +239,7 @@ Ferramenta fora da lista: o Claude aplica regras genéricas (instrução explíc
 
 ## Princípios de persuasão
 
-`references/persuasion.md` — baseado em Meincke et al. (2025), "Call Me A Jerk" (N=28.000 conversas). No estudo, princípios de persuasão elevaram a compliance de **33,3% para 72,0%**, mas o teste foi feito no **GPT-4o mini**, com pedidos objetáveis, e não em modelos Claude. Mede compliance com a instrução, não qualidade da resposta, e não prova o efeito em Claude.
+`references/persuasion.md` — baseado em Meincke et al. (2025), "Call Me A Jerk" (N=28.000 conversas). No estudo, princípios de persuasão elevaram a compliance de **33,3% para 72,0%**, mas o teste foi feito no **GPT-4o mini**, com pedidos objetáveis, e não em modelos Claude. Mede compliance com a instrução, não qualidade da resposta, e não prova o efeito em Claude. Os números (N, 33,3% e 72,0%) não foram conferidos no artigo: o SSRN retornou HTTP 403 em 2026-10-12.
 
 **Aviso importante:** compliance = obediência à instrução, **não** qualidade ou veracidade da resposta. Um prompt mais "obedecido" não é automaticamente um prompt melhor. Por isso o escopo aqui é estreito: disciplina de formato e processo (seguir checklist, anunciar skill, não pular verificação) — não "melhorar respostas" em geral.
 
@@ -273,7 +273,7 @@ Mantenha o `SKILL.md` enxuto — detalhe pesado vai pra `references/`, senão vo
 
 ## Validação e testes
 
-Tudo em biblioteca padrão do Python, sem instalar nada:
+Tudo em biblioteca padrão do Python, sem pacotes externos. Os scripts vêm do clone via git (a instalação sem git não traz `scripts/`):
 
 ```bash
 # Checa um prompt contra as regras do skill: CoT em modelo reasoning-native,

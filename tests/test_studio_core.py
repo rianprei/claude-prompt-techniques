@@ -5,6 +5,7 @@ import stat
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
@@ -410,6 +411,34 @@ class StaleRunTests(StoreCase):
 
     def test_the_cutoff_is_longer_than_the_provider_timeout(self):
         self.assertGreater(core.STALE_RUN_AFTER, dt.timedelta(seconds=TIMEOUT_SECONDS))
+
+
+class InterruptAndListingTests(StoreCase):
+    def test_an_interrupt_during_the_call_is_recorded_and_propagates(self):
+        class Interrupted:
+            def generate(self, brief, references):
+                raise KeyboardInterrupt
+
+        sha = self.brief()["brief_sha256"]
+        token = self.approved(sha)
+        with self.assertRaises(KeyboardInterrupt):
+            run_brief(self.catalog, self.store, Interrupted, sha, token, NOW)
+        (record,) = self.store.list_runs(limit=None)
+        self.assertEqual((record["status"], record["error"]), ("failed", "interrupted"))
+
+    def test_unchanged_run_files_are_not_parsed_again(self):
+        self.execute()
+        self.store.list_runs()
+        with mock.patch.object(core.json, "load", wraps=core.json.load) as spy:
+            self.store.list_runs()
+        self.assertEqual(spy.call_count, 0)
+
+    def test_a_changed_run_file_is_read_again(self):
+        record, _, _ = self.execute()
+        self.assertEqual(self.store.list_runs()[0]["status"], "generated")
+        record["status"] = "failed"
+        self.store.write_run(record)
+        self.assertEqual(self.store.list_runs()[0]["status"], "failed")
 
 
 if __name__ == "__main__":

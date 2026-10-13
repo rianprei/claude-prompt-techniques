@@ -1,6 +1,6 @@
 Reference file for the `prompt-techniques` skill. Loaded on demand by SKILL.md's active generator mode — not a standalone skill entry point.
 
-> Last verified: 2026-10-12 for the Claude, GPT-6, and Grok sections, against official vendor docs. The Codex section follows the GPT-6 docs plus workflow notes. Midjourney and Flux rules were checked against secondary sources only. All other sections were last checked 2026-07-07 and may be stale. Model-specific rules age fast: if the target model is newer than the verification date or absent below, do NOT guess version-specific behavior; apply generic rules (explicit instruction, output contract, format lock) and say the entry may be stale.
+> Last verified: 2026-10-12. Claude thinking, prefill and refusal rules were re-read on the vendor's prompting, models and refusal pages. Other Claude bullets were not re-read one by one. GPT-6 model IDs and reasoning levels were re-read on OpenAI's models page; the GPT-6 guide and launch blog were not readable that day, so their items are marked. Grok rules were re-read on xAI's models, reasoning and API reference pages. The Codex section follows the GPT-6 docs plus workflow notes. Midjourney and Flux rules were checked against secondary sources only. All other sections were last checked 2026-07-07 and may be stale. Model-specific rules age fast: if the target model is newer than the verification date or absent below, do NOT guess version-specific behavior; apply generic rules (explicit instruction, output contract, format lock) and say the entry may be stale.
 
 **Contents** (jump to the section you need, don't read the whole file):
 - Text/chat LLMs: Claude, ChatGPT/GPT-6.x, Grok, Gemini, Qwen 2.5/3, Ollama, Llama/Mistral, DeepSeek-R1, MiniMax
@@ -51,11 +51,11 @@ Current models (Anthropic models overview, read 2026-10-12; lifecycle "active"):
 - API only: prefilling the last assistant turn is not supported from Claude 4.6 on (HTTP 400; also Mythos Preview). For output shape, use Structured Outputs, a tool with an enum field, or a direct instruction ("Respond directly without preamble…"). Mention this only when the user integrates via the API.
 - Effort is set by the harness or API (`effort`), not in the prompt. In Claude Code, `/fast` toggles faster output (confirmed in the session context). Keyword triggers such as "think hard" or "ultrathink" are reported by third-party sources with conflicting mappings and are not verified against official docs; do not rely on them in generated prompts until checked.
 - For a system prompt or any prompt reused across repeated calls (API integration, RAG, multi-document analysis): put static content first (identity, rules, instructions) and dynamic content last (retrieved documents, session data, the actual query). Most API providers cache the shared prefix — reordering this way turns repeated calls cheaper and faster for free.
-- Verbosity differs by model: Opus 5 writes longer user-facing answers than earlier models, so ask for conciseness explicitly. Fable 5.1 writes fewer progress updates between tool calls, so ask for them when you need them.
+- Verbosity differs by model: Opus 5 writes longer user-facing answers than earlier models, so ask for conciseness explicitly. Fable 5.1 differs from Fable 5 in user-facing progress updates, so ask for them when you need them.
 - Format: say what to produce ("Write flowing prose paragraphs") instead of what to avoid, and reduce markdown with an explicit instruction. Use XML tags to lock the output shape.
 - Code tasks: add an investigate-first rule: "Never speculate about code you have not opened. Read the file before answering questions about it." (Anthropic's sample prompt.)
 - Long agentic work: ground every progress claim in tool results. On Opus 5, drop instructions that ask for repeated double-checks, which cause over-verification; on models other than Opus 5 (for example Sonnet 5.5 and Haiku 5.5), a final self-check line helps for coding and math.
-- API only: a response with `stop_reason: "refusal"` is a normal HTTP 200, returned by the safety classifiers of Fable 5.1, Fable 5, Opus 5.5, Opus 5, Sonnet 5.5, and Haiku 5.5. Retry on another Claude model. `reasoning_extraction` refusals have no fallback: change the prompt. Keep assistant turns and thinking blocks unchanged when rebuilding history.
+- API only: a response with `stop_reason: "refusal"` is a normal HTTP 200, returned by the safety classifiers of Fable 5.1, Fable 5, Opus 5.5, Opus 5, Sonnet 5.5, and Haiku 5.5. Read `stop_details` and retry on a fallback model. A `reasoning_extraction` refusal usually comes from a prompt that asks for reasoning in the output; the docs say to keep reasoning in thinking blocks (adaptive thinking) instead. When redeeming a fallback credit, send the request body unchanged and do not strip thinking blocks.
 
 ---
 
@@ -65,10 +65,10 @@ Current models (Anthropic models overview, read 2026-10-12; lifecycle "active"):
 - State tool-use expectations explicitly if the model has access to tools
 - Use compact structured outputs; the model follows dense instructions well.
 - Constrain verbosity when needed: "Respond in under 150 words. No preamble. No caveats."
-- Models: GPT-6 Astra (`gpt-6-astra`, highest intelligence), GPT-6.1 Sol (`gpt-6.1-sol`, balanced), GPT-6 Luna (`gpt-6-luna`, fastest and most cost-effective). GPT-5.x is the prior generation.
-- `reasoning.effort` for GPT-6.1 Sol: low, medium (default), high, xhigh, max. Astra and Sol do not support `none`; use `low` instead.
+- Models (OpenAI models page, read 2026-10-12): GPT-6 Astra (`gpt-6-astra`, "Our most capable model for the most demanding work"), GPT-6.1 Sol (`gpt-6.1-sol`, "Near-Astra performance for complex work at a lower cost"), GPT-6 Luna (`gpt-6-luna`, "Our most efficient model for focused, high-volume tasks").
+- `reasoning.effort` for GPT-6.1 Sol: low, medium, high, xhigh, max (models page). The "medium (default)" marking could not be confirmed on 2026-10-12 [not verified]. Astra and Sol do not list `none`, so use `low` instead; Luna lists `none`.
 - GPT-6 is reasoning-native: do not add "think step by step". Ask for conclusion, assumptions, evidence, and checks instead.
-- The GPT-6 guide says the model tends toward detailed, formatted responses: ask for concise paragraphs when you want less. Prompt it to ask for approval only after preparing a concrete, reviewable result, and make the priority of user instructions and skills explicit.
+- [not verified: the GPT-6 guide and launch blog were not readable on 2026-10-12] Advice from this file: ask for concise paragraphs when you want less detail; ask for approval only after a concrete, reviewable result is ready; state the priority of user instructions and skills explicitly.
 
 ---
 
@@ -129,12 +129,12 @@ Current models (Anthropic models overview, read 2026-10-12; lifecycle "active"):
 ---
 
 **Grok (xAI) — grok-4.7**
-- Current model: `grok-4.7` (xAI guide). A "Grok 4.7 Fast" variant is offered in Cursor and Grok Build, not in the public xAI API.
-- Reasoning effort: low, medium, high (default), xhigh. Use `low` for latency-sensitive or simple tool work; `xhigh` only for deep exploration.
+- Current model: `grok-4.7` (xAI models page, read 2026-10-12: "Our flagship model for code and everything else"). That page lists no "Grok 4.7 Fast". Whether Cursor or Grok Build offer one was not checked [not verified].
+- Reasoning effort (`reasoning.effort`, xAI reasoning guide, read 2026-10-12): low, medium, high (default), xhigh; it cannot be disabled. Use `low` for latency-sensitive or simple tool work; `xhigh` only for deep exploration (this part is advice, not from xAI).
 - Keep prompts outcome-focused: Goal, Context/Input, Constraints, Tools/Permissions, Done. Name the tools and the evidence the task needs.
 - For current facts, require web search or X search, with citations.
 - Long tool-heavy loops: define stop conditions, approval boundaries, retry limits, and compaction checkpoints. Put stable instructions first to keep the prompt cache warm.
-- API: xAI strongly recommends a `prompt_cache_key` (Responses API) or an `x-grok-conv-id` header (Chat Completions), so one conversation keeps hitting the same server. Without it, cache hits are often missed.
+- API: the xAI API reference (read 2026-10-12) shows a `prompt_cache_key` field only in an example response object, where it is null. It contains no cache-routing recommendation and no `x-grok-conv-id` header. The caching guide URL `developers/advanced-api-usage/prompt-caching` returned a generic page with no caching content, so it was not used. This file therefore states no recommendation.
 - Consumer Grok apps expose different controls than the API. There, put behavioral requirements in the prompt instead of settings.
 
 ---

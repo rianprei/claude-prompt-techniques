@@ -53,7 +53,7 @@ Ratios such as 3:1, 11:4.5, 9:19.5, 1:2 and 2:1 are not in this list. Map them t
 | `gemini-3.1-flash-lite-image` | 14 | not listed | not listed |
 | `gemini-3-pro-image` | 6 | 5 | 3 |
 
-The guide gives the limits as "up to 14 / 10 / 6 images of objects", "up to 4 / 5 images of characters" and "up to 3 images as style references". The mapping of these limits to models was not re-checked in this pass. Re-check it before relying on it.
+On 2026-10-12 the guide's table lists these limits. Gemini 3.1 Flash Lite Image: "Up to 14 images of objects with high-fidelity to include in the final image". Gemini Nano Banana 2.1 and Gemini 3.1 Flash Image: "Up to 10 images of objects with high-fidelity to include in the final image" and "Up to 4 images of characters to maintain character consistency". Gemini 3 Pro Image: "Up to 6 images of objects with high-fidelity to include in the final image", "Up to 5 images of characters to maintain character consistency" and "Up to 3 images to be used as style references". The mapping in `gemini-image-models.json` matches this table.
 
 ## Inputs and languages
 

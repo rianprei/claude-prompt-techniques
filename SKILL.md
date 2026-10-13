@@ -19,7 +19,7 @@ Priority tier above already names the ~17 techniques that cover most real usage.
 technique outside it (rare — a specific reasoning/decomposition/agent pattern by name) →
 [references/taxonomy.md](references/taxonomy.md) has the full category index, and [references/technique-catalog.md](references/technique-catalog.md) gives each entry's source and status. Generator mode never needs these files.
 
-**Persuasion** (Meincke et al. 2025: compliance 33%→72% in GPT-4o mini, on objectionable requests; not tested on Claude; compliance = obedience to the instruction, NOT answer quality/accuracy): Authority, Commitment, Scarcity, Social Proof, Unity (Reciprocity/Liking: avoid). Use only for format/process discipline, in plain wording: stacked CAPS ("YOU MUST", "NEVER") can make recent Claude models overtrigger. Detail, ✅/❌ examples and table: [references/persuasion.md](references/persuasion.md). Never to bypass safety.
+**Persuasion** (Meincke et al. 2025, figures not verified against the paper: compliance 33%→72% in GPT-4o mini, on objectionable requests; not tested on Claude; compliance = obedience to the instruction, NOT answer quality/accuracy): Authority, Commitment, Scarcity, Social Proof, Unity (Reciprocity/Liking: avoid). Use only for format/process discipline, in plain wording: stacked CAPS ("YOU MUST", "NEVER") can make recent Claude models overtrigger. Detail, ✅/❌ examples and table: [references/persuasion.md](references/persuasion.md). Never to bypass safety.
 
 ## Generator mode (active — when the request clearly wants a prompt for another tool)
 
