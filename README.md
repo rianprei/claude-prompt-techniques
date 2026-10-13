@@ -170,7 +170,7 @@ prompt-techniques/
 ├── scripts/
 │   ├── contracts.py            # catálogo, IDs, proporções e regex compartilhados
 │   ├── validate_prompt.py      # checa um prompt contra as regras do skill
-│   └── check_repo.py           # checa links, âncoras, numeração e contratos de modelo e chave
+│   └── check_repo.py           # checa links, âncoras, formatação, numeração e contratos de modelo e chave
 ├── studio/                     # GUI local: brief, aprovação de uso única, revisão (README próprio)
 ├── tests/                      # unittest: validador, golden cases, catálogo, contratos e studio
 ├── references/                 # pesados, carregados SÓ sob demanda
@@ -282,7 +282,7 @@ Tudo em biblioteca padrão do Python, sem instalar nada:
 # e proporção fora das 14 oficiais (Gemini).
 python3 scripts/validate_prompt.py --target gpt-6-astra prompt.txt
 
-# Checa links, âncoras, numeração de padrões e templates, IDs de modelo contra o catálogo e chave fora da URL.
+# Checa links, âncoras, formatação, numeração de padrões e templates, IDs de modelo contra o catálogo e chave fora da URL.
 python3 scripts/check_repo.py
 
 # Roda os testes: validador, 19 golden cases, catálogo de imagem, contratos e studio.
@@ -297,14 +297,14 @@ python3 -m unittest discover -s tests -v
 
 ## Studio (GUI local com aprovação por execução paga)
 
-GUI local para gerar imagens com Nano Banana. Ela monta o brief, mostra o plano e o custo nominal, e só chama a API paga depois que você aprova aquele brief exato. A aprovação é de uso único, vale 30 minutos e é gasta antes da chamada. Detalhes e limites estão em [`studio/README.md`](studio/README.md).
+GUI local para gerar imagens com Nano Banana. Ela monta o brief, mostra o plano e o custo nominal, e só chama a API paga depois que você aprova aquele brief exato pela interface. A aprovação é de uso único, vale 30 minutos e é gasta antes da chamada. Detalhes e limites estão em [`studio/README.md`](studio/README.md).
 
 ```bash
 python3 -m studio serve --fake-provider      # imagens de teste, sem rede e sem custo
 GEMINI_API_KEY=... python3 -m studio serve   # API real; a chave é lida em cada execução
 ```
 
-- Escuta só em 127.0.0.1. O token por processo protege as escritas (POST); as leituras (GET) não pedem token, então qualquer processo local as alcança. A chave nunca vai para a página nem para uma URL.
+- Escuta só em 127.0.0.1. O token por processo protege contra outros sites: eles não leem a página que o contém nem enviam o cabeçalho sem CORS. Não protege contra processos locais: a página com o token é servida em `GET /`, então qualquer processo ou usuário que alcance 127.0.0.1 pode emitir aprovações e usar a API paga com a sua chave. Use o Studio em máquina de usuário único. A chave nunca vai para a página nem para uma URL.
 - Precisa de locks POSIX (`fcntl`): em Windows o store recusa operar. Plataforma e catálogo: [`studio/README.md`](studio/README.md).
 - Estado: P1 do plano da GUI. Nenhuma chamada real à API foi feita. O formato da resposta, além dos exemplos do guia, fica UNKNOWN até a primeira chamada real.
 
@@ -352,11 +352,13 @@ O que se perde fora do Claude Code: descoberta automática da skill e garantia d
 
 ## Desinstalar
 
+A skill não grava nada fora da própria pasta por padrão. O Studio guarda em `studio/data`, dentro dela, os briefs, as imagens de referência, as imagens geradas, o histórico das execuções e as aprovações.
+
+**Antes de desinstalar, copie `studio/data` se quiser manter as imagens geradas.** O comando abaixo apaga esse diretório junto, sem perguntar. Se você usou `--data-dir` com outro caminho, esse caminho não é removido: apague-o à parte.
+
 ```bash
 rm -rf ~/.claude/skills/prompt-techniques
 ```
-
-A skill não grava nada fora da própria pasta por padrão. O Studio guarda em `studio/data`, dentro dela, os briefs, as imagens de referência, as imagens geradas, o histórico das execuções e as aprovações. O comando acima apaga esse diretório junto, sem perguntar. Se você usou `--data-dir` com outro caminho, esse caminho não é removido: apague-o à parte. Para manter as imagens geradas, copie `studio/data` antes de desinstalar.
 
 ## Créditos
 

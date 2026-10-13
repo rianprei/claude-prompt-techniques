@@ -46,8 +46,8 @@ The page opens at http://127.0.0.1:8765/. Options: `--port` and `--data-dir`
 ## Security
 
 - The server listens on 127.0.0.1 only. Any Host header other than 127.0.0.1 or localhost is refused (DNS rebinding).
-- Every POST needs the per-process token in `X-Studio-Token` and a JSON body. No CORS headers are sent.
-- Only POST needs the token. `GET /api/state` and the generated images (`/api/runs/<id>/image`) need only the Host check, so any process on this machine can connect to 127.0.0.1 and read run history and images. Browsers on other sites cannot read them: no CORS headers are sent, and the Host check blocks DNS rebinding.
+- Every POST needs the per-process token in `X-Studio-Token` and a JSON body. No CORS headers are sent, so other websites cannot read the page that carries the token or send the header.
+- The token is not a secret from this machine. `GET /` serves the page with the token in it, and `GET /api/state` and the generated images (`/api/runs/<id>/image`) need only the Host check. Any process or user that reaches 127.0.0.1 can therefore read the token, issue an approval (`POST /api/approvals`), and spend the API key. Use the studio on a single-user machine only.
 - The API key is read from `GEMINI_API_KEY` on each run. It goes only in the `x-goog-api-key` header. It is never in a URL,
   never stored, never shown in the page or the state, and redacted from provider error messages. Redirects are refused, so the header never reaches a second address.
 - The server sends a strict Content-Security-Policy. The page uses no inline scripts and builds no HTML from data.
