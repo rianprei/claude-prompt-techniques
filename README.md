@@ -91,11 +91,13 @@ for f in tool-routing patterns templates persuasion taxonomy technique-catalog d
 done
 ```
 
+Sem git, a instalação traz só o skill: `SKILL.md`, `README.md` e os 9 arquivos `.md` de `references/`. `scripts/`, `studio/`, `tests/` e `evals/` não entram nessa instalação; para o validador, o Studio ou os testes, use a instalação via git.
+
 **Verificar:**
 
 ```bash
 ls ~/.claude/skills/prompt-techniques/ ~/.claude/skills/prompt-techniques/references/
-# Esperado: SKILL.md, README.md e references/ com 8 arquivos .md
+# Esperado: SKILL.md, README.md e references/ com 9 arquivos .md
 ```
 
 **Ativar:** abra uma sessão nova do Claude Code. A skill carrega automaticamente — zero configuração. Pra confirmar, pergunte ao Claude: "qual skill de prompt engineering você tem disponível?"
@@ -182,7 +184,7 @@ prompt-techniques/
 │   └── gemini-image-models.json # mesmos dados em JSON, lidos pelos testes
 ├── evals/
 │   ├── protocol.md             # protocolo manual de A/B + log de re-prompts
-│   └── golden_cases.json       # 17 casos fixos para o validador
+│   └── golden_cases.json       # 19 casos fixos para o validador
 └── .githooks/
     └── pre-commit              # opcional: checador + testes antes do commit
 ```
@@ -281,12 +283,12 @@ python3 scripts/validate_prompt.py --target gpt-6-astra prompt.txt
 # Checa links, âncoras, numeração de padrões e templates, IDs de modelo contra o catálogo e chave fora da URL.
 python3 scripts/check_repo.py
 
-# Roda os testes: validador, 17 golden cases, catálogo de imagem, contratos e studio.
+# Roda os testes: validador, 19 golden cases, catálogo de imagem, contratos e studio.
 python3 -m unittest discover -s tests -v
 ```
 
 - **O que o validador não faz:** não julga se a resposta do modelo é boa. Ele lê só o texto do prompt. A qualidade continua no A/B manual de [`evals/protocol.md`](evals/protocol.md).
-- **Golden cases** (`evals/golden_cases.json`): 17 prompts fixos, cada um com o resultado esperado do validador. Eles testam o validador, não as respostas dos modelos. Se um caso quebrar, ou a regra mudou de propósito (atualize o caso) ou houve regressão.
+- **Golden cases** (`evals/golden_cases.json`): 19 prompts fixos, cada um com o resultado esperado do validador. Eles testam o validador, não as respostas dos modelos. Se um caso quebrar, ou a regra mudou de propósito (atualize o caso) ou houve regressão.
 - **Catálogo de imagem e contratos** (`references/gemini-image-models.json`): IDs, status, tamanhos, proporções e preços do Nano Banana, com data de verificação (2026-10-12). Os testes conferem que IDs, preços e proporções do JSON aparecem no Markdown, que proporções, tamanhos e níveis de pensamento são os valores listados na documentação lida em 2026-10-12, e que a data de verificação é a mesma nos dois arquivos. O `check_repo.py` bloqueia ID de modelo fora do catálogo, ID desligado fora dele e chave em query string. Os testes não chamam a API: se o modelo ainda aceita um valor, só uma chamada real confirma.
 - **Limites conhecidos:** a maioria dos sinais é em inglês, com algumas formas em português (passo a passo, não, sem, formato, lista). Em prompts em português, as checagens de agente, CAPS e linguagem vaga não disparam, então a ausência de aviso não prova que o prompt está certo. A detecção de negação conta as negações antes da frase, dentro da mesma cláusula, e uma negação anula outra: "Não pule a checagem passo a passo" pede raciocínio e é marcado em modelo reasoning-native. Uma negação depois da frase não é lida.
 - **Hook opcional:** `git config core.hooksPath .githooks` (uma vez por clone) faz o `check_repo.py` e os testes rodarem antes de cada commit. Não é ativado sozinho.
@@ -301,6 +303,7 @@ GEMINI_API_KEY=... python3 -m studio serve   # API real; a chave é lida em cada
 ```
 
 - Escuta só em 127.0.0.1, com token por processo. A chave nunca vai para a página nem para uma URL.
+- Precisa de locks POSIX (`fcntl`): em Windows o store recusa operar. Plataforma e catálogo: [`studio/README.md`](studio/README.md).
 - Estado: P1 do plano da GUI. Nenhuma chamada real à API foi feita. O formato da resposta, além dos exemplos do guia, fica UNKNOWN até a primeira chamada real.
 
 ## Limitações conhecidas
@@ -351,7 +354,7 @@ O que se perde fora do Claude Code: descoberta automática da skill e garantia d
 rm -rf ~/.claude/skills/prompt-techniques
 ```
 
-Sem resíduo — a skill não toca em nenhum outro arquivo.
+A skill não grava nada fora da própria pasta por padrão. O Studio guarda em `studio/data`, dentro dela, os briefs, as imagens de referência, as imagens geradas, o histórico das execuções e as aprovações. O comando acima apaga esse diretório junto, sem perguntar. Se você usou `--data-dir` com outro caminho, esse caminho não é removido: apague-o à parte. Para manter as imagens geradas, copie `studio/data` antes de desinstalar.
 
 ## Créditos
 

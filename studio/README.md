@@ -69,6 +69,11 @@ timeout (the client uses 300 s, our own choice). No live call was made while thi
 - `runs/<run_id>.json`: status, review history and evaluation history.
 - `approvals.json`: SHA-256 of each token, with its brief hash, issue time, expiry and consumption time.
 
+## Platform and catalog
+
+- The store locks files with `fcntl`, which exists only on POSIX systems (Linux, macOS). On Windows the store refuses to run and raises `unsupported_platform`.
+- The studio does not check the age of the catalog. Its date is `verified_on` in `references/gemini-image-models.json`. `scripts/check_repo.py` warns when that date is more than 90 days old, but only for whoever runs that check.
+
 ## Tests
 
     python3 -m unittest discover -s tests

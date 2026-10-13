@@ -19,7 +19,7 @@ from urllib.parse import urlsplit
 from .core import (APPROVAL_TTL, MAX_REFERENCE_BYTES, Store, StudioError, build_brief, offered_models,
                    preferences, record_evaluation, record_review, run_brief, summarize_run)
 from .client import KEY_ENV, FakeClient, api_key_from_env, real_client
-from contracts import load_catalog  # core has put scripts/ on sys.path by now
+from contracts import load_catalog  # studio/__init__.py put scripts/ on sys.path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_DATA_DIR = os.path.join(HERE, "data")

@@ -17,7 +17,6 @@ import json
 import os
 import re
 import secrets
-import sys
 import tempfile
 from datetime import datetime, timedelta, timezone
 
@@ -26,12 +25,9 @@ try:
 except ImportError:  # not POSIX: the store refuses to run instead of running unlocked
     fcntl = None
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "scripts"))
-
 from validate_prompt import validate  # noqa: E402
 
-APPROVAL_TTL = timedelta(minutes=30)  # window taken from banana-claude's approval design (audit I1)
+APPROVAL_TTL = timedelta(minutes=30)  # approval window; the single-use design is credited in NOTICE
 APPROVAL_RETENTION = timedelta(hours=24)  # finished approvals stay this long, so a reuse says "used"
 MAX_LIVE_APPROVALS = 64
 MAX_PROMPT_CHARS = 8000  # local cap; no official limit was found

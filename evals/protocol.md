@@ -36,7 +36,7 @@ Não é benchmark científico: N pequeno, avaliador é você, sem cegamento. É 
 
 ## Testes automatizados (o que existe)
 
-`evals/golden_cases.json` tem 17 prompts fixos, cada um com o resultado esperado do validador (`scripts/validate_prompt.py`). Eles testam o validador: se uma regra mudar sem querer, um caso quebra. Não medem se a ferramenta-alvo responde bem; isso continua sendo o A/B manual acima. Rode com `python3 -m unittest discover -s tests -v`. Também existem `tests/test_image_catalog.py` (confere a consistência interna do catálogo de modelos de imagem: IDs, preços, proporções e tamanhos, e entre o JSON e o Markdown) e `tests/test_check_repo.py` (testa os contratos de `scripts/check_repo.py`). Nenhum desses testes chama a API: eles conferem consistência interna, não se o modelo ainda aceita o valor.
+`evals/golden_cases.json` tem 19 prompts fixos, cada um com o resultado esperado do validador (`scripts/validate_prompt.py`). Eles testam o validador: se uma regra mudar sem querer, um caso quebra. Não medem se a ferramenta-alvo responde bem; isso continua sendo o A/B manual acima. Rode com `python3 -m unittest discover -s tests -v`. Também existem `tests/test_image_catalog.py` (confere a consistência interna do catálogo de modelos de imagem: IDs, preços, proporções e tamanhos, e entre o JSON e o Markdown) e `tests/test_check_repo.py` (testa os contratos de `scripts/check_repo.py`). Nenhum desses testes chama a API: eles conferem consistência interna, não se o modelo ainda aceita o valor.
 
 ## Toda claim carrega sua limitação junto, não separada
 

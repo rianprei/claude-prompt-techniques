@@ -13,7 +13,7 @@ import urllib.request
 import zlib
 
 from .core import ProviderError, StudioError
-from contracts import load_catalog  # core.py has put scripts/ on sys.path by now
+from contracts import load_catalog  # studio/__init__.py put scripts/ on sys.path
 
 ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/interactions"
 KEY_ENV = "GEMINI_API_KEY"
