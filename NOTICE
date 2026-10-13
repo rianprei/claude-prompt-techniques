@@ -30,7 +30,8 @@ notices here are provided as those licenses require.
                   table were adapted from the upstream prompt-engineering skill.
    Files:         references/persuasion.md
    Notice:        As stated by the upstream project. Its LICENSE file contains
-                  the standard GPL-3.0 text and no copyright line.
+                  the standard GPL-3.0 text, which begins with the Free Software
+                  Foundation's notice, and no copyright line of the project.
    Modifications: The file above was adapted and differs from the upstream
                   version.
    This work is covered by the GPL-3.0 text in the LICENSE file.

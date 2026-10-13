@@ -2,8 +2,8 @@
 
 The studio is a local page for Nano Banana image generation. It builds a brief,
 shows the plan and its nominal price, and calls the paid API only after the user
-approves that exact brief. It is part of the P1 GUI plan in the curation audit
-(ideas I1, I2, I3, I7 and I15). Stdlib only. Nothing runs at import time.
+approves that exact brief. The design ideas it takes from other projects are credited in
+NOTICE. Stdlib only. Nothing runs at import time.
 
 ## Run it
 
@@ -42,6 +42,7 @@ The page opens at http://127.0.0.1:8765/. Options: `--port` and `--data-dir`
 - **Failure.** A failed provider call keeps its approval spent. Nothing retries on its own, and nothing rephrases
   a blocked prompt, as the catalog's safety section asks.
 - **Missing key.** Refused before any approval is spent.
+- **Runs cut off by a stop.** When the studio starts, a run still `running` that began 30 minutes or more earlier is marked `failed` with error `interrupted`. Younger runs are left alone, because a live run from another studio process looks the same in the record. A run record that cannot be read is skipped, so it does not stop the studio from starting.
 
 ## Security
 
@@ -72,7 +73,7 @@ timeout (the client uses 300 s, our own choice). No live call was made while thi
 
 ## Platform and catalog
 
-- The store locks files with `fcntl`, which exists only on POSIX systems (Linux, macOS). On Windows the store refuses to run and raises `unsupported_platform`.
+- The store locks files with `fcntl`, which exists only on POSIX systems (Linux, macOS). On Windows the store refuses to run, so the studio stops at startup with `unsupported_platform`.
 - The studio does not check the age of the catalog. Its date is `verified_on` in `references/gemini-image-models.json`. `scripts/check_repo.py` warns when that date is more than 90 days old, but only for whoever runs that check.
 
 ## Tests

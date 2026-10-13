@@ -29,6 +29,7 @@ from validate_prompt import validate  # noqa: E402
 
 APPROVAL_TTL = timedelta(minutes=30)  # approval window; the single-use design is credited in NOTICE
 APPROVAL_RETENTION = timedelta(hours=24)  # finished approvals stay this long, so a reuse says "used"
+STALE_RUN_AFTER = timedelta(minutes=30)  # longer than one provider call can take: no retry, 300 s socket timeout
 MAX_LIVE_APPROVALS = 64
 MAX_PROMPT_CHARS = 8000  # local cap; no official limit was found
 MAX_NOTE_CHARS = 2000  # local cap for review and evaluation notes
@@ -70,7 +71,9 @@ def iso(moment):
 
 
 def parse_time(text):
-    return datetime.fromisoformat(text)
+    """ISO time as an aware datetime. A time without an offset is read as UTC, the clock the studio writes."""
+    moment = datetime.fromisoformat(text)
+    return moment if moment.tzinfo else moment.replace(tzinfo=timezone.utc)
 
 
 def canonical_json(obj):
@@ -350,6 +353,36 @@ class Store:
                     records.append(json.load(handle))
         records.sort(key=lambda r: r["started_at"], reverse=True)
         return records if limit is None else records[:limit]
+
+    def mark_stale_runs(self, now=None):
+        """Mark runs that a stopped studio left as "running" as failed. Returns how many changed.
+
+        Only runs started at least STALE_RUN_AFTER ago are touched. A live run should be younger than that:
+        one provider call has no retry and a 300 s socket timeout. A record that cannot be read is skipped
+        and left as it is, so a damaged file does not stop the studio from starting. GET /api/state still
+        fails on it.
+        """
+        now = now or utcnow()
+        changed = 0
+        with self._locked():
+            for name in os.listdir(self._path("runs")):
+                if not name.endswith(".json"):
+                    continue
+                try:
+                    with open(self._path("runs", name), encoding="utf-8") as handle:
+                        record = json.load(handle)
+                    started = parse_time(record["started_at"])
+                except (OSError, ValueError, KeyError, TypeError):
+                    continue
+                if record.get("status") != "running" or started + STALE_RUN_AFTER > now:
+                    continue
+                record.update(status="failed", error="interrupted",
+                              error_message="The studio stopped before this run finished. "
+                                            "The approval stays used.")
+                record["finished_at"] = iso(now)
+                self.write_run(record)
+                changed += 1
+        return changed
 
     def read_output(self, run_id):
         record = self.load_run(run_id)

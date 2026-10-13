@@ -1,6 +1,10 @@
 #!/bin/sh
 # Enable once per clone: git config core.hooksPath .githooks
 set -e
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "pre-commit: python3 is not on PATH, so the checks cannot run. Commit aborted." >&2
+    exit 1
+fi
 cd "$(git rev-parse --show-toplevel)"
 python3 scripts/check_repo.py
 python3 -m unittest discover -s tests -q

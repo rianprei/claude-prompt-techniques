@@ -3,6 +3,7 @@ import http.server
 import json
 import os
 import struct
+import subprocess
 import sys
 import threading
 import unittest
@@ -180,6 +181,18 @@ class FakeAndPlaceholderTests(unittest.TestCase):
     def test_placeholder_png_has_the_requested_size(self):
         width, height = struct.unpack(">II", placeholder_png(32, 16)[16:24])
         self.assertEqual((width, height), (32, 16))
+
+
+class ImportTests(unittest.TestCase):
+    def test_importing_the_client_does_not_read_the_catalog(self):
+        # load_catalog is replaced by None before the import, so any read at import time fails the run.
+        code = ("import sys\n"
+                f"sys.path[:0] = [{ROOT!r}, {os.path.join(ROOT, 'scripts')!r}]\n"
+                "import contracts\n"
+                "contracts.load_catalog = None\n"
+                "import studio.client\n")
+        result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
 
 
 if __name__ == "__main__":

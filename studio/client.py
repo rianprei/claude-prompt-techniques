@@ -17,8 +17,12 @@ from contracts import load_catalog  # studio/__init__.py put scripts/ on sys.pat
 
 ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/interactions"
 KEY_ENV = "GEMINI_API_KEY"
-TIMEOUT_SECONDS = 300  # our value; the upstream timeout is UNKNOWN (audit I9)
-SAFETY_REASONS = tuple(load_catalog()["safety_finish_reasons"])
+TIMEOUT_SECONDS = 300  # our value; the upstream timeout is UNKNOWN
+
+
+def safety_reasons():
+    """Finish reasons that mean the provider refused. Read from the catalog when needed, not at import."""
+    return tuple(load_catalog()["safety_finish_reasons"])
 
 
 def api_key_from_env():
@@ -101,7 +105,7 @@ def parse_response(status, payload, api_key=""):
         raise ProviderError("bad_response", "The Gemini API returned something that is not JSON.") from None
     image = find_image(data) if isinstance(data, dict) else None
     if image is None:
-        reason = next((r for r in SAFETY_REASONS if r in text), None)
+        reason = next((r for r in safety_reasons() if r in text), None)
         if reason:
             raise ProviderError("safety_block",
                                 f"The provider blocked this output ({reason}). Change the brief yourself; "

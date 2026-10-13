@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 from contracts import load_catalog  # noqa: E402
 from studio import core  # noqa: E402
-from studio.client import FakeClient, placeholder_png  # noqa: E402
+from studio.client import FakeClient, TIMEOUT_SECONDS, placeholder_png  # noqa: E402
 from studio.core import (  # noqa: E402
     APPROVAL_TTL, MAX_LIVE_APPROVALS, ProviderError, Store, StudioError, allowed_sizes, build_brief,
     offered_models, preferences, record_evaluation, record_review, run_brief, sniff_image, summarize_run,
@@ -370,6 +370,46 @@ class ReviewAndEvaluationTests(StoreCase):
         second = self.generated()
         record_evaluation(self.store, second, 2, "", NOW)
         self.assertEqual(preferences(self.store)["model"][NANO], {"count": 2, "average": 3.5})
+
+
+class TimeTests(unittest.TestCase):
+    def test_a_time_without_offset_is_read_as_utc(self):
+        self.assertEqual(core.parse_time("2026-10-12T09:00:00"), dt.datetime(2026, 10, 12, 9, tzinfo=dt.timezone.utc))
+
+    def test_a_time_with_an_offset_keeps_it(self):
+        self.assertEqual(core.parse_time("2026-10-12T09:00:00-03:00"),
+                         dt.datetime(2026, 10, 12, 12, tzinfo=dt.timezone.utc))
+
+
+class StaleRunTests(StoreCase):
+    def write_run(self, run_id, status, started):
+        self.store.write_run({"run_id": run_id, "brief_sha256": "0" * 64, "model": NANO,
+                              "aspect_ratio": "1:1", "image_size": "1K", "status": status,
+                              "started_at": core.iso(started), "reviews": [], "evaluations": []})
+
+    def test_old_running_run_is_failed_and_a_recent_one_is_kept(self):
+        old, recent = NOW - dt.timedelta(hours=2), NOW - dt.timedelta(minutes=5)
+        self.write_run("run_" + "a" * 16, "running", old)
+        self.write_run("run_" + "b" * 16, "running", recent)
+        self.write_run("run_" + "c" * 16, "generated", old)
+        self.assertEqual(self.store.mark_stale_runs(now=NOW), 1)
+        cut_off = self.store.load_run("run_" + "a" * 16)
+        self.assertEqual((cut_off["status"], cut_off["error"]), ("failed", "interrupted"))
+        self.assertEqual(self.store.load_run("run_" + "b" * 16)["status"], "running")
+        self.assertEqual(self.store.load_run("run_" + "c" * 16)["status"], "generated")
+
+    def test_a_damaged_record_is_left_alone_and_does_not_stop_the_others(self):
+        self.write_run("run_" + "a" * 16, "running", NOW - dt.timedelta(hours=2))
+        damaged = self.store._path("runs", "run_" + "e" * 16 + ".json")
+        with open(damaged, "w", encoding="utf-8") as handle:
+            handle.write("{not json")
+        self.assertEqual(self.store.mark_stale_runs(now=NOW), 1)
+        self.assertEqual(self.store.load_run("run_" + "a" * 16)["status"], "failed")
+        with open(damaged, encoding="utf-8") as handle:
+            self.assertEqual(handle.read(), "{not json")
+
+    def test_the_cutoff_is_longer_than_the_provider_timeout(self):
+        self.assertGreater(core.STALE_RUN_AFTER, dt.timedelta(seconds=TIMEOUT_SECONDS))
 
 
 if __name__ == "__main__":

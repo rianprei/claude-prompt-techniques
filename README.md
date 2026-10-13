@@ -172,7 +172,7 @@ prompt-techniques/
 │   ├── validate_prompt.py      # checa um prompt contra as regras do skill
 │   └── check_repo.py           # checa links e âncoras locais, formatação, numeração e contratos de modelo e chave
 ├── studio/                     # GUI local: brief, aprovação de uso única, revisão (README próprio)
-├── tests/                      # unittest: validador, golden cases, catálogo, contratos e studio
+├── tests/                      # unittest: validador, golden cases, catálogo, contagens, contratos e studio
 ├── references/                 # pesados, carregados SÓ sob demanda
 │   ├── tool-routing.md         # regras por ferramenta e modelo
 │   ├── templates.md            # 13 templates estruturais completos
@@ -285,7 +285,7 @@ python3 scripts/validate_prompt.py --target gpt-6-astra prompt.txt
 # Checa links e âncoras locais, formatação, numeração de padrões e templates, IDs de modelo contra o catálogo e chave fora da URL. URLs externas não são checadas.
 python3 scripts/check_repo.py
 
-# Roda os testes: validador, 19 golden cases, catálogo de imagem, contratos e studio.
+# Roda os testes: validador, 19 golden cases, catálogo de imagem, contagens, contratos e studio.
 python3 -m unittest discover -s tests -v
 ```
 

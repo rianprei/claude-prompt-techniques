@@ -39,6 +39,7 @@ class Studio:
     def __init__(self, data_dir, client_factory=real_client, provider="gemini", catalog=None):
         self.catalog = catalog if catalog is not None else load_catalog()
         self.store = Store(data_dir)
+        self.store.mark_stale_runs()  # runs that a stopped studio left as "running"
         self.client_factory = client_factory
         self.provider = provider
         self.token = secrets.token_urlsafe(32)

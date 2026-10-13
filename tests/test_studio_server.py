@@ -1,4 +1,5 @@
 import base64
+import datetime as dt
 import io
 import json
 import os
@@ -15,6 +16,7 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 from studio.client import FakeClient, placeholder_png  # noqa: E402
+from studio.core import Store, iso  # noqa: E402
 from studio.server import Studio, make_server  # noqa: E402
 
 PNG = placeholder_png()
@@ -214,6 +216,18 @@ class FlowTests(ServerCase):
         self.assertEqual((status, payload["error"]), (412, "missing_api_key"))
         self.assertFalse(state["api_key_configured"])
         live.store.consume_approval(token, plan["brief_sha256"])  # not spent: still usable once a key exists
+
+
+class StartupTests(ServerCase):
+    def test_starting_the_studio_marks_a_run_cut_off_by_a_stop_as_failed(self):
+        run_id = "run_" + "d" * 16
+        started = dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=1)
+        Store(self.data_dir).write_run({"run_id": run_id, "brief_sha256": "0" * 64, "model": NANO,
+                                        "aspect_ratio": "1:1", "image_size": "1K", "status": "running",
+                                        "started_at": iso(started), "reviews": [], "evaluations": []})
+        Studio(self.data_dir, client_factory=FakeClient, provider="fake")
+        record = Store(self.data_dir).load_run(run_id)
+        self.assertEqual((record["status"], record["error"]), ("failed", "interrupted"))
 
 
 if __name__ == "__main__":
