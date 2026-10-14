@@ -88,18 +88,18 @@ curl -fL $base/SKILL.md -o ~/.claude/skills/prompt-techniques/SKILL.md
 curl -fL $base/README.md -o ~/.claude/skills/prompt-techniques/README.md
 curl -fL $base/LICENSE -o ~/.claude/skills/prompt-techniques/LICENSE
 curl -fL $base/NOTICE -o ~/.claude/skills/prompt-techniques/NOTICE
-for f in tool-routing patterns templates persuasion taxonomy technique-catalog defenses image-styles gemini-image-models; do
+for f in tool-routing patterns templates persuasion taxonomy technique-catalog defenses image-styles gemini-image-models gemini-image-examples; do
   curl -fL $base/references/$f.md -o ~/.claude/skills/prompt-techniques/references/$f.md
 done
 ```
 
-Sem git, a instalação traz o skill, a licença e o NOTICE: `SKILL.md`, `README.md`, `LICENSE`, `NOTICE` e os 9 arquivos `.md` de `references/`. Ficam de fora `scripts/`, `studio/`, `tests/`, `evals/` e `references/gemini-image-models.json`, que só os scripts, o Studio e os testes usam; para eles, use a instalação via git.
+Sem git, a instalação traz o skill, a licença e o NOTICE: `SKILL.md`, `README.md`, `LICENSE`, `NOTICE` e os 10 arquivos `.md` de `references/`. Ficam de fora `scripts/`, `studio/`, `tests/`, `evals/` e `references/gemini-image-models.json`, que só os scripts, o Studio e os testes usam; para eles, use a instalação via git.
 
 **Verificar:**
 
 ```bash
 ls ~/.claude/skills/prompt-techniques/ ~/.claude/skills/prompt-techniques/references/
-# Esperado: SKILL.md, README.md, LICENSE, NOTICE e references/ com 9 arquivos .md
+# Esperado: SKILL.md, README.md, LICENSE, NOTICE e references/ com 10 arquivos .md
 ```
 
 **Ativar:** abra uma sessão nova do Claude Code. A skill carrega automaticamente — zero configuração. Pra confirmar, pergunte ao Claude: "qual skill de prompt engineering você tem disponível?"
@@ -175,23 +175,24 @@ prompt-techniques/
 ├── tests/                      # unittest: validador, golden cases, catálogo, contagens, contratos e studio
 ├── references/                 # pesados, carregados SÓ sob demanda
 │   ├── tool-routing.md         # regras por ferramenta e modelo
-│   ├── templates.md            # 13 templates estruturais completos
+│   ├── templates.md            # 14 templates estruturais completos
 │   ├── patterns.md             # padrões que desperdiçam tokens/créditos
-│   ├── taxonomy.md             # taxonomia: 268 nomes em 19 categorias + catálogo de White et al.
+│   ├── taxonomy.md             # taxonomia: 288 nomes em 19 categorias + catálogo de White et al.
 │   ├── technique-catalog.md    # catálogo detalhado: fonte, status, novidade e tipo de cada técnica
 │   ├── persuasion.md           # 7 princípios de persuasão p/ compliance
 │   ├── defenses.md             # defesas para conteúdo não confiável (conceitual)
 │   ├── image-styles.md         # nomes de estilo para prompts de imagem
-│   ├── gemini-image-models.md  # IDs, status, tamanhos, proporções e preços do Nano Banana (2026-10-12)
-│   └── gemini-image-models.json # mesmos dados em JSON, lidos pelos testes
+│   ├── gemini-image-models.md  # IDs, aliases, status, tamanhos, proporções por modelo, limites e preços (2026-10-13)
+│   ├── gemini-image-examples.md # briefs prontos do Nano Banana (pt-BR e EN), validados pelo teste
+│   └── gemini-image-models.json # mesmos dados em JSON, lidos pelos testes e pelo studio
 ├── evals/
 │   ├── protocol.md             # protocolo manual de A/B + log de re-prompts
-│   └── golden_cases.json       # 19 casos fixos para o validador
+│   └── golden_cases.json       # 31 casos fixos para o validador
 └── .githooks/
     └── pre-commit              # opcional: checador + testes antes do commit
 ```
 
-`SKILL.md` contém só a camada de prioridade (modo passivo) e as regras do gerador (modo ativo), com **links** para os arquivos de `references/` — a taxonomia completa (268 nomes em 19 categorias, mais o catálogo de White et al.) mora em `references/taxonomy.md`, e a fonte e o status de cada entrada estão em `references/technique-catalog.md`. O Claude lê `tool-routing.md` ou `taxonomy.md` só quando precisa (pedido de prompt, ou técnica fora da camada de prioridade). Isso é *progressive disclosure*: você não paga tokens por conhecimento que não está usando naquele momento.
+`SKILL.md` contém só a camada de prioridade (modo passivo) e as regras do gerador (modo ativo), com **links** para os arquivos de `references/` — a taxonomia completa (288 nomes em 19 categorias, mais o catálogo de White et al.) mora em `references/taxonomy.md`, e a fonte e o status de cada entrada estão em `references/technique-catalog.md`. O Claude lê `tool-routing.md` ou `taxonomy.md` só quando precisa (pedido de prompt, ou técnica fora da camada de prioridade). Isso é *progressive disclosure*: você não paga tokens por conhecimento que não está usando naquele momento.
 
 Comparação: skills que carregam tudo no início custam milhares de tokens por sessão e causam o efeito "lost in the middle" (modelo ignora regras porque o contexto saturou). Aqui o custo fixo por sessão é só o SKILL.md.
 
@@ -208,7 +209,7 @@ Regras específicas em `references/tool-routing.md`:
 | Geradores full-stack | Bolt, v0, Lovable, Figma Make, Google Stitch |
 | Pesquisa/orquestração | Perplexity, Manus AI |
 | Browser/computer-use | Comet, Atlas, Claude in Chrome |
-| Imagem | Midjourney, GPT Image, Stable Diffusion, SeeDream, Nano Banana Pro, Flux, Ideogram, ComfyUI |
+| Imagem | Midjourney, GPT Image, Stable Diffusion, SeeDream, Nano Banana / Gemini Image (2.1, 2, 2 Lite, Pro), Flux, Ideogram, ComfyUI |
 | Vídeo | Sora, Runway, Kling, LTX Video, Dream Machine, Seedance |
 | Voz | ElevenLabs |
 | Música | Suno |
@@ -219,7 +220,7 @@ Ferramenta fora da lista: o Claude aplica regras genéricas (instrução explíc
 
 ## Templates incluídos
 
-`references/templates.md` — 13 templates, cada um com exemplo preenchido:
+`references/templates.md` — 14 templates, cada um com exemplo preenchido:
 
 | Template | Melhor pra |
 |---|---|
@@ -231,15 +232,16 @@ Ferramenta fora da lista: o Claude aplica regras genéricas (instrução explíc
 | F — Few-Shot | formato mais fácil de mostrar que descrever |
 | G — File-Scope | Cursor/Windsurf/Copilot — edição de código |
 | H — ReAct + Stop Conditions | Claude Code/Devin — agentes autônomos |
-| I — Visual Descriptor | Midjourney/GPT Image/SD/Sora (inclui fórmula de 7 componentes + 9 modos de expertise) |
-| J — Reference Image Editing | editar imagem existente (só descreve o delta) |
+| I — Visual Descriptor | Midjourney/GPT Image/SD/Sora (campos de descrição visual + 9 modos de expertise) |
+| J — Reference Image Editing | editar imagem existente (só descreve o delta, com cláusula de preservação); também combina referências com papel nomeado |
 | K — ComfyUI | workflow nodal (positive + negative separados) |
 | L — Prompt Decompiler | quebrar/adaptar/dividir prompt existente |
 | M — Claude Task Brief | tarefa complexa/agentic em modelos Claude atuais |
+| N — Nano Banana Brief | imagem nova no Nano Banana / Gemini Image, com referências nomeadas (opcional) |
 
 ## Princípios de persuasão
 
-`references/persuasion.md` — baseado em Meincke et al. (2025), "Call Me A Jerk" (N=28.000 conversas). No estudo, princípios de persuasão elevaram a compliance de **33,3% para 72,0%**, mas o teste foi feito no **GPT-4o mini**, com pedidos objetáveis, e não em modelos Claude. Mede compliance com a instrução, não qualidade da resposta, e não prova o efeito em Claude. Os números (N, 33,3% e 72,0%) não foram conferidos no artigo: o SSRN retornou HTTP 403 em 2026-10-12.
+`references/persuasion.md` — baseado em Meincke et al., "Call Me A Jerk" (SSRN 5357179, 2025; título e autores conferidos no Crossref em 2026-10-13). A descrição de terceiros (NeoLabHQ) dá **33,3% para 72,0%** no **GPT-4o mini**, com N=28.000; esses números não foram conferidos no preprint, porque o SSRN retornou HTTP 403 em 2026-10-12. A versão revisada por pares do mesmo grupo (PNAS, 2026, DOI 10.1073/pnas.2535868123) testou GPT-5 mini, Claude Haiku 4.5 e Gemini 3 Flash: a compliance foi de 35,3% para 51,3% em 126.000 conversas, segundo o resumo lido. Mede compliance com a instrução, não qualidade da resposta.
 
 **Aviso importante:** compliance = obediência à instrução, **não** qualidade ou veracidade da resposta. Um prompt mais "obedecido" não é automaticamente um prompt melhor. Por isso o escopo aqui é estreito: disciplina de formato e processo (seguir checklist, anunciar skill, não pular verificação) — não "melhorar respostas" em geral.
 
@@ -279,19 +281,19 @@ Tudo em biblioteca padrão do Python, sem pacotes externos. Os scripts vêm do c
 # Checa um prompt contra as regras do skill: CoT em modelo reasoning-native,
 # bloco de pensamento em Claude 5.x, prefill, CAPS empilhados, formato ausente,
 # agente sem condição de parada, linguagem vaga, chave em URL, modelo de preview ou desligado
-# e proporção fora das 14 oficiais (Gemini).
+# e, para imagem, proporção que o modelo não aceita, alias de Nano Banana resolvido para o ID, texto sem aspas e lista longa de negações.
 python3 scripts/validate_prompt.py --target gpt-6-astra prompt.txt
 
 # Checa links e âncoras locais, formatação, marcadores de pendência, numeração de padrões e templates, IDs de modelo contra o catálogo e chave fora da URL, e avisa se o catálogo tiver mais de 90 dias. URLs externas não são checadas.
 python3 scripts/check_repo.py
 
-# Roda os testes: validador, 19 golden cases, catálogo de imagem, contagens, contratos e studio.
+# Roda os testes: validador, 31 golden cases, catálogo de imagem (com concordância Markdown/JSON), exemplos do Nano Banana, contagens, contratos, checagem do repositório e studio.
 python3 -m unittest discover -s tests -v
 ```
 
 - **O que o validador não faz:** não julga se a resposta do modelo é boa. Ele lê só o texto do prompt. A qualidade continua no A/B manual de [`evals/protocol.md`](evals/protocol.md).
-- **Golden cases** (`evals/golden_cases.json`): 19 prompts fixos, cada um com o resultado esperado do validador. Eles testam o validador, não as respostas dos modelos. Se um caso quebrar, ou a regra mudou de propósito (atualize o caso) ou houve regressão.
-- **Catálogo de imagem e contratos** (`references/gemini-image-models.json`): IDs, status, tamanhos, proporções e preços do Nano Banana, com data de verificação (2026-10-12). Os testes conferem que IDs, preços e proporções do JSON aparecem no Markdown, que proporções, tamanhos e níveis de pensamento são os valores listados na documentação lida em 2026-10-12, e que a data de verificação é a mesma nos dois arquivos. O `check_repo.py` bloqueia ID de modelo fora do catálogo, ID desligado fora dele e chave em query string. Os testes não chamam a API: se o modelo ainda aceita um valor, só uma chamada real confirma.
+- **Golden cases** (`evals/golden_cases.json`): 31 prompts fixos, cada um com o resultado esperado do validador. Eles testam o validador, não as respostas dos modelos. Se um caso quebrar, ou a regra mudou de propósito (atualize o caso) ou houve regressão.
+- **Catálogo de imagem e contratos** (`references/gemini-image-models.json`): IDs, status, tamanhos, proporções e preços do Nano Banana, com data de verificação (2026-10-13). Os testes conferem que IDs, preços e proporções do JSON aparecem no Markdown, que proporções, tamanhos e níveis de pensamento são os valores listados na documentação lida em 2026-10-13 (cada modelo tem a sua lista de proporções; os aliases resolvem para um só ID), e que a data de verificação é a mesma nos dois arquivos. O `check_repo.py` bloqueia ID de modelo fora do catálogo, ID desligado fora dele e chave em query string. Os testes não chamam a API: se o modelo ainda aceita um valor, só uma chamada real confirma.
 - **Limites conhecidos:** a maioria dos sinais é em inglês, com algumas formas em português (passo a passo, não, sem, formato, lista). Em prompts em português, as checagens de agente, CAPS e linguagem vaga não disparam, então a ausência de aviso não prova que o prompt está certo. A detecção de negação conta as negações antes da frase, dentro da mesma cláusula, e uma negação anula outra: "Não pule a checagem passo a passo" pede raciocínio e é marcado em modelo reasoning-native. Uma negação depois da frase não é lida.
 - **Hook opcional:** `git config core.hooksPath .githooks` (uma vez por clone) faz o `check_repo.py` e os testes rodarem antes de cada commit. Não é ativado sozinho.
 
@@ -352,9 +354,9 @@ O que se perde fora do Claude Code: descoberta automática da skill e garantia d
 
 ## Desinstalar
 
-A skill não grava nada fora da própria pasta por padrão. O Studio guarda em `studio/data`, dentro dela, os briefs, as imagens de referência, as imagens geradas, o histórico das execuções e as aprovações.
+O Studio guarda, fora da pasta da skill, em `~/.local/share/prompt-techniques-studio/` (ou em `$XDG_DATA_HOME/prompt-techniques-studio/`), os briefs, as imagens de referência, as imagens geradas, o histórico das execuções e as aprovações.
 
-**Antes de desinstalar, copie `studio/data` se quiser manter as imagens geradas.** O comando abaixo apaga esse diretório junto, sem perguntar. Se você usou `--data-dir` com outro caminho, esse caminho não é removido: apague-o à parte.
+**Antes de desinstalar, copie esse diretório se quiser manter as imagens geradas.** O comando abaixo apaga só a skill; ele não apaga os dados do Studio. Para removê-los também, apague esse diretório à parte. Se você usou `--data-dir` com outro caminho, esse caminho também não é removido.
 
 ```bash
 rm -rf ~/.claude/skills/prompt-techniques
@@ -362,11 +364,11 @@ rm -rf ~/.claude/skills/prompt-techniques
 
 ## Créditos
 
-- **Modo gerador** baseado em [nidhinjs/prompt-master](https://github.com/nidhinjs/prompt-master) (tool routing, templates A–M, patterns, intent extraction), licença MIT.
-- **Fórmula de 7 componentes para imagem + modos de expertise** inspirados em [Hainrixz/claude-banana](https://github.com/Hainrixz/claude-banana) e [AgriciDaniel/banana-claude](https://github.com/AgriciDaniel/banana-claude).
+- **Modo gerador** baseado em [nidhinjs/prompt-master](https://github.com/nidhinjs/prompt-master) (tool routing, templates A–N, patterns, intent extraction), licença MIT.
+- **Modos de expertise de imagem** (Template I) inspirados em [Hainrixz/claude-banana](https://github.com/Hainrixz/claude-banana), que tem nove modos de domínio no seu catálogo.
 - **Princípios de persuasão** de [NeoLabHQ/context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit) (skill prompt-engineering), fundamentados em Meincke et al. (2025). Licença do upstream: GPL-3.0.
 - **Modo referência** (taxonomia de técnicas) é taxonomia própria, inspirada em The Prompt Report (Schulhoff et al., 2024) e no catálogo de padrões de White et al. (2023).
 - **Adições de 2026-10-12** (defesas, validador, nomes de estilo de imagem e nomes de técnicas): ideias de [Valhall-ai/prompt-injection-mitigations](https://github.com/Valhall-ai/prompt-injection-mitigations), [drxvb/apex-prompt-architect](https://github.com/drxvb/apex-prompt-architect), [Hainrixz/claude-banana](https://github.com/Hainrixz/claude-banana), [amerob/ultimate-prompt-engineering-playbook](https://github.com/amerob/ultimate-prompt-engineering-playbook), [FareedKhan-dev/prompt-engineering-cheatsheet](https://github.com/FareedKhan-dev/prompt-engineering-cheatsheet), [KalyanKS-NLP/Prompt-Engineering-Techniques-Hub](https://github.com/KalyanKS-NLP/Prompt-Engineering-Techniques-Hub), [cicero-im/prompting](https://github.com/cicero-im/prompting) e [corralm/awesome-prompting](https://github.com/corralm/awesome-prompting). Licenças e detalhes em `NOTICE`.
-- **Catálogo de modelos de imagem**: fatos (IDs, datas, tamanhos, proporções e preços) da documentação oficial do Google, lida em 2026-10-12. Nenhum texto copiado. Atribuição no `NOTICE`.
+- **Catálogo de modelos de imagem**: fatos (IDs, datas, tamanhos, proporções e preços) da documentação oficial do Google, lida em 2026-10-13. Nenhum texto copiado. Atribuição no `NOTICE`.
 
 Licença do projeto: GPL-3.0 (arquivo `LICENSE`). Avisos e atribuições de terceiros: arquivo `NOTICE`.

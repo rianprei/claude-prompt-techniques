@@ -1,12 +1,12 @@
 Reference file for the `prompt-techniques` skill. Loaded on demand by SKILL.md's active generator mode — not a standalone skill entry point.
 
-> Last verified: 2026-10-12. Claude thinking, prefill and refusal rules were re-read on the vendor's prompting, models and refusal pages. Other Claude bullets were not re-read one by one. GPT-6 model IDs and reasoning levels were re-read on OpenAI's models page; the GPT-6 guide and launch blog were not readable that day, so their items are marked. Grok rules were re-read on xAI's models, reasoning and API reference pages. The Codex section follows the GPT-6 docs plus workflow notes. Midjourney and Flux rules were checked against secondary sources only. All other sections were last checked 2026-07-07 and may be stale. Model-specific rules age fast: if the target model is newer than the verification date or absent below, do NOT guess version-specific behavior; apply generic rules (explicit instruction, output contract, format lock) and say the entry may be stale.
+> Last verified: 2026-10-13. The Nano Banana profile and the image model facts were re-read on 2026-10-13 against Google's image generation guide, the Nano Banana 2.1 model page, the pricing and deprecations pages, the DeepMind prompt guide and the Cloud blog dated 2026-03-05 (see gemini-image-models.md). The Claude bullets were re-read on 2026-10-13 against the models overview, best-practices, refusal and stop-reason pages, and corrected where a quote or claim was not in them. GPT-6 model IDs, reasoning levels and the guide's advice were re-read on OpenAI's models and GPT-6 guide pages, plus the post "Rethinking skills and prompts for GPT-6 Astra"; the GPT-6 launch post was not read. Grok rules were re-read on xAI's models, reasoning, API reference and caching pages, on Cursor's model list, and on Grok Build's overview. The Codex section follows the GPT-6 docs plus workflow notes. Midjourney and Flux rules were checked against secondary sources only. All other sections were last checked 2026-07-07 and may be stale. Model-specific rules age fast: if the target model is newer than the verification date or absent below, do NOT guess version-specific behavior; apply generic rules (explicit instruction, output contract, format lock) and say the entry may be stale.
 
 **Contents** (jump to the section you need, don't read the whole file):
 - Text/chat LLMs: Claude, ChatGPT/GPT-6.x, Grok, Gemini, Qwen 2.5/3, Ollama, Llama/Mistral, DeepSeek-R1, MiniMax
 - Coding agents: Claude Code, Codex CLI, Antigravity, Cursor/Windsurf, Cline, GitHub Copilot, Bolt/v0/Lovable/Figma Make/Stitch, Devin/SWE-agent
 - Research/browser agents: Perplexity/Manus, Comet/Atlas/Claude in Chrome
-- Image: Generation, Reference Editing, ComfyUI, 3D (Text to 3D, In-Engine AI)
+- Image: Generation, Nano Banana / Gemini Image, Reference Editing, ComfyUI, 3D (Text to 3D, In-Engine AI)
 - Video/Voice/Music: Sora/Runway/Kling/etc, ElevenLabs, Suno
 - Workflow automation: Zapier/Make/n8n
 - Safety: Credential Safety, Input Sanitization, Sandwich Defense
@@ -33,28 +33,28 @@ Identify the tool and route accordingly. Read full templates from [templates.md]
 
 **Claude (claude.ai, Claude API, Claude Code)**
 
-Current models (Anthropic models overview, read 2026-10-12; lifecycle "active"): Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5. Specialized models in the same docs: Mythos 5.1 and Mythos 5. Legacy models in the docs navigation: Fable 5, Opus 5, Sonnet 5, Opus 4.8 to 4.5, Sonnet 4.6, Sonnet 4.5 and Haiku 4.5. Do not assume a specific point version — ask or check current docs if the user names one; do not hardcode a "default" version number in generated prompts.
+Current models (Anthropic models overview, read 2026-10-13): Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5, each with a 1M-token context window. The best-practices page also names Mythos 5.1; the overview's legacy list was not re-read. Do not assume a specific point version — ask or check current docs if the user names one; do not hardcode a "default" version number in generated prompts.
 
 *Durable across Claude 4.x/5.x:*
 - Be explicit and specific — Claude follows instructions literally. It does exactly what you say, nothing more. Missing context = narrow literal output, not a smart guess.
-- Claude Opus over-engineers by default — add "Only make changes directly requested. Do not add features or refactor beyond what was asked."
-- XML tags help for complex multi-section prompts: `<context>`, `<task>`, `<constraints>`, `<output_format>`
+- Anthropic's sample prompt to minimize overengineering: "Avoid over-engineering. Only make changes that are directly requested or clearly necessary." It adds: "Don't add features, refactor code, or make 'improvements' beyond what was asked."
+- XML tags reduce misinterpretation when a prompt mixes instructions, context, examples and inputs; the best-practices page uses `<instructions>`, `<context>` and `<input>` as examples, with consistent, descriptive names
 - Provide context and reasoning WHY, not just WHAT — Claude generalizes better from explanations
-- Always specify output format and length explicitly
-- For complex or multi-step tasks: front-load everything in one turn — intent, constraints, acceptance criteria, relevant files. Every extra back-and-forth turn adds reasoning overhead and token cost.
-- Do not hardcode a thinking budget: `budget_tokens` returns 400 from Claude 4.7. Depth is set with `effort`. Thinking is on by default on Opus 5, Sonnet 5, Sonnet 5.5, and Haiku 5.5; always on for Fable 5.1, Fable 5, Mythos 5.1, Mythos 5, and Opus 5.5; off by default on Opus 4.6–4.8 and Sonnet 4.6. To discourage unneeded thinking, use the doc's wording: "Thinking adds latency and should only be used when it will meaningfully improve answer quality… When in doubt, respond directly." For manual step-by-step, see the per-model rule in Safe Techniques.
+- Be specific about the desired output format and constraints (best-practices page)
+- For complex or multi-step tasks: give intent, constraints, acceptance criteria and relevant files up front. The best-practices page says explaining the motivation behind an instruction helps Claude follow it.
+- Do not hardcode a thinking budget: `budget_tokens` returns 400 from Claude 4.7. Depth is set with `effort`. When the thinking parameter is omitted, thinking is on by default on Opus 5, Sonnet 5, Sonnet 5.5 and Haiku 5.5, and off on Opus 4.8 and Sonnet 4.6; the models overview lists Fable 5.1 and Opus 5.5 as "Adaptive (always on)". To discourage unneeded thinking, use the doc's wording: "Thinking adds latency and should only be used when it will meaningfully improve answer quality… When in doubt, respond directly." For manual step-by-step, see the per-model rule in Safe Techniques.
 - Use Template M for agentic or multi-step tasks.
 
 *Current-generation notes:*
-- Literalism and adaptive thinking hold across recent generations — front-loading discipline applies regardless of exact version. Treat the first turn as the only turn for complex work: intent, scope, constraints, acceptance criteria up front.
-- Large context windows (six figures to 1M tokens depending on model/tier) — large multi-file context can go in a single prompt, but keep it relevant; padding still dilutes attention.
+- Literal instruction following is named as a difference for Sonnet 5 and Opus 4.8 on the best-practices page. For complex work, put intent, scope, constraints and acceptance criteria up front.
+- Current models list a 1M-token context window (models overview). A large multi-file context can go in one prompt, but keep it relevant.
 - API only: prefilling the last assistant turn is not supported from Claude 4.6 on (HTTP 400; also Mythos Preview). For output shape, use Structured Outputs, a tool with an enum field, or a direct instruction ("Respond directly without preamble…"). Mention this only when the user integrates via the API.
-- Effort is set by the harness or API (`effort`), not in the prompt. In Claude Code, `/fast` toggles faster output (confirmed in the session context). Keyword triggers such as "think hard" or "ultrathink" are reported by third-party sources with conflicting mappings and are not verified against official docs; do not rely on them in generated prompts until checked.
-- For a system prompt or any prompt reused across repeated calls (API integration, RAG, multi-document analysis): put static content first (identity, rules, instructions) and dynamic content last (retrieved documents, session data, the actual query). Most API providers cache the shared prefix — reordering this way turns repeated calls cheaper and faster for free.
+- Effort is set by the harness or API (`effort`), not in the prompt; the models overview lists a default effort per model. In Claude Code, `/fast` toggles faster output (per the Claude Code harness context). Keyword triggers such as "think hard" or "ultrathink" are reported by third-party sources with conflicting mappings and are not verified against official docs; do not rely on them in generated prompts until checked.
+- For a system prompt or any prompt reused across repeated calls (API integration, RAG, multi-document analysis): put static content first (identity, rules, instructions) and dynamic content last (retrieved documents, session data, the actual query). Prompt caches match an exact shared prefix: the xAI caching guide says messages at the start that match exactly are served from cache, and the Anthropic caching page was not re-read on 2026-10-13.
 - Verbosity differs by model: Opus 5 writes longer user-facing answers than earlier models, so ask for conciseness explicitly. Fable 5.1 differs from Fable 5 in user-facing progress updates, so ask for them when you need them.
-- Format: say what to produce ("Write flowing prose paragraphs") instead of what to avoid, and reduce markdown with an explicit instruction. Use XML tags to lock the output shape.
-- Code tasks: add an investigate-first rule: "Never speculate about code you have not opened. Read the file before answering questions about it." (Anthropic's sample prompt.)
-- Long agentic work: ground every progress claim in tool results. On Opus 5, drop instructions that ask for repeated double-checks, which cause over-verification; on models other than Opus 5 (for example Sonnet 5.5 and Haiku 5.5), a final self-check line helps for coding and math.
+- Format: say what to produce ("Your response should be composed of smoothly flowing prose paragraphs.") instead of what to avoid ("Do not use markdown"), and use XML format indicators to lock the output shape (best-practices page).
+- Code tasks: add an investigate-first rule. Anthropic's sample prompt: "Never speculate about code you have not opened. If the user references a specific file, you MUST read the file before answering."
+- Long agentic work: ground every progress claim in tool results. The best-practices page lists over-verification as a difference of Opus 5 from earlier Opus models. For a self-check, it suggests appending a final line that asks Claude to verify its answer before it finishes.
 - API only: a response with `stop_reason: "refusal"` is a normal HTTP 200, returned by the safety classifiers of Fable 5.1, Fable 5, Opus 5.5, Opus 5, Sonnet 5.5, and Haiku 5.5. Read `stop_details` and retry on a fallback model. A `reasoning_extraction` refusal usually comes from a prompt that asks for reasoning in the output; the docs say to keep reasoning in thinking blocks (adaptive thinking) instead. When redeeming a fallback credit, send the request body unchanged and do not strip thinking blocks.
 
 ---
@@ -66,9 +66,9 @@ Current models (Anthropic models overview, read 2026-10-12; lifecycle "active"):
 - Use compact structured outputs; the model follows dense instructions well.
 - Constrain verbosity when needed: "Respond in under 150 words. No preamble. No caveats."
 - Models (OpenAI models page, read 2026-10-12): GPT-6 Astra (`gpt-6-astra`, "Our most capable model for the most demanding work"), GPT-6.1 Sol (`gpt-6.1-sol`, "Near-Astra performance for complex work at a lower cost"), GPT-6 Luna (`gpt-6-luna`, "Our most efficient model for focused, high-volume tasks").
-- `reasoning.effort` for GPT-6.1 Sol: low, medium, high, xhigh, max (models page). The "medium (default)" marking could not be confirmed on 2026-10-12 [not verified]. Astra and Sol do not list `none`, so use `low` instead; Luna lists `none`.
+- `reasoning.effort` for GPT-6.1 Sol: low, medium (default), high, xhigh, max (GPT-6 guide, read 2026-10-13); the guide says `none` and `minimal` are not supported for Sol, so use `low` where the repo would use `none`. Astra and Luna were not re-read for this detail.
 - GPT-6 is reasoning-native: do not add "think step by step". Ask for conclusion, assumptions, evidence, and checks instead.
-- [not verified: the GPT-6 guide and launch blog were not readable on 2026-10-12] Advice from this file: ask for concise paragraphs when you want less detail; ask for approval only after a concrete, reviewable result is ready; state the priority of user instructions and skills explicitly.
+- Advice from the GPT-6 guide (read 2026-10-13): default to clear, concise paragraphs when you want less detail; ask for approval only after a concrete, reviewable result is ready; make the priority of user instructions and skills explicit. The post "Rethinking skills and prompts for GPT-6 Astra" (read 2026-10-13) says recent models need less handholding and scaffolding; the launch post was not read.
 
 ---
 
@@ -129,12 +129,12 @@ Current models (Anthropic models overview, read 2026-10-12; lifecycle "active"):
 ---
 
 **Grok (xAI) — grok-4.7**
-- Current model: `grok-4.7` (xAI models page, read 2026-10-12: "Our flagship model for code and everything else"). That page lists no "Grok 4.7 Fast". Whether Cursor or Grok Build offer one was not checked [not verified].
+- Current model: `grok-4.7` (xAI models page, read 2026-10-13: "Our flagship model for code and everything else"). That page lists no "Grok 4.7 Fast". Cursor's pricing table (cursor.com/docs/models, read 2026-10-13) lists "Grok 4.7 (Fast)", "Grok 4.6 (Fast)" and "Grok 4.5 (Fast)" next to the base models. Grok Build's overview (docs.x.ai/build/overview.md, read 2026-10-13) names `grok-4.7` for the API and does not mention Fast.
 - Reasoning effort (`reasoning.effort`, xAI reasoning guide, read 2026-10-12): low, medium, high (default), xhigh; it cannot be disabled. Use `low` for latency-sensitive or simple tool work; `xhigh` only for deep exploration (this part is advice, not from xAI).
 - Keep prompts outcome-focused: Goal, Context/Input, Constraints, Tools/Permissions, Done. Name the tools and the evidence the task needs.
 - For current facts, require web search or X search, with citations.
 - Long tool-heavy loops: define stop conditions, approval boundaries, retry limits, and compaction checkpoints. Put stable instructions first to keep the prompt cache warm.
-- API: the xAI API reference (read 2026-10-12) shows a `prompt_cache_key` field only in an example response object, where it is null. It contains no cache-routing recommendation and no `x-grok-conv-id` header. The caching guide URL `developers/advanced-api-usage/prompt-caching` returned a generic page with no caching content, so it was not used. This file therefore states no recommendation.
+- Caching: automatic. The xAI caching guide (docs.x.ai/developers/advanced-api-usage/prompt-caching, read 2026-10-13) recommends the `x-grok-conv-id` header (Chat Completions) or the `prompt_cache_key` body field (Responses) to route one conversation to the same server. Only messages at the start that match exactly are served from cache.
 - Consumer Grok apps expose different controls than the API. There, put behavioral requirements in the prompt instead of settings.
 
 ---
@@ -159,7 +159,7 @@ Current models (Anthropic models overview, read 2026-10-12; lifecycle "active"):
 - Current models are more literal than older generations — vague first turns produce narrower results. Front-load everything: intent, file scope, constraints, acceptance criteria, session strategy.
 - Claude's latest models need explicit direction to act: "Can you suggest changes?" often gets suggestions only, so say "Make these edits…" when you want changes. For inspection, name the scope: "Read all files in /src/auth/ before starting"
 - Opus 4.6 and Opus 5 delegate to subagents readily, sometimes where a grep is enough. Add a damping rule: "Use subagents when tasks can run in parallel, require isolated context, or involve independent workstreams. For simple tasks, sequential operations, or single-file edits, work directly."
-- Claude Opus over-engineers — add "Only make changes directly requested. Do not add extra files, abstractions, or features."
+- Claude Opus over-engineers. Anthropic's sample prompt to minimize overengineering starts "Avoid over-engineering. Only make changes that are directly requested or clearly necessary."
 - Always scope to specific files and directories — never give a global instruction without a path anchor
 - Human review triggers required: "Stop and ask before deleting any file, adding any dependency, or affecting the database schema"
 - Highest-ROI single line for nontrivial tasks: "Before writing any code, make a plan and show it to me for approval." Prefer short prompts pointing at existing code ("see how X is implemented") over long descriptions; persistent context belongs in CLAUDE.md, not the prompt.
@@ -260,9 +260,61 @@ First detect: generation from scratch or editing an existing image?
 - **GPT Image (ChatGPT / gpt-image, successor to the now-retired DALL-E 3)**: Prose description works for a single-subject scene. Add "do not include text in the image unless specified." For a text-heavy, multi-region layout — poster, infographic, exploded-view diagram, map, slide — switch to a JSON prompt instead: nest `header`/`layout`/`callout_labels`/`footer` (or whatever regions the design needs) as object keys, put each label's exact text as a string value. This gives the model a structural map of where each piece of text belongs, which prose reliably loses once there are more than 3-4 labeled regions.
 - **Stable Diffusion**: `(word:weight)` syntax. CFG 7-12. Use a negative prompt (standard for SD 1.5 and SDXL; Flux usually ignores it at CFG 1). Steps 20-30 for drafts, 40-50 for finals.
 - **SeeDream**: Strong at artistic and stylized generation. Specify art style explicitly (anime, cinematic, painterly) before scene content. Mood and atmosphere descriptors work well. Negative prompt recommended.
-- **Nano Banana Pro (Gemini image)**: Prose descriptions work best — no weight syntax, no comma-soup. Use the official text-to-image scaffold: subject + action + location/context + composition + style (Google's prompting guide, dated 2026-03-05). Describe the scene as a narrative, not a keyword list. Strong at text rendering inside images and photo editing via natural language. Expertise modes (cinema, product, portrait, fashion, UI/web, logo, landscape, abstract, infographic) are not in the official guide: use them only as optional style hints.
+- **Nano Banana / Gemini Image**: not this bullet. Use the Nano Banana profile below. Its model names, aliases and limits are in [gemini-image-models.md](gemini-image-models.md).
 - **Flux**: Pure natural language, no parameter syntax at all — everything must be in the description, including camera and lens for photorealism. Longer, more descriptive prompts outperform short ones here (opposite of Midjourney). Strong at text rendering. In ComfyUI, Flux dev runs at CFG 1.0 with guidance set on the FluxGuidance node; a negative prompt usually has no effect (secondary sources).
 - **Ideogram**: Best-in-class text rendering — wrap the exact text to render in quotation marks inside the prompt. Style tags guide aesthetic direction separately from the text-rendering instruction. Best pick when the request is a logo, poster, or social graphic with specific on-image text.
+
+---
+
+**Nano Banana / Gemini Image** (Google's image models: Nano Banana 2.1, Nano Banana 2, Nano Banana 2 Lite, Nano Banana Pro)
+
+Use this profile when the user names Nano Banana, Gemini Image or a Gemini image model ID, or asks for images for a website, UI, product, advertisement, thumbnail, presentation, infographic or storyboard, or for an edit of an existing image with a Google model. IDs, aliases, ratios, limits and prices: [gemini-image-models.md](gemini-image-models.md) (verified 2026-10-13). Briefs to adapt: [gemini-image-examples.md](gemini-image-examples.md). Templates: N (new image) and J (edit or combine).
+
+**1. Route the name to one model ID.** A commercial name is not an API ID. Write the ID in the request, and use the name in the explanation.
+- "Nano Banana 2.1", "Gemini Nano Banana 2.1", or no model named for a new project: `gemini-nano-banana-2.1`. The guide's primary model, and the default.
+- "Nano Banana 2", "Gemini 3.1 Flash Image", or 512 px requested: `gemini-3.1-flash-image`. The only model with 512 px.
+- "Nano Banana 2 Lite", "Gemini 3.1 Flash Lite Image", or cheapest and fastest: `gemini-3.1-flash-lite-image`. 1K only, and not for many references or long edit chains.
+- "Nano Banana Pro", "Gemini 3 Pro Image", or premium professional assets: `gemini-3-pro-image`. No 1:4, 4:1, 1:8 or 8:1. Up to 14 references in total, split 6 objects, 5 characters and 3 styles.
+- "Gemini 2.5 Flash Image": `gemini-2.5-flash-image` is deprecated. Say so, and propose Nano Banana 2 Lite, the guide's migration path.
+- Preview names are shut down (the 3.1 and Pro previews on 2026-06-25). Name the replacement. Never reuse a preview ID.
+- A bare "Nano Banana" or "Gemini Image" names the family. Use `gemini-nano-banana-2.1` and say so. When a request names two models, ask one question, or choose the one the task needs and say why.
+
+**2. Start with the operation.** The Cloud blog (2026-03-05) advises opening the prompt with a strong verb that tells the model the primary operation. The verbs below are our list, not the blog's: Generate, Edit, Transform, Combine or Refine. Then build the brief for that operation:
+- Generate from text: Template N, one narrative paragraph.
+- Edit an existing image: Template J. Describe only the change, then a preservation clause (point 5).
+- Combine references: Template J (multi-image variant), with one role per reference (point 6).
+- Refine: a follow-up in the same conversation that changes one thing (point 5).
+
+**3. Write a narrative scene, with only the fields that matter.** The Cloud blog says a plain list of keywords is not enough. Scene formula: subject + action + location/context + composition + style. Choose the fields the task needs and leave the others out. Never add two that contradict each other.
+- Subject, action, and the material or texture that matters for logos, products and characters.
+- Setting, time and weather, when the scene depends on them. Name the era, place or culture when real-world knowledge matters (the DeepMind guide's advice).
+- Composition: shot type (wide, close-up, low angle), where the subject sits in the frame, which element is the visual focus (hierarchy), and negative space where text will go later.
+- Style and camera: medium (photo, illustration, sticker, 3D render, vector), lens (wide-angle, macro), light (three-point softbox, golden hour), grading or film stock. The guide uses these words to control the image. Mood and atmosphere go in words too, for example "quiet, melancholic, early morning".
+- Destination: set the aspect ratio in the request field, and name the use in words ("widescreen backdrop", "vertical social post").
+
+Describe what should be there, not what to leave out. The guide's example is "an empty, deserted street with no signs of traffic", not "no cars". The validator reports four or more negations in one prompt (W-NEGATIVE-LIST). When an attribute must not look like a common alternative, state the attribute with a brightness or saturation cue ("bright, polished gold") instead of a list of "NOT" items. Heuristic from Template I's locked-attribute rule, not in Google's docs. Template I's "NOT" lists are written for other image tools.
+
+**4. Text in the image.** Put the exact words in quotation marks, and describe the typography: font style, weight, color and placement. Say which text is the headline and which is secondary. For regional localization, the DeepMind guide says to write in one language and then specify the target language and the regional cultural cues in the prompt ("Translate and localize ideas"). The validator reports text named without quotes (W-TEXT-UNQUOTED). Write the prompt in the language the user wrote, and name the language of the text when it differs. Keep the user's words unchanged unless a translation was asked for; to translate, give the translated text in quotes. For copy longer than a headline, have the text written first, in its own turn, and then ask for the image with that exact text. The guide's limitation says this works best. The guide gives no character limit, so do not state one.
+
+**5. Edit, and refine in the same conversation.** The guide's inpainting pattern is: "Using the provided image, change only [specific element] to [new element/description]. Keep everything else in the image exactly the same, preserving the original style, lighting, and composition." Rules:
+- Describe the change only. Never rebuild the scene from a new description.
+- Always add a preservation clause: what stays exactly the same (face, logo, layout, light, background). The validator reports an edit with no preservation clause (W-EDIT-NO-PRESERVATION).
+- Keep a critical detail intact by describing it in full, such as "the white serif logo on the black t-shirt", and then say it must not change. The guide's high-fidelity pattern works this way.
+- Iterate with one change per turn, in the same conversation. The guide recommends multi-turn editing for iteration, and its example is "Keep everything the same, but change the character's expression to be more serious".
+
+**6. Several references (up to 14 in total).** Upload each reference as its own image and name each one with a role: identity (character, face or product), style, composition, palette or background. The DeepMind guide says to give each character or object a distinct name. Write one clause per reference, in the order sent: "Image 1 (character, keep the face and hair exactly): ...". The validator reports numbered references with no roles (W-REF-ROLE). The per-type limits differ by model (the reference table in gemini-image-models.md), but the request has no field for the type, so the total of 14 is the limit that applies. Heuristic, not in Google's docs: a collage made outside the prompt, with several references in one image, can blur the roles. Use it only when the user asks for it.
+
+**7. Character and product consistency.** Give the character a name and fixed identifying attributes (age range, hair, clothing, one distinctive feature). Use the same reference image and the same name in every scene. For a turnaround or a series, generate one pose at a time with the previous result attached, as the guide's 360-view template does. Check each result for drift in the identifying attributes before the next request. If the face, logo or product detail has drifted, name it again with a preservation clause.
+
+**8. Websites, interfaces, products and advertising.** Products and ads: the guide's product template is a studio-lit product photograph, with the product, the surface it sits on, the lighting setup, the camera angle that shows the key feature, the detail in sharp focus, and the ratio. Keep an exact product or logo in a reference with a role (product or identity), with a preservation clause (point 5). For websites and interfaces, our workflow rule, not a Google recommendation: read the project's real identity before writing the prompt: the palette from the CSS or the design config, the fonts, the logo file, and any photos already in use. Put those values into the prompt as constraints, and do not invent a palette. Ask what the image is for: hero background, card image, icon, avatar, logo or social post. For a background that will carry text, ask for negative space where the layout needs it ("a vast, empty off-white canvas, creating significant negative space for text", the guide's minimalist template). Set the ratio of the layout slot. Do not put a real brand or a real person in a brand asset unless the user has the rights to use them.
+
+**9. Infographics, slides, posters, storyboards and thumbnails.** For a storyboard or comic, use the guide's sequential-art template ("Make a 3 panel comic in a [style]. Put the character in a [type of scene]."); the guide says these work best with Nano Banana Pro and Nano Banana 2 (`gemini-3.1-flash-image`). A video thumbnail can come from a video: video-to-image is available on Nano Banana 2.1, Nano Banana 2 and Nano Banana 2 Lite (guide). For infographics and slides, describe the structure before the style: the title, the number of blocks, their order, the exact text of each block in quotes, the reading direction and the destination ratio (16:9 for a slide, 9:16 for a story, 1:1 for a post). The DeepMind guide suggests asking for a timeline or a flowchart to organize information. The guide says the model may not return the exact number of images asked for. Heuristic, from that limit: one slide per request, not a whole deck in one prompt.
+
+**10. Ratio, size and thinking.** Set `aspect_ratio` and `image_size` in the request field. The prompt text alone does not set them. Each model accepts only its own ratios (the catalog lists them). Map any other ratio to the nearest one the model accepts, and say so. Sizes use an uppercase K. The default size for Nano Banana 2.1 is 1K. 512 px is only for `gemini-3.1-flash-image`. Thinking cannot be turned off, and the levels differ by model. Do not add "think step by step" to a Nano Banana prompt: the model reasons already, the same rule as the other reasoning-native models.
+
+**11. What to hand back.** One copyable prompt block, then the model ID, the ratio and the size, then the reference list (name and role) when there are references. Add one line on what was optimized. Give no theory of prompt engineering unless the user asks for it.
+
+**12. Limits and safety.** The official pages give no numbers for text length or banned words, so do not state any. A blocked prompt (`PROHIBITED_CONTENT`, `IMAGE_SAFETY` or `IMAGE_PROHIBITED_CONTENT`) is a question for the user: ask before changing it, and never rephrase it to get past the filter. Images carry a SynthID watermark, which the guide states. Do not promise C2PA: the Cloud blog says it, and the current guide does not. Use only images the user has the rights to upload.
 
 ---
 

@@ -22,7 +22,8 @@ from .client import KEY_ENV, TIMEOUT_SECONDS, FakeClient, api_key_from_env, real
 from contracts import load_catalog  # studio/__init__.py put scripts/ on sys.path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_DATA_DIR = os.path.join(HERE, "data")
+DEFAULT_DATA_DIR = os.path.join(os.environ.get("XDG_DATA_HOME") or os.path.join(os.path.expanduser("~"), ".local", "share"),
+                                "prompt-techniques-studio")  # outside the skill folder: images never sit in the git clone
 STATIC_DIR = os.path.join(HERE, "static")
 STATIC_FILES = {"/app.js": ("app.js", "text/javascript; charset=utf-8"),
                 "/style.css": ("style.css", "text/css; charset=utf-8")}
@@ -198,7 +199,7 @@ def main(argv=None):
     serve = commands.add_parser("serve", help="start the local page")
     serve.add_argument("--port", type=int, default=8765, help="port on 127.0.0.1 (default 8765)")
     serve.add_argument("--data-dir", default=DEFAULT_DATA_DIR,
-                       help="where briefs, images and approvals are kept (default studio/data)")
+                       help="where briefs, images and approvals are kept (default ~/.local/share/prompt-techniques-studio)")
     serve.add_argument("--timeout", type=int, default=TIMEOUT_SECONDS,
                        help=f"seconds to wait for the live provider on each paid run (default {TIMEOUT_SECONDS}; "
                             "no effect with --fake-provider)")

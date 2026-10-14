@@ -19,6 +19,7 @@ Full template library for the prompt-techniques skill. Read the relevant templat
 | [K — ComfyUI](#template-k--comfyui) | ComfyUI node-based image workflows |
 | [L — Prompt Decompiler](#template-l--prompt-decompiler) | Breaking down, adapting, or splitting existing prompts |
 | [M — Claude Task Brief](#template-m--claude-task-brief) | Complex, multi-step, or agentic task on current Claude models |
+| [N — Nano Banana Brief](#template-n--nano-banana-brief) | New image with Nano Banana / Gemini Image, with optional named references |
 
 ---
 
@@ -348,6 +349,8 @@ Relationship: [how the combined elements interact — scale, position, lighting 
 Negative prompt: [what to avoid introducing]
 ```
 
+For Nano Banana / Gemini Image (up to 14 references per request, see [gemini-image-models.md](gemini-image-models.md)), give each reference a name and a role (identity, style, composition, palette or product), with one clause per reference in the order sent. In a multi-turn edit, send one change per turn in the same conversation, and keep the preservation clause in each turn. Routing rules: [tool-routing.md](tool-routing.md), the Nano Banana profile.
+
 **Outpainting / aspect expansion variant** — growing the canvas beyond the original image, not
 editing content inside it (different operation from both variants above):
 ```
@@ -515,3 +518,46 @@ After each completed step: ✅ [what was done] — [file(s) affected]. Back ever
 ```
 
 **When to use:** Current Claude models on any surface — claude.ai, API, Claude Code — when the task is complex, multi-file, ambiguous, or agentic. Not needed for simple one-shot tasks.
+
+---
+
+## Template N — Nano Banana Brief
+
+*Use for Nano Banana / Gemini Image (Nano Banana 2.1, Nano Banana 2, Nano Banana 2 Lite, Nano Banana Pro) when the image is new. For an edit of an existing image, use Template J. Model IDs, ratios and limits: [gemini-image-models.md](gemini-image-models.md). Routing: the Nano Banana profile in [tool-routing.md](tool-routing.md).*
+
+```
+Operation: Generate
+Model: [model ID from the catalog]
+Aspect ratio (request field): [a ratio that model accepts]
+Image size (request field): [1K | 2K | 4K; 512 only for gemini-3.1-flash-image]
+
+Prompt:
+[One narrative paragraph. Subject and action first; then setting and time; then composition
+(shot type, subject position, negative space for text); then style (medium, lens, light, grading).
+Positive wording: describe what should be there.]
+[Text in the image, if any: the exact words in quotation marks, the typography (font style,
+weight, color), where the text goes, and its language.]
+[Destination in words, for example "widescreen backdrop" or "vertical social post".]
+
+References (in the order sent; delete this block when there are none):
+1. [name]: [role: identity | product | style | composition | palette | background]. Keep exactly: [what must not change]
+```
+
+**Example** (an original brief, not from Google's examples):
+```
+Operation: Generate
+Model: gemini-nano-banana-2.1
+Aspect ratio (request field): 4:5
+Image size (request field): 1K
+
+Prompt:
+A photo of a hand-thrown olive-green ceramic vase holding three dried eucalyptus stems, standing on a pale oak shelf. Soft window light comes from the left, and the shot is taken at eye level with a 50mm lens, with shallow depth of field. The top third of the frame stays empty, off-white, with room for a headline. Vertical social post.
+```
+
+**Rules:**
+- Use only the ratios and sizes that the model accepts (catalog). Set them in the request fields, not only in the prompt text.
+- Keep the prompt to the fields the task needs. Describe what should be in the picture, not what to leave out.
+- Text in the picture goes in quotation marks, in the language the user asked for. Copy longer than a headline is written first, in its own turn.
+- More than one reference: name each one, and give each one a role.
+
+**When to use:** A new image from text, with or without named references, on any Nano Banana / Gemini Image model.

@@ -14,7 +14,7 @@ with open(os.path.join(ROOT, "evals", "golden_cases.json"), encoding="utf-8") as
 
 class GoldenCases(unittest.TestCase):
     def test_case_count_matches_the_docs(self):
-        self.assertEqual(len(CASES), 19)  # README and evals/protocol.md say 19
+        self.assertEqual(len(CASES), 31)  # README and evals/protocol.md say 31
 
     def test_each_case(self):
         for case in CASES:

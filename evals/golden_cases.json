@@ -113,5 +113,77 @@
     "prompt": "Explain DNS to a beginner.",
     "expect": ["W-OUTPUT-FORMAT"],
     "forbid": ["W-MODEL-UNKNOWN"]
+  },
+  {
+    "id": "edit-without-preservation-is-flagged",
+    "target": "gemini-nano-banana-2.1",
+    "prompt": "Using the provided photo of the living room, change the blue sofa to a brown leather chesterfield.",
+    "expect": ["W-EDIT-NO-PRESERVATION"]
+  },
+  {
+    "id": "edit-with-preservation-is-clean",
+    "target": "gemini-nano-banana-2.1",
+    "prompt": "Using the provided photo of the living room, change only the blue sofa to a brown leather chesterfield. Keep everything else exactly the same, including the lighting and the pillows.",
+    "clean": true
+  },
+  {
+    "id": "two-references-without-roles-are-flagged",
+    "target": "gemini-nano-banana-2.1",
+    "prompt": "Combine image 1 and image 2 into one scene on a rainy street.",
+    "expect": ["W-REF-ROLE"]
+  },
+  {
+    "id": "references-with-roles-are-clean",
+    "target": "gemini-nano-banana-2.1",
+    "prompt": "Use the character from image 1 for identity and the palette of image 2 for the colors. Place them in a sunlit kitchen.",
+    "clean": true
+  },
+  {
+    "id": "unquoted-text-is-flagged",
+    "target": "gemini-nano-banana-2.1",
+    "prompt": "A poster for a bakery with the text Pao Quente in bold red letters at the top.",
+    "expect": ["W-TEXT-UNQUOTED"]
+  },
+  {
+    "id": "quoted-text-is-clean",
+    "target": "gemini-nano-banana-2.1",
+    "prompt": "A poster for a bakery with the text \"Pao Quente\" in bold red letters at the top.",
+    "clean": true
+  },
+  {
+    "id": "no-text-request-is-clean",
+    "target": "gemini-nano-banana-2.1",
+    "prompt": "A minimalist product photo of a ceramic mug on a concrete surface, with no text in the image.",
+    "clean": true
+  },
+  {
+    "id": "long-negation-list-is-flagged",
+    "target": "gemini-nano-banana-2.1",
+    "prompt": "A street scene with no cars, no people, no signs, no traffic and never any birds.",
+    "expect": ["W-NEGATIVE-LIST"]
+  },
+  {
+    "id": "ratio-not-accepted-by-pro-is-flagged",
+    "target": "gemini-3-pro-image",
+    "prompt": "Make a panoramic poster of a harbor at dusk. Aspect ratio 1:4.",
+    "expect": ["W-ASPECT-RATIO"]
+  },
+  {
+    "id": "alias-target-uses-the-model-ratios",
+    "target": "Nano Banana Pro",
+    "prompt": "Make a cinematic poster of a harbor at dusk. Aspect ratio 21:9.",
+    "clean": true
+  },
+  {
+    "id": "preview-alias-in-prompt-is-blocked",
+    "target": "gemini-nano-banana-2.1",
+    "prompt": "Use Nano Banana 2 preview for the first draft of a harbor at dusk.",
+    "expect": ["E-MODEL-PREVIEW"]
+  },
+  {
+    "id": "bare-family-target-is-clean",
+    "target": "Nano Banana",
+    "prompt": "Make a flat logo of a lighthouse. Aspect ratio 16:9.",
+    "clean": true
   }
 ]

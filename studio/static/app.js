@@ -78,16 +78,20 @@
     fillSizes();
   }
 
-  function renderAspects(ratios) {
+  function fillAspects() {
     const select = $("aspect");
-    if (select.options.length) return;
+    const model = state.models.find((m) => m.id === $("model").value);
+    const ratios = model ? model.aspect_ratios : [];
+    const previous = select.value;
+    select.replaceChildren();
     for (const ratio of ratios) {
       const option = document.createElement("option");
       option.value = ratio;
       option.textContent = ratio;
       select.appendChild(option);
     }
-    select.value = "1:1";
+    if (ratios.includes(previous)) select.value = previous;
+    else if (ratios.includes("1:1")) select.value = "1:1";
   }
 
   function renderHistory(data) {
@@ -123,7 +127,7 @@
   async function loadState() {
     const data = await call("GET", "/api/state");
     renderModels(data);
-    renderAspects(data.aspect_ratios);
+    fillAspects();
     renderHistory(data);
     $("provider-status").textContent = data.provider === "fake"
       ? "Fake provider: placeholder images, no network, no cost."
@@ -282,6 +286,7 @@
 
   $("model").addEventListener("change", () => {
     fillSizes();
+    fillAspects();
     invalidatePlan();
   });
   for (const id of ["prompt", "aspect", "size", "references"]) {

@@ -1,6 +1,6 @@
 # Image style names
 
-Use this file when a prompt targets an image model (Midjourney, GPT Image, Flux, Stable Diffusion, or a ComfyUI graph) and the user asks for a look. It lists style families and the names of 70 techniques. A name is a style term. The syntax of the prompt depends on the target tool, so check its entry in [tool-routing.md](tool-routing.md) and the templates in [templates.md](templates.md) (I and K).
+Use this file when a prompt targets an image model (Midjourney, GPT Image, Flux, Stable Diffusion, or a ComfyUI graph) and the user asks for a look. It lists style families and the names of 70 techniques. A name is a style term. The syntax of the prompt depends on the target tool, so check its entry in [tool-routing.md](tool-routing.md) and the templates in [templates.md](templates.md) (I and K). For Nano Banana / Gemini Image (the target of the Nano Banana profile in tool-routing.md), the style names go into a narrative sentence, not a keyword list; use Template N.
 
 Source: Hainrixz/claude-banana (MIT), `knowledge/techniques-catalog.md`. The names below come from that catalog's section headings, read 2026-10-12. The catalog's descriptions and example prompts stay in that file.
 

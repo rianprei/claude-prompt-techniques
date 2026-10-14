@@ -3,7 +3,7 @@
 Stdlib only, and nothing here touches the network. client.py makes the paid call,
 and run_brief() calls it only after the approval has been consumed.
 
-Data lives in one directory (studio/data by default; git ignores it):
+Data lives in one directory, outside the skill folder by default (see server.py):
     briefs/<sha256>.json   each brief in canonical JSON, named by its hash
     inputs/<sha256>        uploaded reference images, named by their hash
     outputs/<run_id>.ext   generated images
@@ -28,6 +28,7 @@ except ImportError:  # not POSIX: the store refuses to run instead of running un
     fcntl = None
 
 from validate_prompt import validate  # noqa: E402
+from contracts import model_ratios, reference_total  # noqa: E402
 
 APPROVAL_TTL = timedelta(minutes=30)  # approval window; the single-use design is credited in NOTICE
 APPROVAL_RETENTION = timedelta(hours=24)  # finished approvals stay this long, so a reuse says "used"
@@ -36,7 +37,8 @@ INTERRUPTED_MESSAGE = "The studio stopped before this run finished. The approval
 MAX_LIVE_APPROVALS = 64
 MAX_PROMPT_CHARS = 8000  # local cap; no official limit was found
 MAX_NOTE_CHARS = 2000  # local cap for review and evaluation notes
-MAX_REFERENCE_BYTES = 10 * 1024 * 1024  # local cap; no official limit was found
+MAX_REFERENCE_BYTES = 10 * 1024 * 1024  # local cap per image; the official limit applies to the whole request
+MAX_INLINE_REQUEST_BYTES = 20_000_000  # official: inline image data limits the total request to 20 MB (image understanding page, read 2026-10-13)
 MAX_RUNS_LISTED = 50
 REVIEW_VERDICTS = ("pass", "targeted_fix", "regenerate", "blocked")
 NOTE_REQUIRED = ("targeted_fix", "blocked")
@@ -114,9 +116,8 @@ def allowed_sizes(catalog, model):
 
 
 def max_references(model):
-    """Smallest documented reference limit. The catalog does not map limits to models, so this is conservative."""
-    limits = [v for v in model.get("reference_limits", {}).values() if v]
-    return min(limits) if limits else 0
+    """Most reference images one request may carry: the guide's total for the model (14 for the current image models)."""
+    return reference_total(model)
 
 
 def offered_models(catalog):
@@ -130,10 +131,16 @@ def offered_models(catalog):
             "id": model["id"],
             "name": model.get("display_name", model["id"]),
             "sizes": sizes,
+            "aspect_ratios": model_ratios(catalog, model),
             "prices_usd_per_image": {s: model["prices_usd_per_image"][s] for s in sizes},
             "max_references": max_references(model),
         })
     return offers
+
+
+def inline_request_bytes(prompt, sizes):
+    """Size of the inline request body: the prompt bytes, plus each reference as base64 (4 characters per 3 bytes)."""
+    return len(prompt.encode("utf-8")) + sum(4 * ((size + 2) // 3) for size in sizes)
 
 
 def build_brief(catalog, store, *, prompt, model_id, aspect_ratio, image_size, references):
@@ -151,15 +158,17 @@ def build_brief(catalog, store, *, prompt, model_id, aspect_ratio, image_size, r
     prompt = prompt.strip()
     if len(prompt) > MAX_PROMPT_CHARS:
         raise StudioError("prompt_too_long", f"The prompt has more than {MAX_PROMPT_CHARS} characters.")
-    if aspect_ratio not in catalog["aspect_ratios"]:
+    if aspect_ratio not in offer["aspect_ratios"]:
         raise StudioError("aspect_ratio_not_official",
-                          f"{aspect_ratio!r} is not one of the {len(catalog['aspect_ratios'])} official aspect ratios.")
+                          f"{aspect_ratio!r} is not an aspect ratio of {model_id}; it accepts {len(offer['aspect_ratios'])}.")
     if image_size not in offer["sizes"]:
         raise StudioError("image_size_not_allowed", f"{image_size!r} is not available for {model_id}.")
     if not isinstance(references, list) or len(references) > offer["max_references"]:
         raise StudioError("too_many_references",
                           f"{model_id} takes at most {offer['max_references']} reference images here.")
     refs = [store.check_reference(ref) for ref in references]
+    if inline_request_bytes(prompt, [store.reference_size(ref) for ref in refs]) > MAX_INLINE_REQUEST_BYTES:
+        raise StudioError("request_too_large", "The prompt and the reference images together are over the 20 MB inline request limit.", 413)
     findings = validate(prompt, model_id, catalog)
     blocking = [f for f in findings if f["level"] == "ERROR"]
     if blocking:
@@ -243,6 +252,10 @@ class Store:
         if not os.path.exists(path):
             _write_atomic(path, data)
         return {"sha256": digest, "mime_type": mime_type}
+
+    def reference_size(self, ref):
+        """Byte size of a reference that check_reference has accepted."""
+        return os.path.getsize(self._path("inputs", ref["sha256"]))
 
     def check_reference(self, ref):
         """A brief may name only images that were uploaded to this studio."""

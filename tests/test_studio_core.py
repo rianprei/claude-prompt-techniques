@@ -35,15 +35,28 @@ class OfferTests(unittest.TestCase):
 
     def test_512_px_stays_hidden_until_the_catalog_confirms_it(self):
         catalog = load_catalog()
+        catalog["image_sizes"]["512_json_value_confirmed"] = False
         flash = next(m for m in catalog["models"] if m["id"] == "gemini-3.1-flash-image")
         self.assertEqual(allowed_sizes(catalog, flash), ["1K", "2K", "4K"])
         catalog["image_sizes"]["512_json_value_confirmed"] = True
         self.assertIn("512", allowed_sizes(catalog, flash))
 
-    def test_reference_cap_is_the_smallest_documented_limit(self):
+    def test_512_px_is_not_offered_for_the_nano_banana_2_1_model(self):
+        catalog = load_catalog()
+        nano = next(m for m in catalog["models"] if m["id"] == "gemini-nano-banana-2.1")
+        self.assertNotIn("512", allowed_sizes(catalog, nano))
+
+    def test_reference_cap_is_the_documented_total_of_fourteen(self):
         caps = {offer["id"]: offer["max_references"] for offer in offered_models(load_catalog())}
-        self.assertEqual(caps, {"gemini-nano-banana-2.1": 4, "gemini-3.1-flash-image": 4,
-                                "gemini-3.1-flash-lite-image": 14, "gemini-3-pro-image": 3})
+        self.assertEqual(caps, {"gemini-nano-banana-2.1": 14, "gemini-3.1-flash-image": 14,
+                                "gemini-3.1-flash-lite-image": 14, "gemini-3-pro-image": 14})
+
+    def test_each_offer_lists_only_the_aspect_ratios_its_model_accepts(self):
+        offers = {offer["id"]: offer for offer in offered_models(load_catalog())}
+        self.assertEqual(len(offers["gemini-nano-banana-2.1"]["aspect_ratios"]), 14)
+        self.assertEqual(len(offers["gemini-3-pro-image"]["aspect_ratios"]), 10)
+        self.assertNotIn("1:4", offers["gemini-3-pro-image"]["aspect_ratios"])
+        self.assertNotIn("1:4", offers["gemini-3.1-flash-lite-image"]["aspect_ratios"])
 
 
 class StoreCase(unittest.TestCase):
@@ -94,16 +107,37 @@ class BriefTests(StoreCase):
             self.brief(aspect_ratio="3:1")
         self.assertEqual(ctx.exception.code, "aspect_ratio_not_official")
 
+    def test_ratio_the_model_does_not_accept_is_refused_before_approval(self):
+        with self.assertRaises(StudioError) as ctx:
+            self.brief(model_id="gemini-3-pro-image", aspect_ratio="1:4")
+        self.assertEqual(ctx.exception.code, "aspect_ratio_not_official")
+        self.assertEqual(self.brief(model_id=NANO, aspect_ratio="1:4")["brief"]["aspect_ratio"], "1:4")
+        self.assertEqual(self.brief(model_id="gemini-3.1-flash-lite-image", aspect_ratio="21:9")["brief"]["aspect_ratio"], "21:9")
+
     def test_512_px_is_refused_while_unconfirmed(self):
+        self.catalog["image_sizes"]["512_json_value_confirmed"] = False
         with self.assertRaises(StudioError) as ctx:
             self.brief(model_id="gemini-3.1-flash-image", image_size="512")
         self.assertEqual(ctx.exception.code, "image_size_not_allowed")
 
-    def test_too_many_references_is_refused(self):
+    def test_references_over_the_inline_limit_are_refused_before_approval(self):
+        png = b"\x89PNG\r\n\x1a\n" + b"\0" * 300
+        refs = [self.store.save_reference("image/png", png) for _ in range(3)]
+        with mock.patch("studio.core.MAX_INLINE_REQUEST_BYTES", 1000):
+            with self.assertRaises(StudioError) as ctx:
+                self.brief(model_id="gemini-3.1-flash-image", references=refs)
+            self.assertEqual(ctx.exception.code, "request_too_large")
+            plan = self.brief(model_id="gemini-3.1-flash-image", references=refs[:2])
+        self.assertEqual(len(plan["brief"]["references"]), 2)
+
+    def test_fifteen_references_are_refused_and_fourteen_are_not(self):
         ref = {"sha256": "0" * 64, "mime_type": "image/png"}
         with self.assertRaises(StudioError) as ctx:
-            self.brief(references=[ref] * 5)
+            self.brief(references=[ref] * 15)
         self.assertEqual(ctx.exception.code, "too_many_references")
+        with self.assertRaises(StudioError) as ctx:
+            self.brief(references=[ref] * 14)
+        self.assertEqual(ctx.exception.code, "reference_unknown")  # the cap passed; the fake hash is not stored
 
     def test_unknown_reference_is_refused(self):
         with self.assertRaises(StudioError) as ctx:

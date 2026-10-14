@@ -10,7 +10,7 @@ NOTICE. Stdlib only. Nothing runs at import time.
     python3 -m studio serve --fake-provider      # placeholder images, no network, no cost
     GEMINI_API_KEY=... python3 -m studio serve   # live provider; the key is read on each run
 
-The page opens at http://127.0.0.1:8765/. Options: `--port` (default 8765), `--data-dir` (default `studio/data`, which git ignores) and `--timeout` (seconds to wait for the live provider on each paid run; default 300; no effect with `--fake-provider`).
+The page opens at http://127.0.0.1:8765/. Options: `--port` (default 8765), `--data-dir` (default `~/.local/share/prompt-techniques-studio`, or under `$XDG_DATA_HOME`; outside the skill folder) and `--timeout` (seconds to wait for the live provider on each paid run; default 300; no effect with `--fake-provider`).
 
 ## Flow
 
@@ -28,14 +28,21 @@ The page opens at http://127.0.0.1:8765/. Options: `--port` (default 8765), `--d
 
 - **Models.** Only current or active IDs without preview are offered. Deprecated and shut-down IDs are not.
   The source is `references/gemini-image-models.json`.
-- **Sizes.** Only sizes with a catalog price. 512 px stays hidden until the catalog confirms its JSON value.
-- **Aspect ratios.** Only the 14 official values.
+- **Sizes.** Only sizes with a catalog price. 512 px is offered only for `gemini-3.1-flash-image`, the one model whose documentation lists it. Its JSON value (`512`) is the enum in the Interactions API reference; no live call was made.
+- **Aspect ratios.** Each offer lists the ratios its model accepts (`aspect_ratios` in the catalog). The page
+  rebuilds the list when the model changes. A ratio the model does not accept is refused at planning time. For example,
+  `gemini-3-pro-image` takes 10 ratios and has no 1:4, and Nano Banana 2.1 takes all 14.
 - **References.** Uploaded through the page, checked by file signature (PNG, JPEG or WebP), stored by hash.
-  The count is capped at the smallest documented reference limit for the model, which is conservative because
-  the catalog does not map limits to models. The 10 MB size cap and the 8000-character prompt cap are local
-  choices, not official limits.
+  The count is capped at `reference_total_max`, which is 14 for each current image model: the guide's total
+  ("Mix up to 14 reference images"). The per-type limits (for example 10 objects and 4 characters) are not
+  enforced, because the request does not say which type each image is. The 10 MB size cap per image and the
+  8000-character prompt cap are local choices. The whole request is capped at 20 MB inline, the prompt plus each reference as base64, from the image
+  understanding page. A brief over that limit is refused at planning time, before any approval is spent.
 - **Prompt.** `scripts/validate_prompt.py` checks it. An ERROR blocks the plan. A WARN is shown with the plan.
-  For image models only the checks that apply to them run: key in URL, model status, aspect ratios and vague wording.
+  For image models only the checks that apply to them run: key in URL, model status (also through the catalog's
+  aliases), aspect ratios of the model, vague wording, an edit with no preservation clause, numbered references with
+  no roles, text without quotation marks, and long lists of negations. The last four are heuristics that flag a
+  prompt for review as WARN; they do not block it.
 - **Approval.** 30 minutes, single use, bound to the brief hash. The registry keeps only the SHA-256 of
   each token. A refused approval (unknown, used, expired or mismatched) is never spent.
 - **Failure.** A failed provider call keeps its approval spent. Nothing retries on its own, and nothing rephrases
@@ -62,7 +69,7 @@ block in `steps[].content`.
 UNKNOWN until a live call is made: the response field names beyond the guide's examples, and the upstream
 timeout (the client waits 300 s by default, our own choice; `--timeout` changes it). No live call was made while this was built.
 
-## Data (`studio/data`, ignored by git, created with mode 0700)
+## Data (`~/.local/share/prompt-techniques-studio`, created with mode 0700)
 
 - `briefs/<sha256>.json`: canonical JSON, named by its hash.
 - `inputs/<sha256>`: uploaded reference images, named by their hash.
@@ -92,7 +99,7 @@ No test calls Google's API. The tests use localhost only.
 - Live API calls. None were made.
 - Real browser rendering. `tests/studio_page_check.mjs` drives the page script against the real server through a
   small DOM stub (22 checks). No real browser was used, so layout and styling were not checked.
-- Official rate and text limits. The catalog has none, so the studio sets none.
+- Official rate and text limits. None is documented in the pages read, so the studio sets none beyond the 20 MB inline limit above.
 - Content policy. It is not enforced by code: no real brands and no real people in prompts, and no sexualized
   depictions of real people.
 

@@ -1,5 +1,7 @@
 # Persuasion Principles for Prompt Compliance
 
+The 2026 PNAS version by the same group (DOI 10.1073/pnas.2535868123), read through its abstract on 2026-10-13, tested GPT-5 mini, Claude Haiku 4.5 and Gemini 3 Flash: compliance rose from 35.3% to 51.3% across 126,000 conversations. The figures below are the NeoLabHQ kit's description of the 2025 preprint, not checked against it (SSRN blocked on 2026-10-12).
+
 Source: adapted from NeoLabHQ/context-engineering-kit (GPL-3.0), which cites Meincke, L., Shapiro, D., Duckworth, A., Mollick, E. R., Mollick, L., and Cialdini, R. (2025), "Call Me A Jerk: Persuading AI to Comply with Objectionable Requests", SSRN 5357179 (preregistration: OSF kj863). The study tested seven principles on GPT-4o mini, with two objectionable requests (an insult, and the synthesis of a regulated drug) and N=28,000 conversations. Reported compliance: 33.3% for controls vs. 72.0% with a principle (p < .001). Not tested on Claude models. It measures compliance with the instruction, not answer quality or safety. Use: format and process discipline in prompts and skills. Never to bypass safety.
 
 ## The 7 principles

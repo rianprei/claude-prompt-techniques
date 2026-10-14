@@ -102,5 +102,14 @@ class FileListingTest(unittest.TestCase):
             self.assertEqual(repo_files(tmp), ["a b.md", "c.md"])
 
 
+class RepoIsCleanTest(unittest.TestCase):
+    """The same check the pre-commit hook runs, against the real repository."""
+
+    def test_check_repo_passes_on_this_repository(self):
+        script = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts", "check_repo.py")
+        result = subprocess.run([sys.executable, script], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -19,7 +19,7 @@ Priority tier above already names the ~17 techniques that cover most real usage.
 technique outside it (rare — a specific reasoning/decomposition/agent pattern by name) →
 [references/taxonomy.md](references/taxonomy.md) has the full category index, and [references/technique-catalog.md](references/technique-catalog.md) gives each entry's source and status. Generator mode never needs these files.
 
-**Persuasion** (Meincke et al. 2025, figures not verified against the paper: compliance 33%→72% in GPT-4o mini, on objectionable requests; not tested on Claude; compliance = obedience to the instruction, NOT answer quality/accuracy): Authority, Commitment, Scarcity, Social Proof, Unity (Reciprocity/Liking: avoid). Use only for format/process discipline, in plain wording: stacked CAPS ("YOU MUST", "NEVER") can make recent Claude models overtrigger. Detail, ✅/❌ examples and table: [references/persuasion.md](references/persuasion.md). Never to bypass safety.
+**Persuasion** (Meincke et al.: the 2025 SSRN figures, 33%→72%, are unverified; the 2026 PNAS abstract reports 35.3%→51.3% on three models; details in references/persuasion.md; compliance = obedience to the instruction, NOT answer quality/accuracy): Authority, Commitment, Scarcity, Social Proof, Unity (Reciprocity/Liking: avoid). Use only for format/process discipline, in plain wording: stacked CAPS ("YOU MUST", "NEVER") can make recent Claude models overtrigger. Detail, ✅/❌ examples and table: [references/persuasion.md](references/persuasion.md). Never to bypass safety.
 
 ## Generator mode (active — when the request clearly wants a prompt for another tool)
 
@@ -75,12 +75,13 @@ with the pattern list from [references/patterns.md](references/patterns.md) (tas
 adjust ONLY the dimension that failed, deliver a new version. Do not rewrite from scratch.
 
 **Per-tool detail and templates — do not load here, read on demand**:
-- [references/tool-routing.md](references/tool-routing.md) — rules specific to Claude/GPT/Cursor/Midjourney/coding agent
+- [references/tool-routing.md](references/tool-routing.md) — rules specific to Claude/GPT/Cursor/Midjourney/coding agent, and the Nano Banana / Gemini Image profile (routing by name, scene and edit briefs, references, text, web assets)
 - [references/patterns.md](references/patterns.md) — patterns that waste tokens/credits (task/context/format/scope/reasoning/agentic)
-- [references/templates.md](references/templates.md) — 13 structural templates A–M (RTF, CO-STAR, RISEN, CRISPE, Auditable Reasoning, Few-Shot, File-Scope, ReAct+Stop, Visual Descriptor, Reference Image Editing, ComfyUI, Prompt Decompiler, Claude Task Brief)
+- [references/templates.md](references/templates.md) — 14 structural templates A–N (RTF, CO-STAR, RISEN, CRISPE, Auditable Reasoning, Few-Shot, File-Scope, ReAct+Stop, Visual Descriptor, Reference Image Editing, ComfyUI, Prompt Decompiler, Claude Task Brief, Nano Banana Brief)
 - [references/defenses.md](references/defenses.md) — defenses for prompts that process untrusted content (conceptual; categories and trade-offs)
 - [references/technique-catalog.md](references/technique-catalog.md) — detailed technique catalog: source, status, novelty and kind for each entry
 - [references/image-styles.md](references/image-styles.md) — style names for image prompts (Midjourney, GPT Image, Flux, ComfyUI)
-- [references/gemini-image-models.md](references/gemini-image-models.md) — Gemini image model IDs, status, sizes, ratios and prices (verified 2026-10-12; check the official page before use)
+- [references/gemini-image-models.md](references/gemini-image-models.md) — Gemini image model IDs, commercial aliases, status, sizes, per-model ratios, reference limits, thinking levels and prices (verified 2026-10-13; check the official page before use)
+- [references/gemini-image-examples.md](references/gemini-image-examples.md) — copyable Nano Banana briefs for generation, edits, references, consistency, in-image text, web assets, infographics and refinement (Portuguese and English)
 
 Read only the needed tool/category section, not the whole file.

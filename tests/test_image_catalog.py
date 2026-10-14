@@ -84,9 +84,9 @@ class ImageCatalogTest(unittest.TestCase):
     def test_tool_routing_uses_the_official_scaffold(self):
         with open(os.path.join(ROOT, "references", "tool-routing.md"), encoding="utf-8") as fh:
             routing = fh.read()
-        line = next(ln for ln in routing.split("\n") if "Nano Banana Pro (Gemini image)" in ln)
+        line = next(ln for ln in routing.split("\n") if "Scene formula:" in ln)
         self.assertIn("subject + action + location/context + composition + style", line)
-        self.assertNotIn("7-component", line)
+        self.assertNotIn("7-component", routing)
 
 
 if __name__ == "__main__":

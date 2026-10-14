@@ -1,16 +1,41 @@
 {
-  "verified_on": "2026-10-12",
-  "scope": "Gemini image models (Nano Banana family) in the Gemini Developer API. Facts from official pages only; no vendor text is reproduced.",
+  "verified_on": "2026-10-13",
+  "scope": "Gemini image models (Nano Banana family) in the Gemini Developer API. Facts from official pages only; no vendor text is reproduced. Each model entry carries its own aspect ratios, thinking levels, reference limits and grounding, because the official tables differ per model.",
   "sources": {
     "image_generation_guide": "https://ai.google.dev/gemini-api/docs/image-generation",
+    "model_page_nano_banana_2_1": "https://ai.google.dev/gemini-api/docs/models/gemini-nano-banana-2.1",
     "api_reference_generate_content": "https://ai.google.dev/api/generate-content",
+    "api_reference_interactions": "https://ai.google.dev/api/interactions-api",
+    "image_understanding": "https://ai.google.dev/gemini-api/docs/image-understanding",
     "pricing": "https://ai.google.dev/gemini-api/docs/pricing",
     "deprecations": "https://ai.google.dev/gemini-api/docs/deprecations",
-    "prompting_guide_dated_2026_03_05": "https://cloud.google.com/blog/products/ai-machine-learning/ultimate-prompting-guide-for-nano-banana"
+    "deepmind_prompt_guide": "https://deepmind.google/models/gemini-image/prompt-guide/",
+    "cloud_prompting_guide_dated_2026_03_05": "https://cloud.google.com/blog/products/ai-machine-learning/ultimate-prompting-guide-for-nano-banana"
   },
-  "aspect_ratios": ["1:1", "1:4", "4:1", "1:8", "8:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"],
+  "aspect_ratios": [
+    "1:1",
+    "1:4",
+    "4:1",
+    "1:8",
+    "8:1",
+    "2:3",
+    "3:2",
+    "3:4",
+    "4:3",
+    "4:5",
+    "5:4",
+    "9:16",
+    "16:9",
+    "21:9"
+  ],
+  "aspect_ratios_basis": "The union of the aspect ratios of all image models. Each model's own list is in models[].aspect_ratios: the 14 values only for gemini-nano-banana-2.1 and gemini-3.1-flash-image (guide, per-model tables, 2026-10-13).",
   "image_sizes": {
-    "values": ["512", "1K", "2K", "4K"],
+    "values": [
+      "512",
+      "1K",
+      "2K",
+      "4K"
+    ],
     "enum_names": {
       "512": "IMAGE_SIZE_FIVE_TWELVE",
       "1K": "IMAGE_SIZE_ONE_K",
@@ -19,88 +44,369 @@
     },
     "uppercase_k_required": true,
     "512_documented_for": "gemini-3.1-flash-image",
-    "512_json_value_confirmed": false
+    "512_json_value_confirmed": true,
+    "512_basis": "Guide (2026-10-13): 'Gemini 3.1 Flash Image adds the smaller 512px (0.5K) resolution (not supported on Gemini Nano Banana 2.1)'; its per-model table lists 512px for 3.1 Flash only. The enum values 512, 1K, 2K, 4K are in the Interactions API reference (image_size) and the generate-content reference (imageSize). The guide also writes the label as '512px (05.K)' once. No live call was made."
   },
-  "thinking_levels": ["MINIMAL", "LOW", "MEDIUM", "HIGH"],
+  "inline_request_limit_bytes": 20000000,
+  "inline_request_limit_basis": "Image understanding page: inline image data limits the total request size (text prompts, system instructions and inline bytes) to 20MB. The studio counts each reference as base64 characters plus the prompt bytes, the conservative reading.",
+  "thinking_levels": [
+    "MINIMAL",
+    "LOW",
+    "MEDIUM",
+    "HIGH"
+  ],
+  "thinking_levels_basis": "Enum in the API reference. The guide's per-model table (2026-10-13) lists the subset each model accepts; its examples send lowercase values such as 'high' in generation_config.thinking_level.",
+  "thinking_cannot_be_disabled": true,
   "thinking_default": "model-dependent",
   "thinking_on_models_before_gemini_3": "error",
+  "reference_total_max": 14,
+  "reference_total_basis": "Guide (2026-10-13): 'Mix up to 14 reference images'. The per-type limits of each model add up to this total (10 + 4, 6 + 5 + 3, 14).",
   "batch_discount": 0.5,
   "prompt_structure": {
-    "text_to_image": ["Subject", "Action", "Location/context", "Composition", "Style"],
-    "with_reference_images": ["Reference images", "Relationship instruction", "New scenario"],
-    "source": "prompting_guide_dated_2026_03_05",
+    "text_to_image": [
+      "Subject",
+      "Action",
+      "Location/context",
+      "Composition",
+      "Style"
+    ],
+    "with_reference_images": [
+      "Reference images",
+      "Relationship instruction",
+      "New scenario"
+    ],
+    "source": "cloud_prompting_guide_dated_2026_03_05; the same formulas are in the Cloud blog",
     "section": "Image generation: text-to-image without references, and generation with references"
   },
   "grounding_search": {
     "free_requests_per_month": 5000,
     "price_per_1000_after_free_usd": 14.0,
-    "scope": "shared across Gemini 3 and newer models"
+    "scope": "shared across Gemini 3 and newer models (pricing page)",
+    "image_search_models": [
+      "gemini-nano-banana-2.1",
+      "gemini-3.1-flash-image"
+    ],
+    "image_search_basis": "Guide (2026-10-13): Grounding with Google Image Search 'is only available for the Gemini Nano Banana 2.1 and Gemini 3.1 Flash Image models'."
   },
-  "safety_finish_reasons": ["PROHIBITED_CONTENT", "IMAGE_SAFETY", "IMAGE_PROHIBITED_CONTENT"],
+  "c2pa": {
+    "status": "conflict",
+    "basis": "The Cloud blog (2026-03-05) says all generated images include C2PA Content Credentials and a SynthID watermark. The current guide (2026-10-13) says all generated images include a SynthID watermark and does not mention C2PA. Do not promise C2PA."
+  },
+  "safety_finish_reasons": [
+    "PROHIBITED_CONTENT",
+    "IMAGE_SAFETY",
+    "IMAGE_PROHIBITED_CONTENT"
+  ],
+  "bare_family_name": {
+    "names": [
+      "Nano Banana",
+      "Gemini Image"
+    ],
+    "default_model": "gemini-nano-banana-2.1",
+    "basis": "The guide describes gemini-nano-banana-2.1 as the primary high-efficiency workhorse (2026-10-13). A family name ('Nano Banana', 'Gemini Image') with no version names the family, not the 2025 model, which is 'Gemini 2.5 Flash Image'."
+  },
   "models": [
     {
       "id": "gemini-nano-banana-2.1",
       "display_name": "Nano Banana 2.1",
+      "aliases": [
+        "Nano Banana 2.1",
+        "Gemini Nano Banana 2.1"
+      ],
       "status": "current",
-      "label_preview_or_ga": "UNKNOWN",
+      "label_preview_or_ga": "Stable",
+      "label_basis": "Model page, 'Versions' section: 'Stable: gemini-nano-banana-2.1' (read 2026-10-13).",
+      "routing": "Default for new projects. Primary high-efficiency model for image generation and conversational editing; Google Search grounding; text rendering and infographic layout; multi-turn consistency.",
       "released": "2026-10-06",
+      "released_basis": "Deprecations table 'Nano Banana models' (2026-10-13).",
       "shutdown": null,
-      "replaces": ["gemini-3.1-flash-image-preview", "gemini-2.5-flash-image-preview"],
-      "sizes": ["1K", "2K", "4K"],
-      "prices_usd_per_image": {"1K": 0.0336, "2K": 0.0504, "4K": 0.113},
-      "reference_limits": {"object": 10, "character": 4, "style": null},
-      "video_input": true
+      "replaces": [
+        "gemini-3.1-flash-image-preview",
+        "gemini-2.5-flash-image-preview"
+      ],
+      "sizes": [
+        "1K",
+        "2K",
+        "4K"
+      ],
+      "aspect_ratios": [
+        "1:1",
+        "1:4",
+        "4:1",
+        "1:8",
+        "8:1",
+        "2:3",
+        "3:2",
+        "3:4",
+        "4:3",
+        "4:5",
+        "5:4",
+        "9:16",
+        "16:9",
+        "21:9"
+      ],
+      "prices_usd_per_image": {
+        "1K": 0.0336,
+        "2K": 0.0504,
+        "4K": 0.113
+      },
+      "thinking": {
+        "levels": [
+          "MINIMAL",
+          "MEDIUM",
+          "HIGH"
+        ],
+        "default": "MEDIUM"
+      },
+      "reference_limits": {
+        "object": 10,
+        "character": 4,
+        "style": null
+      },
+      "reference_total_max": 14,
+      "search_grounding": true,
+      "image_search_grounding": true,
+      "real_people_from_web_search": false,
+      "video_input": true,
+      "input_token_limit": 131072,
+      "output_token_limit": 32768,
+      "batch": true
     },
     {
       "id": "gemini-3.1-flash-image",
       "display_name": "Nano Banana 2 (Gemini 3.1 Flash Image)",
+      "aliases": [
+        "Nano Banana 2",
+        "Gemini 3.1 Flash Image"
+      ],
       "status": "active",
-      "released": null,
+      "label_preview_or_ga": "UNKNOWN",
+      "label_basis": "Deprecations table gives the release date 2026-05-28 and the '-preview' ID was the earlier model (2026-02-26). No page read states whether this ID is labelled preview or GA.",
+      "routing": "Previous generation. The only model that offers 512 px. The guide recommends Nano Banana 2.1 for all new projects.",
+      "released": "2026-05-28",
+      "released_basis": "Deprecations table 'Nano Banana models' (2026-10-13).",
       "shutdown": null,
-      "sizes": ["512", "1K", "2K", "4K"],
-      "prices_usd_per_image": {"512": 0.045, "1K": 0.067, "2K": 0.101, "4K": 0.151},
-      "reference_limits": {"object": 10, "character": 4, "style": null},
+      "sizes": [
+        "512",
+        "1K",
+        "2K",
+        "4K"
+      ],
+      "aspect_ratios": [
+        "1:1",
+        "1:4",
+        "4:1",
+        "1:8",
+        "8:1",
+        "2:3",
+        "3:2",
+        "3:4",
+        "4:3",
+        "4:5",
+        "5:4",
+        "9:16",
+        "16:9",
+        "21:9"
+      ],
+      "prices_usd_per_image": {
+        "512": 0.045,
+        "1K": 0.067,
+        "2K": 0.101,
+        "4K": 0.151
+      },
+      "thinking": {
+        "levels": [
+          "MINIMAL",
+          "HIGH"
+        ],
+        "default": "MINIMAL"
+      },
+      "reference_limits": {
+        "object": 10,
+        "character": 4,
+        "style": null
+      },
+      "reference_total_max": 14,
+      "search_grounding": true,
+      "image_search_grounding": true,
+      "real_people_from_web_search": false,
       "video_input": true,
-      "input_token_limit": 131072
+      "input_token_limit": 131072,
+      "output_token_limit": 32768,
+      "batch": true
     },
     {
       "id": "gemini-3.1-flash-lite-image",
       "display_name": "Nano Banana 2 Lite (Gemini 3.1 Flash Lite Image)",
+      "aliases": [
+        "Nano Banana 2 Lite",
+        "Gemini 3.1 Flash Lite Image"
+      ],
       "status": "active",
-      "released": null,
+      "label_preview_or_ga": "UNKNOWN",
+      "label_basis": "Deprecations table gives the release date 2026-06-30. The model page for this ID was not read.",
+      "routing": "Fastest and cheapest. 1K only. Not optimized for many reference inputs or long sequential edits (guide, 2026-10-13).",
+      "released": "2026-06-30",
+      "released_basis": "Deprecations table 'Nano Banana models' (2026-10-13).",
       "shutdown": null,
-      "sizes": ["1K"],
-      "prices_usd_per_image": {"1K": 0.0336},
-      "reference_limits": {"object": 14, "character": null, "style": null},
-      "video_input": true
+      "sizes": [
+        "1K"
+      ],
+      "aspect_ratios": [
+        "1:1",
+        "3:2",
+        "2:3",
+        "3:4",
+        "4:3",
+        "4:5",
+        "5:4",
+        "9:16",
+        "16:9",
+        "21:9"
+      ],
+      "aspect_ratios_basis": "Guide 'Features' section: 'Gemini 3.1 Flash Lite Image adds 1:1, 3:2, 2:3, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9, 21:9 aspect ratios.' The guide has no per-ratio pixel table for this model; 1:4, 4:1, 1:8 and 8:1 are not listed for it.",
+      "prices_usd_per_image": {
+        "1K": 0.0336
+      },
+      "thinking": {
+        "levels": [
+          "MINIMAL",
+          "HIGH"
+        ],
+        "default": "MINIMAL"
+      },
+      "reference_limits": {
+        "object": 14,
+        "character": null,
+        "style": null
+      },
+      "reference_total_max": 14,
+      "search_grounding": false,
+      "image_search_grounding": false,
+      "real_people_from_web_search": null,
+      "video_input": true,
+      "input_token_limit": null,
+      "output_token_limit": null,
+      "batch": true
     },
     {
       "id": "gemini-3-pro-image",
       "display_name": "Nano Banana Pro (Gemini 3 Pro Image)",
+      "aliases": [
+        "Nano Banana Pro",
+        "Gemini 3 Pro Image"
+      ],
       "status": "active",
-      "released": null,
+      "label_preview_or_ga": "UNKNOWN",
+      "label_basis": "Deprecations table gives the release date 2026-05-28; the '-preview' ID was the earlier model (2025-11-20). No page read states the label.",
+      "routing": "Premium choice for complex visual tasks and professional asset production: world knowledge, localization, brand consistency, creative control. Not in the guide's 'controlling thinking levels' table.",
+      "released": "2026-05-28",
+      "released_basis": "Deprecations table 'Nano Banana models' (2026-10-13).",
       "shutdown": null,
-      "sizes": ["1K", "2K", "4K"],
-      "prices_usd_per_image": {"1K": 0.134, "2K": 0.134, "4K": 0.24},
-      "reference_limits": {"object": 6, "character": 5, "style": 3},
-      "video_input": false
+      "replaces": [
+        "gemini-3-pro-image-preview"
+      ],
+      "sizes": [
+        "1K",
+        "2K",
+        "4K"
+      ],
+      "aspect_ratios": [
+        "1:1",
+        "2:3",
+        "3:2",
+        "3:4",
+        "4:3",
+        "4:5",
+        "5:4",
+        "9:16",
+        "16:9",
+        "21:9"
+      ],
+      "aspect_ratios_basis": "Guide per-model table '3.1 Pro Image' (2026-10-13). 1:4, 4:1, 1:8 and 8:1 are not in it.",
+      "prices_usd_per_image": {
+        "1K": 0.134,
+        "2K": 0.134,
+        "4K": 0.24
+      },
+      "thinking": {
+        "levels": null,
+        "default": null,
+        "basis": "Not listed for thinking-level control in the guide (2026-10-13). Thinking is on and cannot be disabled."
+      },
+      "reference_limits": {
+        "object": 6,
+        "character": 5,
+        "style": 3
+      },
+      "reference_total_max": 14,
+      "reference_limits_conflict": "The guide's table lists 6 object, 5 character and 3 style references. Its Limitations section says 'supports 5 images with high fidelity, and up to 14 images in total'. The table is used here.",
+      "search_grounding": true,
+      "image_search_grounding": false,
+      "real_people_from_web_search": null,
+      "video_input": false,
+      "input_token_limit": 65536,
+      "input_token_basis": "Cloud blog (2026-03-05). Not stated on the 2026-10-13 pages read.",
+      "output_token_limit": 32768,
+      "output_token_basis": "Cloud blog (2026-03-05): 'Both models support a maximum of 32,768 output tokens' (3.1 Flash and Pro).",
+      "batch": true
     },
     {
       "id": "gemini-2.5-flash-image",
       "display_name": "Nano Banana (Gemini 2.5 Flash Image)",
+      "aliases": [
+        "Gemini 2.5 Flash Image"
+      ],
+      "aliases_note": "The bare name 'Nano Banana' is not an alias of this model. It names the family (see bare_family_name).",
       "status": "deprecated",
+      "label_preview_or_ga": null,
+      "routing": "Legacy. The guide's recommended migration path is Nano Banana 2 Lite.",
       "released": "2025-10-02",
+      "released_basis": "Deprecations table (2026-10-13).",
       "shutdown": null,
-      "shutdown_conflict": "Open conflict, not resolved: the deprecations table gives 2027-03-15 and the pricing page gives 2026-10-02. No date is treated as confirmed, so shutdown is null until one source is resolved.",
+      "shutdown_conflict": "Open conflict, not resolved: the deprecations table gives 2027-03-15; the pricing page warning (2026-10-13) says 'will be shut down on October 2, 2026'. No date is treated as confirmed, so shutdown is null.",
       "replacement": "gemini-3.1-flash-lite-image",
-      "replacement_conflict": "The pricing page names Gemini 3.1 Flash Image as the replacement.",
-      "sizes": ["1K"],
-      "prices_usd_per_image": {"1K": 0.039},
+      "replacement_conflict": "The deprecations table and the guide's model selection name Nano Banana 2 Lite. The pricing page warning names Gemini 3.1 Flash Image or Gemini 3.1 Flash Lite Image.",
+      "sizes": [
+        "1K"
+      ],
+      "aspect_ratios": [
+        "1:1",
+        "2:3",
+        "3:2",
+        "3:4",
+        "4:3",
+        "4:5",
+        "5:4",
+        "9:16",
+        "16:9",
+        "21:9"
+      ],
+      "aspect_ratios_basis": "Guide per-model table 'Gemini 2.5 Flash Image' (2026-10-13).",
+      "prices_usd_per_image": {
+        "1K": 0.039
+      },
+      "thinking": {
+        "levels": null,
+        "default": null,
+        "basis": "Thinking levels are not documented in the pages read (2026-10-13)."
+      },
+      "reference_limits": {
+        "object": null,
+        "character": null,
+        "style": null
+      },
+      "reference_total_max": 3,
+      "reference_total_basis": "Guide Limitations (2026-10-13): 'works best with up to 3 images as input'. Not a hard limit in the pages read.",
+      "search_grounding": false,
       "video_input": false
     },
     {
       "id": "gemini-3.1-flash-image-preview",
       "display_name": "Nano Banana 2 preview",
+      "aliases": [
+        "Nano Banana 2 preview"
+      ],
       "status": "shut_down",
       "released": "2026-02-26",
       "shutdown": "2026-06-25",
@@ -109,6 +415,9 @@
     {
       "id": "gemini-3-pro-image-preview",
       "display_name": "Nano Banana Pro preview",
+      "aliases": [
+        "Nano Banana Pro preview"
+      ],
       "status": "shut_down",
       "released": "2025-11-20",
       "shutdown": "2026-06-25",
@@ -117,9 +426,21 @@
     {
       "id": "gemini-2.5-flash-image-preview",
       "display_name": "Nano Banana preview",
+      "aliases": [
+        "Nano Banana preview"
+      ],
       "status": "shut_down",
       "released": "2025-05-07",
       "shutdown": "2026-01-15",
+      "replacement": "gemini-nano-banana-2.1"
+    },
+    {
+      "id": "gemini-2.0-flash-preview-image-generation",
+      "display_name": "Gemini 2.0 Flash image generation preview",
+      "aliases": [],
+      "status": "shut_down",
+      "released": "2025-05-07",
+      "shutdown": "2025-11-14",
       "replacement": "gemini-nano-banana-2.1"
     }
   ]

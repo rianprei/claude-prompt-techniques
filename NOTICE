@@ -38,12 +38,12 @@ notices here are provided as those licenses require.
 
 CONCEPTUAL REFERENCES
 ---------------------
-Credited in README.md as inspiration for the image prompt formula and the
-expertise modes. If any text is copied from these works in the future, add
+Credited in README.md as inspiration for the expertise modes of the image template (Template I). If any text is copied from these works in the future, add
 that work's license notice here. Entries below are ideas and names only; no text was copied from them unless a notice says so.
 
 - Hainrixz/claude-banana (MIT): https://github.com/Hainrixz/claude-banana
-  Style names only, in references/image-styles.md (from the catalog's section headings).
+  Style names only, in references/image-styles.md (from the catalog's section headings), and the nine domain
+  modes of expertise in Template I (names and their field emphasis, not the text).
 - AgriciDaniel/banana-claude (MIT): https://github.com/AgriciDaniel/banana-claude
   Ideas only: the contract that a key goes in a header and never in a URL (scripts/check_repo.py),
   a model catalog with a verification date (references/gemini-image-models.json), a single-use
@@ -73,8 +73,12 @@ ACADEMIC REFERENCES (cited, no text reproduced)
 -----------------------------------------------
 - Schulhoff, S. et al. (2024). The Prompt Report: A Systematic Survey of
   Prompt Engineering Techniques. arXiv:2406.06608.
-- Meincke, L. et al. (2025). Call Me A Jerk: Persuading AI to Comply with
-  Objectionable Requests. SSRN 5357179.
+- Meincke, L., Shapiro, D., Duckworth, A., Mollick, E. R., Mollick, L., and Cialdini, R. (2025).
+  Call Me A Jerk: Persuading AI to Comply with Objectionable Requests. SSRN 5357179,
+  DOI 10.2139/ssrn.5357179.
+- Meincke, L., Shapiro, D., Duckworth, A. L., Mollick, E., Mollick, L., Van den Bulte, C., and Cialdini, R. (2026).
+  Persuading large language models to comply with objectionable requests. Proceedings of the
+  National Academy of Sciences, DOI 10.1073/pnas.2535868123.
 - Cheng, Z. et al. (2023). Batch Prompting: Efficient Inference with Large Language Model APIs. arXiv:2301.08721.
 - Khot, T. et al. (2022). Decomposed Prompting: A Modular Approach for Solving Complex Tasks. arXiv:2210.02406.
 - Zhao, T. Z. et al. (2021). Calibrate Before Use: Improving Few-Shot Performance of Language Models. arXiv:2102.09690.
@@ -94,13 +98,15 @@ ACADEMIC REFERENCES (cited, no text reproduced)
 VENDOR DOCUMENTATION
 --------------------
 Model-routing rules were checked against public documentation from Anthropic,
-OpenAI, and xAI. The rules are stated in this project's own words, and no
+OpenAI, xAI, and Cursor's published model list. The rules are stated in this project's own words, and no
 vendor text is reproduced, except short quoted sentences, which are attributed where used. Anthropic, "Prompting best practices" (platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices), section "Long context prompting", read 2026-10-12.
 
-Google, Gemini API documentation (ai.google.dev: image generation guide, API reference, pricing and
-deprecations) and the Google Cloud prompting guide dated 2026-03-05, read 2026-10-12. Only facts are
-recorded (model IDs, sizes, aspect ratios, prices, dates) in references/gemini-image-models.md and
-references/gemini-image-models.json. No vendor text is reproduced.
+Google, Gemini API documentation (ai.google.dev: image generation guide, the Nano Banana 2.1 model page,
+API reference, pricing and deprecations), the DeepMind prompt guide (deepmind.google/models/gemini-image/prompt-guide/),
+and the Google Cloud prompting guide dated 2026-03-05. Read 2026-10-12 and again 2026-10-13. Facts are recorded
+(model IDs, aliases, sizes, aspect ratios, limits, prices, dates) in references/gemini-image-models.md and
+references/gemini-image-models.json. Short quoted phrases from these pages appear where they are used, with their
+source; no page text is reproduced at length.
 
 MIT LICENSE (nidhinjs/prompt-master)
 ------------------------------------
