@@ -93,13 +93,13 @@ for f in tool-routing patterns templates persuasion taxonomy technique-catalog d
 done
 ```
 
-Sem git, a instalação traz o skill, a licença e o NOTICE: `SKILL.md`, `README.md`, `LICENSE`, `NOTICE` e os 10 arquivos `.md` de `references/`. Ficam de fora `scripts/`, `studio/`, `tests/`, `evals/` e `references/gemini-image-models.json`, que só os scripts, o Studio e os testes usam; para eles, use a instalação via git.
+Sem git, a instalação traz o skill, a licença e o NOTICE: `SKILL.md`, `README.md`, `LICENSE`, `NOTICE` e os 11 arquivos `.md` de `references/`. Ficam de fora `scripts/`, `studio/`, `tests/`, `evals/`, `references/gemini-image-models.json` e `references/image-targets.json`, que só os scripts, o Studio e os testes usam; para eles, use a instalação via git.
 
 **Verificar:**
 
 ```bash
 ls ~/.claude/skills/prompt-techniques/ ~/.claude/skills/prompt-techniques/references/
-# Esperado: SKILL.md, README.md, LICENSE, NOTICE e references/ com 10 arquivos .md
+# Esperado: SKILL.md, README.md, LICENSE, NOTICE e references/ com 11 arquivos .md
 ```
 
 **Ativar:** abra uma sessão nova do Claude Code. A skill carrega automaticamente — zero configuração. Pra confirmar, pergunte ao Claude: "qual skill de prompt engineering você tem disponível?"
@@ -170,12 +170,14 @@ prompt-techniques/
 ├── scripts/
 │   ├── contracts.py            # catálogo, IDs, proporções e regex compartilhados
 │   ├── validate_prompt.py      # checa um prompt contra as regras do skill
-│   └── check_repo.py           # checa links e âncoras locais, formatação, marcadores de pendência, numeração e contratos de modelo e chave; avisa se o catálogo tem mais de 90 dias
+│   ├── check_repo.py           # checa links e âncoras locais, formatação, marcadores de pendência, numeração e contratos de modelo e chave; avisa se o catálogo tem mais de 90 dias
+│   ├── image_targets.py        # registro de alvos de imagem: resolve nomes, checa status e fontes, gera image-targets.md
+│   └── image_prompt.py         # renderiza um brief visual para um alvo: prompt, ajustes nativos e avisos (JSON)
 ├── studio/                     # página local e CLI: brief, aprovação de uso única, revisão, avaliação (README próprio)
-├── tests/                      # unittest: validador, golden cases, catálogo, contagens, contratos e studio
+├── tests/                      # unittest: validador, golden cases, catálogo, contagens, contratos, studio e imagem (registro e renderer)
 ├── references/                 # pesados, carregados SÓ sob demanda
 │   ├── tool-routing.md         # regras por ferramenta e modelo
-│   ├── templates.md            # 14 templates estruturais completos
+│   ├── templates.md            # 15 templates estruturais completos (A–O)
 │   ├── patterns.md             # padrões que desperdiçam tokens/créditos
 │   ├── taxonomy.md             # taxonomia: 288 nomes em 19 categorias + catálogo de White et al.
 │   ├── technique-catalog.md    # catálogo detalhado: fonte, status, novidade e tipo de cada técnica
@@ -184,7 +186,9 @@ prompt-techniques/
 │   ├── image-styles.md         # nomes de estilo para prompts de imagem
 │   ├── gemini-image-models.md  # IDs, aliases, status, tamanhos, proporções por modelo, limites e preços (2026-10-13)
 │   ├── gemini-image-examples.md # briefs prontos do Nano Banana (pt-BR e EN), validados pelo teste
-│   └── gemini-image-models.json # mesmos dados em JSON, lidos pelos testes e pelo studio
+│   ├── gemini-image-models.json # mesmos dados em JSON, lidos pelos testes e pelo studio
+│   ├── image-targets.json      # alvos de imagem fora do Nano Banana: fatos com status e fonte (2026-10-14)
+│   └── image-targets.md        # o mesmo registro em Markdown, gerado pelo script (não editar à mão)
 ├── evals/
 │   ├── protocol.md             # protocolo manual de A/B + log de re-prompts
 │   └── golden_cases.json       # 31 casos fixos para o validador
@@ -209,7 +213,7 @@ Regras específicas em `references/tool-routing.md`:
 | Geradores full-stack | Bolt, v0, Lovable, Figma Make, Google Stitch |
 | Pesquisa/orquestração | Perplexity, Manus AI |
 | Browser/computer-use | Comet, Atlas, Claude in Chrome |
-| Imagem | Midjourney V8.2, GPT Image 2.5 (gpt-image-2.5-sunburst, gpt-image-2.5-flare), Stable Diffusion 3.5, Seedream 5.0 Pro, Nano Banana / Gemini Image (2.1, 2 Lite, Pro; 2 descontinuado em 2026-10-06), FLUX 3, Ideogram 4.5 (e 4.0), ComfyUI |
+| Imagem | Midjourney V8.2, GPT Image 2.5 (gpt-image-2.5-sunburst, gpt-image-2.5-flare), FLUX 3 Image, FLUX.2, FLUX.1 Kontext, Ideogram 4.5, Recraft V4.1, Adobe Firefly, Seedream 5.0, Stable Diffusion 3.5, SDXL, ComfyUI, Nano Banana / Gemini Image (2.1, 2 Lite, Pro; 2 descontinuado em 2026-10-06) |
 | Vídeo | Sora 2, Runway Gen-4.5, Kling 4.0, LTX-2.5, Ray3.2 (Dream Machine), Seedance 2.5 |
 | Voz | ElevenLabs |
 | Música | Suno |
@@ -218,9 +222,21 @@ Regras específicas em `references/tool-routing.md`:
 
 Ferramenta fora da lista: o Claude aplica regras genéricas (instrução explícita, contrato de saída, format lock) ou pergunta.
 
+### Imagem fora do Nano Banana
+
+Para Midjourney, GPT Image, FLUX, Ideogram, Recraft, Firefly, Seedream, Stable Diffusion, SDXL e ComfyUI, o skill escreve um brief visual só uma vez (Template O) e o adapta ao alvo pedido. Cada fato de cada alvo — sintaxe, mecanismo de prompt negativo, ajustes nativos, limites — tem um status (`VERIFIED`, `PARTIAL` ou `UNKNOWN`) e a URL oficial de onde veio, em [`references/image-targets.md`](references/image-targets.md). Um alvo cuja sintaxe não foi verificada recebe um prompt portátil e avisos; nenhum parâmetro, peso ou campo é inventado. Campo do brief que o alvo não envia vira aviso, não some em silêncio.
+
+```bash
+python3 scripts/image_prompt.py render --target midjourney --brief brief.json   # prompt, ajustes nativos e avisos (JSON)
+python3 scripts/image_prompt.py resolve "flux"                                 # nome ambíguo: devolve os candidatos
+python3 scripts/image_targets.py check                                          # registro: status e fontes
+```
+
+O Nano Banana não é renderizado aqui: o renderer devolve um redirecionamento para o Template N e para o Studio, e o caminho dele não muda.
+
 ## Templates incluídos
 
-`references/templates.md` — 14 templates, cada um com exemplo preenchido:
+`references/templates.md` — 15 templates, cada um com exemplo preenchido:
 
 | Template | Melhor pra |
 |---|---|
@@ -238,6 +254,7 @@ Ferramenta fora da lista: o Claude aplica regras genéricas (instrução explíc
 | L — Prompt Decompiler | quebrar/adaptar/dividir prompt existente |
 | M — Claude Task Brief | tarefa complexa/agentic em modelos Claude atuais |
 | N — Nano Banana Brief | imagem nova no Nano Banana / Gemini Image, com referências nomeadas (opcional) |
+| O — Visual Brief | um brief visual adaptado a Midjourney, GPT Image, FLUX, Ideogram, Recraft, Firefly, Seedream, Stable Diffusion, SDXL ou ComfyUI |
 
 ## Princípios de persuasão
 
@@ -293,6 +310,7 @@ python3 -m unittest discover -s tests -v
 
 - **O que o validador não faz:** não julga se a resposta do modelo é boa. Ele lê só o texto do prompt. A qualidade continua no A/B manual de [`evals/protocol.md`](evals/protocol.md).
 - **Golden cases** (`evals/golden_cases.json`): 31 prompts fixos, cada um com o resultado esperado do validador. Eles testam o validador, não as respostas dos modelos. Se um caso quebrar, ou a regra mudou de propósito (atualize o caso) ou houve regressão.
+- **Registro de alvos de imagem** (`references/image-targets.json`): cada fato tem status e fonte; toda fonte tem URL https e data de conferência; o `references/image-targets.md` é gerado a partir dele, e um teste recusa o arquivo se ele ficar desatualizado. O renderer tem testes por família, por alias, por campo recusado e por regressão.
 - **Catálogo de imagem e contratos** (`references/gemini-image-models.json`): IDs, status, tamanhos, proporções e preços do Nano Banana, com data de verificação (2026-10-13). Os testes conferem que IDs, preços e proporções do JSON aparecem no Markdown, que proporções, tamanhos e níveis de pensamento são os valores listados na documentação lida em 2026-10-13 (cada modelo tem a sua lista de proporções; os aliases resolvem para um só ID), e que a data de verificação é a mesma nos dois arquivos. O `check_repo.py` bloqueia ID de modelo fora do catálogo, ID desligado fora dele e chave em query string. Os testes não chamam a API: se o modelo ainda aceita um valor, só uma chamada real confirma.
 - **Limites conhecidos:** a maioria dos sinais é em inglês, com algumas formas em português (passo a passo, não, sem, formato, lista). Em prompts em português, as checagens de agente, CAPS e linguagem vaga não disparam, então a ausência de aviso não prova que o prompt está certo. A detecção de negação conta as negações antes da frase, dentro da mesma cláusula, e uma negação anula outra: "Não pule a checagem passo a passo" pede raciocínio e é marcado em modelo reasoning-native. Uma negação depois da frase não é lida.
 - **Hook opcional:** `git config core.hooksPath .githooks` (uma vez por clone) faz o `check_repo.py` e os testes rodarem antes de cada commit. Não é ativado sozinho.
@@ -370,7 +388,7 @@ rm -rf ~/.claude/skills/prompt-techniques
 
 ## Créditos
 
-- **Modo gerador** baseado em [nidhinjs/prompt-master](https://github.com/nidhinjs/prompt-master) (tool routing, templates A–N, patterns, intent extraction), licença MIT.
+- **Modo gerador** baseado em [nidhinjs/prompt-master](https://github.com/nidhinjs/prompt-master) (tool routing, templates A–O, patterns, intent extraction), licença MIT.
 - **Modos de expertise de imagem** (Template I) inspirados em [Hainrixz/claude-banana](https://github.com/Hainrixz/claude-banana), que tem nove modos de domínio no seu catálogo.
 - **Princípios de persuasão** de [NeoLabHQ/context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit) (skill prompt-engineering), fundamentados em Meincke et al. (2025). Licença do upstream: GPL-3.0.
 - **Modo referência** (taxonomia de técnicas) é taxonomia própria, inspirada em The Prompt Report (Schulhoff et al., 2024) e no catálogo de padrões de White et al. (2023).

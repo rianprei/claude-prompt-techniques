@@ -1,0 +1,1196 @@
+{
+  "verified_on": "2026-10-14",
+  "scope": "Prompt adaptation for image models other than Gemini. Gemini/Nano Banana stays in gemini-image-models.json, Template N and the Studio. This file records what each vendor's official pages say about prompting, negative prompts, native parameters and editing. It records no paid calls.",
+  "status_meaning": {
+    "VERIFIED": "Read in a primary vendor page on the date shown; the sentence or field is quoted or paraphrased from that page.",
+    "PARTIAL": "Read only in a secondary summary, in a page that did not render, or in an older version of the page. Use with care and check before relying on it.",
+    "UNKNOWN": "Not found in any page read. Nothing is assumed."
+  },
+  "mechanism_meaning": {
+    "flag": "Negative content is given as a parameter inside the prompt text.",
+    "field": "Negative content is a separate API or UI field.",
+    "none": "No negative field is documented in the pages read. Exclusions must be written as text in the prompt, or as positive descriptions.",
+    "ui-only": "A negative field exists in the product interface, but the API field is not available for the model named.",
+    "unknown": "Not documented in the pages read."
+  },
+  "targets": [
+    {
+      "id": "midjourney",
+      "name": "Midjourney",
+      "vendor": "Midjourney",
+      "route": "renderer",
+      "access": {
+        "api": "not covered: no API page read",
+        "ui": "Midjourney web and Discord; parameters are typed in the prompt bar"
+      },
+      "aliases": [
+        "midjourney",
+        "mj",
+        "midjourney v8",
+        "midjourney v8.2",
+        "midjourney v8.1"
+      ],
+      "verification": "VERIFIED",
+      "prompt_style": {
+        "status": "PARTIAL",
+        "text": "Descriptive phrases, separated by commas, are the traditional form. The Edit model also accepts written instructions (conversational). The parameter list says parameters go at the end, with a space before the dashes and no punctuation inside them. The order of descriptors is not documented; the renderer uses subject first as a convention.",
+        "source": "https://docs.midjourney.com/hc/en-us/articles/32859204029709-Parameter-List"
+      },
+      "negative_prompt": {
+        "mechanism": "flag",
+        "status": "VERIFIED",
+        "text": "--no lists what to leave out. Each word after --no is read separately by the moderation system, so '--no modern clothing' is read as 'no modern' and 'no clothing'. Name the clothing you want instead. Same effect as weighting part of a multi-prompt at -0.5.",
+        "source": "https://docs.midjourney.com/hc/en-us/articles/32173351982093-No"
+      },
+      "text_in_image": {
+        "status": "UNKNOWN",
+        "text": "No text-rendering guidance was found in the pages read. Put the wording in quotes, and check the output.",
+        "source": null
+      },
+      "references": {
+        "status": "VERIFIED",
+        "text": "--sref takes an image URL or a style code. The Style Reference page says style references are compatible with Midjourney versions 6 and later.",
+        "source": "https://docs.midjourney.com/hc/en-us/articles/32180011136653-Style-Reference"
+      },
+      "edit": {
+        "status": "VERIFIED",
+        "text": "The Edit model (--edit with image URLs, up to four) changes an image from written instructions, combines up to four images, or edits regions in the Editor. Compatible with V8.1 and V8.2. Not compatible with --tile. The output matches the first image's aspect ratio unless --ar is set.",
+        "source": "https://docs.midjourney.com/hc/en-us/articles/48495453462797-Edit-Model"
+      },
+      "native_settings": [
+        {
+          "name": "--ar",
+          "values": "W:H, whole numbers only (1.39:1 is written 139:100)",
+          "status": "VERIFIED",
+          "source": "https://docs.midjourney.com/hc/en-us/articles/31894244298125-Aspect-Ratio"
+        },
+        {
+          "name": "--no",
+          "values": "comma-separated list",
+          "status": "VERIFIED",
+          "source": "https://docs.midjourney.com/hc/en-us/articles/32173351982093-No"
+        },
+        {
+          "name": "--raw",
+          "values": "flag; reduces default styling so the prompt has more influence",
+          "status": "VERIFIED",
+          "source": "https://docs.midjourney.com/hc/en-us/articles/32859204029709-Parameter-List"
+        },
+        {
+          "name": "--sref",
+          "values": "image URL or style code; 'random' creates a code",
+          "status": "VERIFIED",
+          "source": "https://docs.midjourney.com/hc/en-us/articles/32180011136653-Style-Reference"
+        },
+        {
+          "name": "--sw",
+          "values": "0 to 1000, default 100; not with Moodboards",
+          "status": "VERIFIED",
+          "source": "https://docs.midjourney.com/hc/en-us/articles/32180011136653-Style-Reference"
+        },
+        {
+          "name": "--edit",
+          "values": "image URLs, up to four",
+          "status": "VERIFIED",
+          "source": "https://docs.midjourney.com/hc/en-us/articles/48495453462797-Edit-Model"
+        },
+        {
+          "name": "--v",
+          "values": "current default V8.2 (since 2026-07-24)",
+          "status": "VERIFIED",
+          "source": "https://docs.midjourney.com/hc/en-us/articles/32199405667853-Version"
+        },
+        {
+          "name": "--hd / --sd",
+          "values": "HD gives 2K images on V8.1 and later; costs 1.3 GPU minutes against 0.8",
+          "status": "VERIFIED",
+          "source": "https://docs.midjourney.com/hc/en-us/articles/32199405667853-Version"
+        },
+        {
+          "name": "max aspect ratio",
+          "values": "14:1 (4:1 for HD)",
+          "status": "VERIFIED",
+          "source": "https://docs.midjourney.com/hc/en-us/articles/32199405667853-Version"
+        }
+      ],
+      "limitations": [
+        "The product is Discord and the web app. No API page was read, so no API fields are listed.",
+        "--style raw (an older form in earlier notes) is not in the current parameter list; the flag is --raw.",
+        "--oref is replaced by the Edit model in V8.X."
+      ],
+      "sources": [
+        {
+          "url": "https://docs.midjourney.com/hc/en-us/articles/32859204029709-Parameter-List",
+          "title": "Parameter List",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://docs.midjourney.com/hc/en-us/articles/32173351982093-No",
+          "title": "No",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://docs.midjourney.com/hc/en-us/articles/32199405667853-Version",
+          "title": "Version",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://docs.midjourney.com/hc/en-us/articles/32180011136653-Style-Reference",
+          "title": "Style Reference",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://docs.midjourney.com/hc/en-us/articles/48495453462797-Edit-Model",
+          "title": "Midjourney: Edit Model",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://docs.midjourney.com/hc/en-us/articles/31894244298125-Aspect-Ratio",
+          "title": "Midjourney: Aspect Ratio",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        }
+      ]
+    },
+    {
+      "id": "gpt-image",
+      "name": "GPT Image 2.5 (OpenAI API)",
+      "vendor": "OpenAI",
+      "route": "renderer",
+      "access": {
+        "api": "Image API (images.generate, images.edit) and Responses API image_generation tool",
+        "ui": "ChatGPT Images is a product and was not read; its behaviour is not covered here"
+      },
+      "aliases": [
+        "gpt image",
+        "gpt image 2.5",
+        "gpt-image-2.5-sunburst",
+        "gpt-image-2.5-flare",
+        "gpt image 2",
+        "chatgpt images",
+        "openai image"
+      ],
+      "verification": "VERIFIED",
+      "prompt_style": {
+        "status": "VERIFIED",
+        "text": "For complex requests, organise the prompt as scene, subject, details and constraints, using labelled sections. Describe visible details: materials, lighting, colours, medium. Specify framing, viewpoint and placement. Treat camera terms as cues for appearance.",
+        "source": "https://developers.openai.com/api/docs/guides/image-prompting"
+      },
+      "negative_prompt": {
+        "mechanism": "none",
+        "status": "VERIFIED",
+        "text": "No negative field is documented. The guide says to state exclusions in the prompt, for example 'no extra text, no watermarks, no unrelated logos'.",
+        "source": "https://developers.openai.com/api/docs/guides/image-prompting"
+      },
+      "text_in_image": {
+        "status": "VERIFIED",
+        "text": "Put required wording in quotes and describe its position and typography. Spell unusual words letter by letter when needed. Ask for no extra text, then check spelling. Use quality medium or high for small or dense text.",
+        "source": "https://developers.openai.com/api/docs/guides/image-prompting"
+      },
+      "references": {
+        "status": "VERIFIED",
+        "text": "Identify each input by number and purpose (subject, style, clothing, background), and say how the inputs combine. The Image API takes input images for edits; the Responses API keeps conversation context for iteration.",
+        "source": "https://developers.openai.com/api/docs/guides/image-prompting"
+      },
+      "edit": {
+        "status": "VERIFIED",
+        "text": "Say 'change only X' and list what to preserve (identity, geometry, layout, lighting, labels). Repeated edits can drift: restate the constraints each time. For pixel-identical regions, composite the approved edit into the original, because prompting alone does not guarantee it.",
+        "source": "https://developers.openai.com/api/docs/guides/image-prompting"
+      },
+      "native_settings": [
+        {
+          "name": "model",
+          "values": "gpt-image-2.5-sunburst (precise editing), gpt-image-2.5-flare (fast)",
+          "status": "VERIFIED",
+          "source": "https://developers.openai.com/api/docs/guides/image-generation"
+        },
+        {
+          "name": "size",
+          "values": "1024x1024, 1536x1024, 1024x1536 recommended; custom WIDTHxHEIGHT: multiples of 16, aspect between 1:3 and 3:1, edges up to 3840, total 655,360 to 8,294,400 pixels",
+          "status": "VERIFIED",
+          "source": "https://developers.openai.com/api/docs/guides/image-generation"
+        },
+        {
+          "name": "quality",
+          "values": "low, medium, high, xhigh, max, auto (default auto); xhigh and max exist only on the 2.5 models",
+          "status": "VERIFIED",
+          "source": "https://developers.openai.com/api/docs/guides/image-generation"
+        },
+        {
+          "name": "background",
+          "values": "transparent, opaque, auto; transparent needs output_format png or webp",
+          "status": "VERIFIED",
+          "source": "https://developers.openai.com/api/docs/guides/image-generation"
+        },
+        {
+          "name": "output_format",
+          "values": "png (default), jpeg, webp",
+          "status": "VERIFIED",
+          "source": "https://developers.openai.com/api/docs/guides/image-generation"
+        },
+        {
+          "name": "output_compression",
+          "values": "0 to 100, only for jpeg or webp",
+          "status": "VERIFIED",
+          "source": "https://developers.openai.com/api/docs/guides/image-generation"
+        },
+        {
+          "name": "moderation",
+          "values": "auto (default), low",
+          "status": "VERIFIED",
+          "source": "https://developers.openai.com/api/docs/guides/image-generation"
+        }
+      ],
+      "limitations": [
+        "Text rendering and precise placement in layouts are listed as limitations by the vendor.",
+        "The gpt-image-2 cookbook (older) uses the same kind of labelled structure; its examples target gpt-image-2, not 2.5.",
+        "The ChatGPT product interface was not read."
+      ],
+      "sources": [
+        {
+          "url": "https://developers.openai.com/api/docs/guides/image-prompting",
+          "title": "Image prompting (GPT Image 2.5)",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://developers.openai.com/api/docs/guides/image-generation",
+          "title": "Image generation (API, output options)",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://developers.openai.com/cookbook/examples/multimodal/image-gen-models-prompting-guide",
+          "title": "GPT Image prompting guide (cookbook, older model name gpt-image-2)",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        }
+      ]
+    },
+    {
+      "id": "flux-3",
+      "name": "FLUX 3 Image",
+      "vendor": "Black Forest Labs",
+      "route": "renderer",
+      "access": {
+        "api": "POST https://api.bfl.ai/v1/flux-3-image (asynchronous: returns polling_url)",
+        "ui": "BFL playground, not read"
+      },
+      "aliases": [
+        "flux 3",
+        "flux 3 image",
+        "bfl flux 3"
+      ],
+      "verification": "VERIFIED",
+      "prompt_style": {
+        "status": "VERIFIED",
+        "text": "Medium and style first, then the subjects and where they sit, then light, colour and background: the FLUX 3 launch captions follow roughly this order, and the template is not a strict formula. Only what can be seen: no 'beautiful', 'iconic' or 'masterpiece'. A short prompt works because FLUX 3 Image expands it before it generates; add detail only for what you want to control.",
+        "source": "https://docs.bfl.ai/guides/prompting_unified_basics"
+      },
+      "negative_prompt": {
+        "mechanism": "none",
+        "status": "VERIFIED",
+        "text": "On FLUX 3 Image there is no negative_prompt, seed, prompt_upsampling or guidance field. Unknown fields return HTTP 422.",
+        "source": "https://docs.bfl.ai/guides/prompting_unified_reference"
+      },
+      "text_in_image": {
+        "status": "VERIFIED",
+        "text": "Quote each piece of text exactly, say where it goes and give it a type style. Without boxes, write the position in words.",
+        "source": "https://docs.bfl.ai/guides/prompting_unified_basics"
+      },
+      "references": {
+        "status": "VERIFIED",
+        "text": "images takes 1 to 10 references (URL or base64), each 256x256 px to 16 MP. The prompt says what to do with each image: edit, restyle or combine. There is no separate mode field.",
+        "source": "https://docs.bfl.ai/flux_3/flux3_image_overview"
+      },
+      "edit": {
+        "status": "VERIFIED",
+        "text": "Send the image in images with a prompt that describes the change. A single edit does not need a box: FLUX 3 Image expands the instruction, may add a box for the element you name, and returns the expanded prompt, including any boxes, in result.prompt. To control exactly which elements change, use bounding boxes.",
+        "source": "https://docs.bfl.ai/flux_3/flux3_image_layout"
+      },
+      "layout_boxes": {
+        "status": "VERIFIED",
+        "text": "Boxes are written into prompt: the description first, then a JSON array of rows {id, bbox, desc}, with bbox [top, left, bottom, right] as integers from 0 to 1000 measured from the top-left corner. The example is prompt = caption + ' ' + json.dumps(rows).",
+        "source": "https://docs.bfl.ai/flux_3/flux3_image_bounding_boxes"
+      },
+      "native_settings": [
+        {
+          "name": "aspect_ratio",
+          "values": "21:9, 2:1, 16:9, 3:2, 7:5, 4:3, 5:4, 1:1, 4:5, 3:4, 5:7, 2:3, 9:16, 1:2, 9:21, or auto (first reference, else 1:1)",
+          "status": "VERIFIED",
+          "source": "https://docs.bfl.ai/flux_3/flux3_image_overview"
+        },
+        {
+          "name": "resolution",
+          "values": "768sq (fastest, for drafts), 1k, 1.5k, 2k, 4k",
+          "status": "VERIFIED",
+          "source": "https://docs.bfl.ai/flux_3/flux3_image_overview"
+        },
+        {
+          "name": "safety_tolerance",
+          "values": "integer 0 (strictest) to 4; default 2",
+          "status": "VERIFIED",
+          "source": "https://docs.bfl.ai/flux_3/flux3_image_overview"
+        },
+        {
+          "name": "grounding",
+          "values": "boolean, default true (web and image search before generating); false gives faster results from the prompt alone",
+          "status": "VERIFIED",
+          "source": "https://docs.bfl.ai/flux_3/flux3_image_overview"
+        },
+        {
+          "name": "boxes",
+          "values": "appended after the caption as a JSON array of {id, bbox, desc} rows; bbox is [top, left, bottom, right] in integers from 0 to 1000; the caption names each element as <id>",
+          "status": "VERIFIED",
+          "source": "https://docs.bfl.ai/flux_3/flux3_image_bounding_boxes"
+        }
+      ],
+      "limitations": [
+        "The API is asynchronous; poll polling_url until the status is Ready.",
+        "A reference larger than 16 MP is refused (HTTP 400)."
+      ],
+      "sources": [
+        {
+          "url": "https://docs.bfl.ai/flux_3/flux3_image_overview",
+          "title": "FLUX 3 Image overview",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://docs.bfl.ai/flux_3/flux3_image_bounding_boxes",
+          "title": "Bounding boxes with FLUX 3 Image",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://docs.bfl.ai/guides/prompting_unified_basics",
+          "title": "Prompting basics",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://docs.bfl.ai/flux_3/flux3_image_generate",
+          "title": "FLUX 3 Image: generate",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://docs.bfl.ai/flux_3/flux3_image_layout",
+          "title": "FLUX 3 Image: layout prompts",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://docs.bfl.ai/guides/prompting_unified_reference",
+          "title": "FLUX prompting reference",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        }
+      ]
+    },
+    {
+      "id": "flux-2",
+      "name": "FLUX.2 [pro] and [flex]",
+      "vendor": "Black Forest Labs",
+      "route": "renderer",
+      "access": {
+        "api": "API reference pages exist for [pro] and [flex]; field names were not read",
+        "ui": "not read"
+      },
+      "aliases": [
+        "flux 2",
+        "flux 2 pro",
+        "flux.2 flex"
+      ],
+      "verification": "PARTIAL",
+      "prompt_style": {
+        "status": "VERIFIED",
+        "text": "Use Subject + Action + Style + Context, most important first. Length bands: 10 to 30 words for quick exploration, 30 to 80 for most projects, 80 or more for complex scenes. Longer does not mean better.",
+        "source": "https://docs.bfl.ai/guides/prompting_guide_flux2"
+      },
+      "negative_prompt": {
+        "mechanism": "none",
+        "status": "VERIFIED",
+        "text": "FLUX.2 has no negative prompts. Say what you want: 'sharp focus throughout' instead of 'no blur'; 'an empty scene' instead of 'no people'.",
+        "source": "https://docs.bfl.ai/guides/prompting_guide_flux2"
+      },
+      "text_in_image": {
+        "status": "VERIFIED",
+        "text": "Put exact text in quotation marks and specify its placement and style.",
+        "source": "https://docs.bfl.ai/guides/prompting_guide_flux2"
+      },
+      "references": {
+        "status": "UNKNOWN",
+        "text": "Not read for FLUX.2 in this pass.",
+        "source": null
+      },
+      "edit": {
+        "status": "PARTIAL",
+        "text": "The editing example pairs a prompt with input_image and an optional second image for multi-reference edits. The page was read only in part.",
+        "source": "https://docs.bfl.ai/flux_2/flux2_image_editing"
+      },
+      "native_settings": [
+        {
+          "name": "hex colour in prompt",
+          "values": "tie each hex code to a specific object: 'the car is #FF0000'",
+          "status": "VERIFIED",
+          "source": "https://docs.bfl.ai/guides/prompting_guide_flux2"
+        },
+        {
+          "name": "JSON prompt",
+          "values": "structured JSON is accepted directly or flattened into prose",
+          "status": "VERIFIED",
+          "source": "https://docs.bfl.ai/guides/prompting_guide_flux2"
+        }
+      ],
+      "limitations": [
+        "The FLUX.2 [klein] section says prose beats keyword lists and lighting matters most. It was read only in a summary, so it is not listed as verified.",
+        "No API field names are listed: the reference was not read."
+      ],
+      "sources": [
+        {
+          "url": "https://docs.bfl.ai/guides/prompting_guide_flux2",
+          "title": "Prompting guide, FLUX.2 [pro] and [max]",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://docs.bfl.ai/flux_2/flux2_image_editing",
+          "title": "FLUX.2 image editing (read in part)",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        }
+      ]
+    },
+    {
+      "id": "flux-kontext",
+      "name": "FLUX.1 Kontext (previous generation)",
+      "vendor": "Black Forest Labs",
+      "route": "renderer",
+      "access": {
+        "api": "POST https://api.bfl.ai/v1/flux-kontext-pro",
+        "ui": "BFL playground, not read"
+      },
+      "aliases": [
+        "kontext",
+        "flux kontext",
+        "flux.1 kontext",
+        "kontext pro"
+      ],
+      "verification": "VERIFIED",
+      "prompt_style": {
+        "status": "VERIFIED",
+        "text": "For edits, describe only what should change, because the input image supplies the rest of the scene. State what to preserve, use specific verbs, and spell out each change when several are made.",
+        "source": "https://docs.bfl.ai/guides/prompting_unified_reference"
+      },
+      "negative_prompt": {
+        "mechanism": "none",
+        "status": "VERIFIED",
+        "text": "No negative field is documented on the Kontext editing page.",
+        "source": "https://docs.bfl.ai/kontext/kontext_image_editing"
+      },
+      "text_in_image": {
+        "status": "VERIFIED",
+        "text": "Put the original and the replacement text in quotation marks, for example 'Sync & Bloom' changed to 'FLUX & JOY'.",
+        "source": "https://docs.bfl.ai/kontext/kontext_image_editing"
+      },
+      "references": {
+        "status": "UNKNOWN",
+        "text": "Only one input image is documented for editing.",
+        "source": null
+      },
+      "edit": {
+        "status": "VERIFIED",
+        "text": "Editing needs an instruction and an input image, sent to /v1/flux-kontext-pro.",
+        "source": "https://docs.bfl.ai/kontext/kontext_image_editing"
+      },
+      "native_settings": [
+        {
+          "name": "endpoint",
+          "values": "/v1/flux-kontext-pro",
+          "status": "VERIFIED",
+          "source": "https://docs.bfl.ai/kontext/kontext_image_editing"
+        },
+        {
+          "name": "aspect_ratio",
+          "values": "override only; ratios from 3:7 to 7:3; by default the output matches the input size rounded to multiples of 32",
+          "status": "VERIFIED",
+          "source": "https://docs.bfl.ai/kontext/kontext_image_editing"
+        },
+        {
+          "name": "input_image",
+          "values": "base64 or URL; up to 20 MB or 20 megapixels",
+          "status": "VERIFIED",
+          "source": "https://docs.bfl.ai/kontext/kontext_image_editing"
+        }
+      ],
+      "limitations": [
+        "The overview page calls Kontext [pro] a previous-generation model and recommends FLUX.2 for editing and generation.",
+        "Use Kontext only when a Kontext workflow is already in place."
+      ],
+      "sources": [
+        {
+          "url": "https://docs.bfl.ai/kontext/kontext_image_editing",
+          "title": "Kontext image editing",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://docs.bfl.ai/guides/prompting_unified_reference",
+          "title": "Prompt reference",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        }
+      ]
+    },
+    {
+      "id": "ideogram",
+      "name": "Ideogram 4.5 (API v2)",
+      "vendor": "Ideogram",
+      "route": "renderer",
+      "access": {
+        "api": "POST https://api.ideogram.ai/v2/image/generate/ideogram-4-5 and POST https://api.ideogram.ai/v2/image/precise-edit/ideogram-4-5",
+        "ui": "Ideogram website (main site returned HTTP 403 when fetched)"
+      },
+      "aliases": [
+        "ideogram",
+        "ideogram 4.5",
+        "ideogram 4",
+        "ideogram 4.0",
+        "ideogram v4"
+      ],
+      "verification": "VERIFIED",
+      "prompt_style": {
+        "status": "VERIFIED",
+        "text": "A natural-language prompt is rewritten or expanded by magic_prompt (auto by default). A structured JSON prompt is used as is. The developer page describes 4.5 as known for prompt fidelity and crisp typography.",
+        "source": "https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5"
+      },
+      "negative_prompt": {
+        "mechanism": "none",
+        "status": "VERIFIED",
+        "text": "Neither the generate nor the precise-edit reference has a negative field. Exclusions must be written as positive description.",
+        "source": "https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5"
+      },
+      "text_in_image": {
+        "status": "UNKNOWN",
+        "text": "The developer page mentions crisp typography, but no quoting rule for text was found in the pages read. Quoting is the renderer's default, and it is not a verified Ideogram rule.",
+        "source": null
+      },
+      "references": {
+        "status": "VERIFIED",
+        "text": "Generation with source images takes up to 5 images, up to 25 MB each (JPEG, PNG or WEBP). The first image is the one edited; the others are extra references.",
+        "source": "https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5"
+      },
+      "edit": {
+        "status": "VERIFIED",
+        "text": "Precise edit: the image to edit (up to 50 MB, raw bytes), an instruction in prompt, optional reference_images and mask. The result keeps the image's width and height. context_window confines the edit to one region.",
+        "source": "https://developer.ideogram.ai/api-reference/images/precise-edit/ideogram-4-5"
+      },
+      "native_settings": [
+        {
+          "name": "prompt",
+          "values": "1 to 10000 characters, natural language or structured JSON",
+          "status": "VERIFIED",
+          "source": "https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5"
+        },
+        {
+          "name": "magic_prompt",
+          "values": "auto (default), on, off",
+          "status": "VERIFIED",
+          "source": "https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5"
+        },
+        {
+          "name": "resolution",
+          "values": "auto, source, or an exact WIDTHxHEIGHT; without source images an exact size must be a 1K or 2K preset (for example 1024x1024, 2048x2048, 1440x2880); with source images, auto is the default",
+          "status": "VERIFIED",
+          "source": "https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5"
+        },
+        {
+          "name": "rendering_quality",
+          "values": "very_low, low, medium, high; default high without source images, medium with them; very_low needs source images",
+          "status": "VERIFIED",
+          "source": "https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5"
+        },
+        {
+          "name": "background",
+          "values": "auto, transparent, opaque",
+          "status": "VERIFIED",
+          "source": "https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5"
+        },
+        {
+          "name": "num_images",
+          "values": "1 to 8, default 1",
+          "status": "VERIFIED",
+          "source": "https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5"
+        },
+        {
+          "name": "seed",
+          "values": "0 to 2147483647",
+          "status": "VERIFIED",
+          "source": "https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5"
+        },
+        {
+          "name": "context_window",
+          "values": "none (default), auto (needs a mask), or four integers y_min,x_min,y_max,x_max",
+          "status": "VERIFIED",
+          "source": "https://developer.ideogram.ai/api-reference/images/precise-edit/ideogram-4-5"
+        }
+      ],
+      "limitations": [
+        "Image URLs in responses expire; download results you want to keep.",
+        "Ideogram 4.0 has its own endpoint pages; its fields were not compared with 4.5 here."
+      ],
+      "sources": [
+        {
+          "url": "https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5",
+          "title": "Generate with Ideogram 4.5",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://developer.ideogram.ai/api-reference/images/precise-edit/ideogram-4-5",
+          "title": "Precise edit with Ideogram 4.5",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://developer.ideogram.ai",
+          "title": "Developer home (overview wording)",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        }
+      ]
+    },
+    {
+      "id": "recraft",
+      "name": "Recraft (V4.1 default)",
+      "vendor": "Recraft",
+      "route": "renderer",
+      "access": {
+        "api": "Recraft API: /generations, /generations/raster, /generations/vector",
+        "ui": "Recraft Studio (negative prompt field and an 'Avoid text in image' switch)"
+      },
+      "aliases": [
+        "recraft",
+        "recraft v4",
+        "recraft v4.1",
+        "recraft v3"
+      ],
+      "verification": "VERIFIED",
+      "prompt_style": {
+        "status": "VERIFIED",
+        "text": "If the model does not read the prompt as expected, try a more general style (Recraft V3, Photorealism, Illustration) instead of a custom or niche style.",
+        "source": "https://www.recraft.ai/docs/best-practices/prompting-and-image-generation"
+      },
+      "negative_prompt": {
+        "mechanism": "ui-only",
+        "status": "VERIFIED",
+        "text": "The Studio has a negative prompt field. Write the unwanted item as a plain noun ('apples', not 'no apples'): the Studio page says 'no' can confuse the model. The API negative_prompt field is listed under native settings.",
+        "source": "https://www.recraft.ai/docs/recraft-studio/image-generation/working-with-text-and-prompts/negative-prompts"
+      },
+      "text_in_image": {
+        "status": "PARTIAL",
+        "text": "The Studio switch 'Avoid text in image' disables text generation; it may introduce typos for logos. The API equivalent is not confirmed. text_layout exists, for V3 models only.",
+        "source": "https://www.recraft.ai/docs/recraft-studio/image-generation/working-with-text-and-prompts/negative-prompts"
+      },
+      "references": {
+        "status": "VERIFIED",
+        "text": "style_references (multipart) and style_reference_urls (JSON) take style reference images on all models except V4.1 Flash. style_id uses a stored style as the visual reference, with style_match regular, precise or flexible.",
+        "source": "https://www.recraft.ai/docs/api-reference/endpoints"
+      },
+      "edit": {
+        "status": "UNKNOWN",
+        "text": "No API edit endpoint was read for Recraft in this pass. Prompt-based editing is described for the Studio only.",
+        "source": null
+      },
+      "native_settings": [
+        {
+          "name": "model",
+          "values": "recraftv4_1 (default); style references switch the default to recraftv4_styles",
+          "status": "VERIFIED",
+          "source": "https://www.recraft.ai/docs/api-reference/endpoints"
+        },
+        {
+          "name": "style",
+          "values": "a style name; all models except V4.1 Flash",
+          "status": "VERIFIED",
+          "source": "https://www.recraft.ai/docs/api-reference/endpoints"
+        },
+        {
+          "name": "negative_prompt",
+          "values": "V2 and V3 models only",
+          "status": "VERIFIED",
+          "source": "https://www.recraft.ai/docs/api-reference/endpoints"
+        },
+        {
+          "name": "text_layout",
+          "values": "V3 models only",
+          "status": "VERIFIED",
+          "source": "https://www.recraft.ai/docs/api-reference/endpoints"
+        },
+        {
+          "name": "image_format",
+          "values": "webp (default) or png",
+          "status": "VERIFIED",
+          "source": "https://www.recraft.ai/docs/api-reference/endpoints"
+        },
+        {
+          "name": "random_seed",
+          "values": "integer, all models",
+          "status": "VERIFIED",
+          "source": "https://www.recraft.ai/docs/api-reference/endpoints"
+        }
+      ],
+      "limitations": [
+        "The endpoint reference is long; only the fields named above were checked.",
+        "Compare the negative field behaviour on the model you use before relying on it."
+      ],
+      "sources": [
+        {
+          "url": "https://www.recraft.ai/docs/api-reference/endpoints",
+          "title": "Endpoints",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://www.recraft.ai/docs/recraft-studio/image-generation/working-with-text-and-prompts/negative-prompts",
+          "title": "Negative prompts (Studio)",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://www.recraft.ai/docs/best-practices/prompting-and-image-generation",
+          "title": "Prompting and image generation",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        }
+      ]
+    },
+    {
+      "id": "firefly",
+      "name": "Adobe Firefly Services (Image 5)",
+      "vendor": "Adobe",
+      "route": "renderer",
+      "access": {
+        "api": "Firefly Services API (generate endpoints under /v3 were named in a secondary summary)",
+        "ui": "Adobe Firefly web app, not read"
+      },
+      "aliases": [
+        "firefly",
+        "adobe firefly",
+        "firefly image 5",
+        "image5"
+      ],
+      "verification": "PARTIAL",
+      "prompt_style": {
+        "status": "PARTIAL",
+        "text": "The tutorial shows a plain prompt, with customisation by prompt biasing locale, style presets and customPrompt. A prompt length of 1 to 1024 characters (Image5: 1 to 1500) was seen only in a secondary summary.",
+        "source": "https://developer.adobe.com/firefly-services/docs/firefly-api/guides/how-tos/firefly-generate-image-api-tutorial"
+      },
+      "negative_prompt": {
+        "mechanism": "unknown",
+        "status": "PARTIAL",
+        "text": "A negativePrompt string (up to 1024 characters) was reported in a secondary summary, not in a page read. The API reference page is rendered by JavaScript and did not return its fields. Do not send it until the reference is checked.",
+        "source": "https://developer.adobe.com/firefly-services/docs/firefly-api/api/"
+      },
+      "text_in_image": {
+        "status": "UNKNOWN",
+        "text": "No text-rendering guidance was read for Firefly.",
+        "source": null
+      },
+      "references": {
+        "status": "VERIFIED",
+        "text": "Structure reference uses an uploaded image (imageReference.source.uploadId) and a structure object with strength from 1 to 100, default 50, for outline and depth. Style reference is a separate feature.",
+        "source": "https://developer.adobe.com/firefly-services/docs/firefly-api/guides/concepts/structure-image-reference/"
+      },
+      "edit": {
+        "status": "UNKNOWN",
+        "text": "No edit endpoint was read for Firefly.",
+        "source": null
+      },
+      "native_settings": [
+        {
+          "name": "structure",
+          "values": "{strength: 1 to 100, default 50, imageReference.source.uploadId}",
+          "status": "VERIFIED",
+          "source": "https://developer.adobe.com/firefly-services/docs/firefly-api/guides/concepts/structure-image-reference/"
+        },
+        {
+          "name": "promptBiasingLocaleCode",
+          "values": "locale code, for example en-US",
+          "status": "VERIFIED",
+          "source": "https://developer.adobe.com/firefly-services/docs/firefly-api/guides/how-tos/firefly-generate-image-api-tutorial"
+        },
+        {
+          "name": "style presets",
+          "values": "preset names such as doodle_drawing; the list was not read",
+          "status": "VERIFIED",
+          "source": "https://developer.adobe.com/firefly-services/docs/firefly-api/guides/how-tos/firefly-generate-image-api-tutorial"
+        }
+      ],
+      "limitations": [
+        "The API reference page did not render, so its field table, model names and limits are not verified.",
+        "The Firefly endpoint paths in secondary summaries (/v3/images/generate) are not confirmed."
+      ],
+      "sources": [
+        {
+          "url": "https://developer.adobe.com/firefly-services/docs/firefly-api/guides/concepts/structure-image-reference/",
+          "title": "Structure reference",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://developer.adobe.com/firefly-services/docs/firefly-api/guides/how-tos/firefly-generate-image-api-tutorial",
+          "title": "Generate image API tutorial",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://developer.adobe.com/firefly-services/docs/firefly-api/api/",
+          "title": "API reference (client-rendered; not parsed)",
+          "checked": "2026-10-14",
+          "kind": "primary-unreadable"
+        }
+      ]
+    },
+    {
+      "id": "seedream",
+      "name": "Seedream 5.0 (BytePlus ModelArk)",
+      "vendor": "ByteDance (BytePlus ModelArk)",
+      "route": "renderer",
+      "access": {
+        "api": "BytePlus ModelArk image generation API (named in a secondary summary)",
+        "ui": "Dreamina (product name, not read)"
+      },
+      "aliases": [
+        "seedream",
+        "seedream 5",
+        "seedream 5.0",
+        "seedream 5.0 pro",
+        "seedream 5.0 flash",
+        "dreamina",
+        "dreamina seedream",
+        "bytedance seedream"
+      ],
+      "verification": "PARTIAL",
+      "prompt_style": {
+        "status": "PARTIAL",
+        "text": "Name the art style before scene content (for example anime, cinematic, painterly); mood and atmosphere work well. The docs reportedly suggest about 600 English words at most. Both points come from a secondary summary; the cited page rendered without its content.",
+        "source": "https://docs.byteplus.com/en/docs/ModelArk/1541523"
+      },
+      "negative_prompt": {
+        "mechanism": "unknown",
+        "status": "UNKNOWN",
+        "text": "Not found in any page read. The pages rendered without their content. Do not assume a field.",
+        "source": null
+      },
+      "text_in_image": {
+        "status": "UNKNOWN",
+        "text": "No text-rendering guidance was read.",
+        "source": null
+      },
+      "references": {
+        "status": "UNKNOWN",
+        "text": "Not read.",
+        "source": null
+      },
+      "edit": {
+        "status": "UNKNOWN",
+        "text": "An 'interactive editing guide' page exists in the docs index; its content was not read.",
+        "source": null
+      },
+      "native_settings": [],
+      "limitations": [
+        "The pages read for Seedream 4.0-4.5, 5.0 pro and the API reference rendered as navigation only.",
+        "Model names (5.0 pro, 5.0 flash, 5.0 lite) come from the page titles and a secondary summary.",
+        "optimize_prompt_options (standard or fast mode) was reported in a secondary summary only."
+      ],
+      "sources": [
+        {
+          "url": "https://docs.byteplus.com/en/docs/ModelArk/1541523",
+          "title": "Image generation API (client-rendered; partly read)",
+          "checked": "2026-10-14",
+          "kind": "primary-unreadable"
+        },
+        {
+          "url": "https://docs.byteplus.com/en/docs/ModelArk/1829186",
+          "title": "Seedream 4.0-4.5 prompt guide (client-rendered; not read)",
+          "checked": "2026-10-14",
+          "kind": "primary-unreadable"
+        },
+        {
+          "url": "https://docs.byteplus.com/en/docs/modelark/seedream-5-0-pro",
+          "title": "Seedream 5.0 pro tutorial (client-rendered; not read)",
+          "checked": "2026-10-14",
+          "kind": "primary-unreadable"
+        }
+      ]
+    },
+    {
+      "id": "sd-3-5",
+      "name": "Stable Diffusion 3.5",
+      "vendor": "Stability AI",
+      "route": "renderer",
+      "access": {
+        "api": "Stability API (reference page client-rendered; not read)",
+        "ui": "ComfyUI workflows (local models)"
+      },
+      "aliases": [
+        "stable diffusion 3.5",
+        "sd 3.5",
+        "stable diffusion 3.5 large",
+        "sd 3.5 large"
+      ],
+      "verification": "PARTIAL",
+      "prompt_style": {
+        "status": "UNKNOWN",
+        "text": "No official SD 3.5 prompt guide was read. Third-party guides disagree on how much the negative prompt matters for SD 3.5.",
+        "source": null
+      },
+      "negative_prompt": {
+        "mechanism": "unknown",
+        "status": "UNKNOWN",
+        "text": "The ComfyUI Stable Diffusion 3.5 partner-node page was not read: the saved copy is the partner-node overview, which has no SD 3.5 field. A secondary summary says an optional negative text field exists there. Not verified.",
+        "source": "https://docs.comfy.org/tutorials/partner-nodes/stability-ai/stable-diffusion-3-5-image"
+      },
+      "text_in_image": {
+        "status": "UNKNOWN",
+        "text": "Not read.",
+        "source": null
+      },
+      "references": {
+        "status": "UNKNOWN",
+        "text": "Not read.",
+        "source": null
+      },
+      "edit": {
+        "status": "UNKNOWN",
+        "text": "Inpainting for SD 3.5 was not read.",
+        "source": null
+      },
+      "native_settings": [
+        {
+          "name": "weight syntax (word:1.2)",
+          "values": "not verified for SD 3.5",
+          "status": "UNKNOWN",
+          "source": null
+        },
+        {
+          "name": "cfg",
+          "values": "not verified for SD 3.5; set it per the model card",
+          "status": "UNKNOWN",
+          "source": null
+        }
+      ],
+      "limitations": [
+        "No official ComfyUI tutorial for SD 3.5 local workflows was found; the templates page points to the template browser.",
+        "The SD 3.5 model card on Hugging Face was not read."
+      ],
+      "sources": [
+        {
+          "url": "https://docs.comfy.org/tutorials/partner-nodes/stability-ai/stable-diffusion-3-5-image",
+          "title": "ComfyUI partner node: Stable Diffusion 3.5 (not read; the download returned the partner-node overview)",
+          "checked": "2026-10-14",
+          "kind": "primary-unreadable"
+        },
+        {
+          "url": "https://platform.stability.ai/docs/api-reference",
+          "title": "Stability API reference (client-rendered; not read)",
+          "checked": "2026-10-14",
+          "kind": "primary-unreadable"
+        }
+      ]
+    },
+    {
+      "id": "sdxl",
+      "name": "Stable Diffusion XL (SDXL)",
+      "vendor": "Stability AI (community checkpoints)",
+      "route": "renderer",
+      "access": {
+        "api": "not read",
+        "ui": "ComfyUI or other local tools"
+      },
+      "aliases": [
+        "sdxl",
+        "stable diffusion xl",
+        "stable diffusion xl base"
+      ],
+      "verification": "UNKNOWN",
+      "prompt_style": {
+        "status": "UNKNOWN",
+        "text": "No current SDXL prompt guide was read. Earlier notes listed weight syntax and CFG ranges; those were not verified, so they are not used.",
+        "source": null
+      },
+      "negative_prompt": {
+        "mechanism": "unknown",
+        "status": "UNKNOWN",
+        "text": "Negative conditioning exists in ComfyUI graphs in general (see the comfyui entry). SDXL-specific advice was not read.",
+        "source": null
+      },
+      "text_in_image": {
+        "status": "UNKNOWN",
+        "text": "Not read.",
+        "source": null
+      },
+      "references": {
+        "status": "UNKNOWN",
+        "text": "Not read.",
+        "source": null
+      },
+      "edit": {
+        "status": "UNKNOWN",
+        "text": "Not read.",
+        "source": null
+      },
+      "native_settings": [],
+      "limitations": [
+        "No SDXL primary page was read in this pass. Nothing about weights, guidance scale or steps is asserted."
+      ],
+      "sources": [
+        {
+          "url": "https://docs.comfy.org/tutorials/basic/text-to-image",
+          "title": "ComfyUI text to image (its examples are SD 1.5)",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        }
+      ]
+    },
+    {
+      "id": "comfyui",
+      "name": "ComfyUI node graph",
+      "vendor": "ComfyUI",
+      "route": "renderer",
+      "access": {
+        "api": "node graph; no API",
+        "ui": "ComfyUI desktop and web"
+      },
+      "aliases": [
+        "comfyui",
+        "comfy"
+      ],
+      "verification": "VERIFIED",
+      "prompt_style": {
+        "status": "VERIFIED",
+        "text": "Text-to-image in ComfyUI takes two text inputs: a positive prompt (what you want) and a negative prompt (what you don't want), both encoded by the CLIP Text Encoder and connected to the KSampler. Write them as two separate blocks.",
+        "source": "https://docs.comfy.org/tutorials/basic/text-to-image"
+      },
+      "negative_prompt": {
+        "mechanism": "field",
+        "status": "VERIFIED",
+        "text": "The Negative condition input of the KSampler carries the negative prompt; the page explains it suppresses unwanted content.",
+        "source": "https://docs.comfy.org/tutorials/basic/text-to-image"
+      },
+      "text_in_image": {
+        "status": "UNKNOWN",
+        "text": "Depends on the checkpoint in the graph.",
+        "source": null
+      },
+      "references": {
+        "status": "UNKNOWN",
+        "text": "Depends on the nodes in the graph; not covered by this entry.",
+        "source": null
+      },
+      "edit": {
+        "status": "UNKNOWN",
+        "text": "Depends on the workflow; not covered by this entry.",
+        "source": null
+      },
+      "native_settings": [
+        {
+          "name": "cfg",
+          "values": "classifier-free guidance scale on the sampler node; controls prompt constraint strength (too high overfits)",
+          "status": "VERIFIED",
+          "source": "https://docs.comfy.org/tutorials/basic/text-to-image"
+        },
+        {
+          "name": "checkpoint",
+          "values": "the model file loaded by the checkpoint loader node; node values depend on it",
+          "status": "VERIFIED",
+          "source": "https://docs.comfy.org/tutorials/basic/text-to-image"
+        }
+      ],
+      "limitations": [
+        "The text-to-image page's examples are for SD 1.5, not for newer models.",
+        "The FLUX.1 tutorial in ComfyUI says FLUX.1 does not need negative prompts; that is for FLUX.1 in ComfyUI, not for FLUX 3."
+      ],
+      "sources": [
+        {
+          "url": "https://docs.comfy.org/tutorials/basic/text-to-image",
+          "title": "ComfyUI text to image",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        },
+        {
+          "url": "https://docs.comfy.org/tutorials/flux/flux-1-text-to-image",
+          "title": "ComfyUI FLUX.1 text to image",
+          "checked": "2026-10-14",
+          "kind": "primary-read"
+        }
+      ]
+    },
+    {
+      "id": "nano-banana",
+      "name": "Nano Banana (Gemini Image)",
+      "vendor": "Google",
+      "route": "gemini",
+      "access": {
+        "api": "Gemini Interactions API, through the Studio (python3 -m studio)",
+        "ui": "Gemini app, not covered"
+      },
+      "aliases": [
+        "nano banana",
+        "nano banana pro",
+        "nano banana 2",
+        "nano banana 2.1",
+        "nano banana 2 lite",
+        "gemini image",
+        "gemini 3 pro image",
+        "gemini-nano-banana-2.1"
+      ],
+      "verification": "VERIFIED",
+      "prompt_style": {
+        "status": "VERIFIED",
+        "text": "Use Template N (Nano Banana Brief) in templates.md. Model IDs, limits and prices are in references/gemini-image-models.json.",
+        "source": "https://ai.google.dev/gemini-api/docs/image-generation"
+      },
+      "negative_prompt": {
+        "mechanism": "none",
+        "status": "VERIFIED",
+        "text": "Exclusions are written in the prompt. See the Nano Banana profile in tool-routing.md.",
+        "source": "https://ai.google.dev/gemini-api/docs/image-generation"
+      },
+      "text_in_image": {
+        "status": "VERIFIED",
+        "text": "See Template N.",
+        "source": "https://ai.google.dev/gemini-api/docs/image-generation"
+      },
+      "references": {
+        "status": "VERIFIED",
+        "text": "See Template N and the reference limits in the Gemini catalog.",
+        "source": "https://ai.google.dev/gemini-api/docs/image-generation"
+      },
+      "edit": {
+        "status": "VERIFIED",
+        "text": "See Template J and Template N.",
+        "source": "https://ai.google.dev/gemini-api/docs/image-generation"
+      },
+      "native_settings": [],
+      "limitations": [
+        "This entry does not render prompts. The renderer returns a redirect for it, so the Nano Banana path stays unchanged."
+      ],
+      "sources": [
+        {
+          "url": "https://ai.google.dev/gemini-api/docs/image-generation",
+          "title": "Gemini image generation (read in earlier passes; see gemini-image-models.md)",
+          "checked": "2026-10-13",
+          "kind": "primary-read"
+        }
+      ]
+    }
+  ]
+}

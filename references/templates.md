@@ -20,6 +20,7 @@ Full template library for the prompt-techniques skill. Read the relevant templat
 | [L — Prompt Decompiler](#template-l--prompt-decompiler) | Breaking down, adapting, or splitting existing prompts |
 | [M — Claude Task Brief](#template-m--claude-task-brief) | Complex, multi-step, or agentic task on current Claude models |
 | [N — Nano Banana Brief](#template-n--nano-banana-brief) | New image with Nano Banana / Gemini Image, with optional named references |
+| [O — Visual Brief (multi-model adapter)](#template-o--visual-brief-multi-model-adapter) | One image brief, adapted to Midjourney, GPT Image, FLUX, Ideogram, Recraft, Firefly, Seedream, Stable Diffusion, SDXL or ComfyUI |
 
 ---
 
@@ -302,8 +303,8 @@ fields; use these as a starting point, not an exhaustive list:
 - Film stock (photoreal look): `Kodak Portra 400` (warm skin tones), `Fuji Velvia 50` (saturated landscapes), `Ilford HP5` (B&W grain)
 
 **Tool-specific syntax:**
-- **Midjourney**: Comma-separated descriptors, not prose. Add `--ar`, `--style`, `--v <current>` at the end (do not hardcode a version).
-- **Stable Diffusion 1.5 / SDXL**: Use `(word:1.3)` weight syntax. CFG scale 7 to 12. Negative prompt is mandatory.
+- **Midjourney**: Comma-separated descriptors, not prose. Parameters go at the end, after a space: `--ar` (whole numbers), `--raw` (more of the prompt, less default styling). `--v` takes the current version, V8.2 by default; do not hardcode a version. Verified syntax: references/image-targets.md (midjourney).
+- **Stable Diffusion 1.5 / SDXL**: the weight syntax and CFG values from earlier notes were not verified on 2026-10-14, so they are not used here. Negative prompts are a separate block in ComfyUI (Template K). See references/image-targets.md (sdxl: UNKNOWN).
 - **Sora 2 / video** (rule written for Sora, not re-verified for Sora 2): Add camera movement (slow dolly, static shot, crane up), duration in seconds, and cut style.
 
 ---
@@ -316,9 +317,9 @@ fields; use these as a starting point, not an exhaustive list:
 "Attach your reference image to [tool name] before sending this prompt."
 
 **Detect the tool's editing capability:**
-- Midjourney V8.2 (default since 2026-07-24): the Edit Model replaces Omni Reference, Character Reference and the Retexture tool. Check the Version page before writing a reference flag; `--oref` and `--cref` belong to the older versions.
-- GPT Image (ChatGPT): use the Edit capability in ChatGPT's image tool, not a fresh Generate request
-- Stable Diffusion 1.5 / SDXL (older checkpoints): use img2img mode, not txt2img. Set denoising strength 0.3-0.6 to preserve the original
+- Midjourney V8.2 (default since 2026-07-24): the Edit model (`--edit`, with up to four image URLs) replaces Omni Reference, Character Reference and the Retexture tool (Version page, read 2026-10-14).
+- GPT Image (API): send the source image to the edit call with a prompt that says what to change and what to keep. ChatGPT's own image tool was not read.
+- Stable Diffusion 1.5 / SDXL (older checkpoints): the edit workflow was not verified on 2026-10-14 (see references/image-targets.md, sdxl: UNKNOWN). No strength value is given here.
 
 ```
 Reference image: [attached / URL]
@@ -372,9 +373,9 @@ Do not distort or regenerate the original center image
 "Which checkpoint model are you using? (Stable Diffusion 3.5, SDXL, FLUX 3, FLUX.2, or other)"
 
 **Model-specific notes:**
-- SD 1.5 (legacy): shorter prompts work better, under 75 tokens per block, use (word:weight) syntax
-- SDXL: handles longer prompts, supports more natural language alongside weighted syntax
-- FLUX (FLUX 3 is the latest family; the rules in this line were written for FLUX.1 dev and are not re-verified for FLUX 3): natural language works well, less reliance on weighted syntax, very responsive to style descriptions. For FLUX.1 dev in ComfyUI, use CFG 1.0 and set guidance on the FluxGuidance node.
+- SD 1.5 (legacy): the ComfyUI text-to-image examples are SD 1.5. Token limits and weight syntax were not re-verified here.
+- SDXL: not verified on 2026-10-14. See references/image-targets.md.
+- FLUX 3 Image: send the image in `images` with a prompt that describes the change. A single edit needs no box; the service may add one and returns the expanded prompt in `result.prompt`. FLUX.2 has no negative prompts. FLUX.1 Kontext is a previous-generation model: describe only the change. Verified details: references/image-targets.md.
 
 ```
 POSITIVE PROMPT:
@@ -561,3 +562,127 @@ A photo of a hand-thrown olive-green ceramic vase holding three dried eucalyptus
 - More than one reference: name each one, and give each one a role.
 
 **When to use:** A new image from text, with or without named references, on any Nano Banana / Gemini Image model.
+
+---
+
+## Template O — Visual Brief (multi-model adapter)
+
+*Use for an image prompt for a target other than Nano Banana: Midjourney, GPT Image, FLUX (FLUX 3, FLUX.2, Kontext), Ideogram, Recraft, Firefly, Seedream, Stable Diffusion 3.5, SDXL or ComfyUI. Nano Banana keeps Template N. Each target's facts, sources and status are in [image-targets.md](image-targets.md).*
+
+Write the brief once, in these fields, and adapt it to the target's form. Do not paste one verbose prompt into every tool: each target reads a different form, and some take settings that a prompt cannot carry.
+
+| Field | What goes there |
+|---|---|
+| `subject`, `action` | what is in the picture and what it does |
+| `environment`, `composition`, `perspective` | where it is, how it is framed, and from where it is seen |
+| `medium` | the medium or style, for example "product photograph" or "watercolour" |
+| `lighting`, `color`, `materials` | light, palette, surfaces |
+| `text` | each piece of exact text, with `placement` and `typography`; `replaces` is for a text edit only |
+| `constraints` | exclusions ("no watermark") or positive invariants; the renderer decides how each target takes them |
+| `aspect_ratio` | `W:H` with whole numbers, or `auto`; decimals are refused |
+| `references` | each reference with a `role`: style, subject, structure or background |
+| `edit` | the change, and what to keep (`preserve`); edits only |
+| `boxes` | FLUX 3 only: element boxes, `[top, left, bottom, right]` in 0–1000 |
+| `options` | target settings (model, quality, resolution, seed); each is checked against what that target documents |
+
+**Rules**
+
+- Settings are native fields or parameters, never prompt text. The one exception is Midjourney: its parameters are typed at the end of the prompt bar, and the renderer shows them apart from the prompt.
+- Exclusions follow each target's negative mechanism (the mechanism field in image-targets.md). Midjourney takes them as `--no`. ComfyUI has a separate negative block. Recraft's API has a negative field only for V2 and V3. Where there is no negative field, the exclusion stays in the prompt as a sentence, and the warning asks for a positive rewrite, which controls better.
+- A target whose syntax is not verified gets a portable prompt and a warning. Nothing is invented: no weights, no parameters, no fields.
+- A bare family name can match several targets ("flux", "stable diffusion"). Ask which version, because the answer changes the prompt. If the person does not know, use the generic fallback and say so.
+- Nano Banana is not rendered here. The renderer returns a redirect to Template N and the Studio.
+
+**Render it**
+
+    python3 scripts/image_prompt.py render --target <name> --brief brief.json
+    python3 scripts/image_prompt.py resolve "<name the person used>"
+
+The output is JSON: `prompt`, `native_parameters` or `native_settings`, `negative_prompt` with its mechanism, `warnings`, `limitations`, `sources`. Read the warnings before you hand the prompt over.
+
+### Worked example: one brief, five targets
+
+The same brief, rendered by `scripts/image_prompt.py`. The prompt text and the native settings are shown apart, because they are sent apart (or, for Midjourney, typed apart). Warnings are in the JSON output; they are not copied here.
+
+Brief:
+
+```json
+{
+  "subject": "a ceramic teapot",
+  "environment": "a pale oak table by a window",
+  "composition": "centred, with empty space above",
+  "perspective": "eye level",
+  "lighting": "soft morning light from the left",
+  "color": "terracotta and cream",
+  "medium": "product photograph",
+  "materials": "glazed stoneware",
+  "aspect_ratio": "4:5",
+  "text": [
+    {
+      "content": "TEA",
+      "placement": "on a small paper label on the side",
+      "typography": "small serif capitals"
+    }
+  ],
+  "constraints": [
+    "no watermark",
+    "no extra text"
+  ]
+}
+```
+
+#### Midjourney
+
+Prompt:
+
+```text
+a ceramic teapot, a pale oak table by a window, product photograph, soft morning light from the left, terracotta and cream, glazed stoneware, centred, with empty space above, eye level, "TEA" on a small paper label on the side, small serif capitals
+```
+
+Native parameters, typed after the prompt in the prompt bar: `--ar 4:5 --no watermark, extra text`
+
+#### GPT Image 2.5 (API)
+
+Prompt:
+
+```text
+Style: product photograph
+Scene: a pale oak table by a window; eye level; centred, with empty space above; soft morning light from the left; terracotta and cream
+Subject: a ceramic teapot (glazed stoneware)
+Text: "TEA" on a small paper label on the side, small serif capitals
+Constraints: no watermark; no extra text.
+```
+
+Native settings (sent as fields, not in the prompt): `model`: gpt-image-2.5-sunburst; `endpoint`: images.generate; `size`: null (4:5 is not one of the recommended sizes, so the renderer warns and leaves the size to you); `quality`: auto; `output_format`: png
+
+#### FLUX 3 Image (API)
+
+Prompt:
+
+```text
+Product photograph. A ceramic teapot, a pale oak table by a window. Soft morning light from the left. Terracotta and cream. Glazed stoneware. Centred, with empty space above. Eye level. No watermark, no extra text. The text reads "TEA" on a small paper label on the side, set in small serif capitals.
+```
+
+Native settings (sent as fields, not in the prompt): `aspect_ratio`: 4:5
+
+#### Ideogram 4.5 (API v2)
+
+Prompt:
+
+```text
+a ceramic teapot, a pale oak table by a window, product photograph, soft morning light from the left, terracotta and cream, glazed stoneware, centred, with empty space above, eye level. The text reads "TEA" on a small paper label on the side, small serif capitals. No watermark, no extra text.
+```
+
+Native settings (sent as fields, not in the prompt): `endpoint`: /v2/image/generate/ideogram-4-5; `rendering_quality`: high; `background`: auto
+
+#### ComfyUI (positive and negative blocks)
+
+Prompt:
+
+```text
+a ceramic teapot, a pale oak table by a window, product photograph, soft morning light from the left, terracotta and cream, glazed stoneware, centred, with empty space above, eye level. The text reads "TEA" on a small paper label on the side, small serif capitals
+```
+
+Negative prompt, in its own block: `watermark, extra text` (no "no" in a negative block: the exclusion is the item itself)
+
+Node settings: node_inputs: Positive Prompt -> KSampler positive; Negative Prompt -> KSampler negative; cfg: set on the sampler node; the value depends on the checkpoint and is not given here

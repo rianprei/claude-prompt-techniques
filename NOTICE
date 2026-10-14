@@ -117,6 +117,17 @@ image understanding page were read again). Facts are recorded
 references/gemini-image-models.json. Short quoted phrases from these pages appear where they are used, with their
 source; no page text is reproduced at length.
 
+On 2026-10-14, the facts for image targets other than Gemini (references/image-targets.json and .md) were read in the
+vendors' own documentation pages: Midjourney (docs.midjourney.com: parameter list, No, Version, Style Reference, Edit
+Model, Aspect Ratio), OpenAI (developers.openai.com: image prompting and image generation guides, and the GPT Image prompting cookbook,
+which names an older model), Black Forest Labs (docs.bfl.ai: FLUX 3 Image overview, generate, layout and bounding boxes,
+FLUX.2 prompting guide, FLUX.1 Kontext image editing, prompt basics and prompt reference), Ideogram (developer.ideogram.ai: Ideogram 4.5
+generate and precise-edit references), Recraft (recraft.ai/docs: endpoints, negative prompts, prompting best practices),
+Adobe Firefly (developer.adobe.com: structure reference and the generate tutorial), and ComfyUI (docs.comfy.org: text to
+image and FLUX.1 pages). Pages that rendered only as navigation (Seedream and BytePlus ModelArk, the Firefly API reference,
+the Stability AI API reference) were not read; their claims are marked PARTIAL or UNKNOWN in the registry. Quoted phrases
+are short and attributed where used; no page text is reproduced at length. The rules are in this project's own words.
+
 MIT LICENSE (nidhinjs/prompt-master)
 ------------------------------------
 

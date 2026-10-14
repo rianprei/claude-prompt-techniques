@@ -18,7 +18,7 @@ from contracts import KEY_IN_URL, MODEL_ID
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LINK = re.compile(r"\]\(([^)\s]+)\)")
 MARKER = re.compile(r"\b(TODO|FIXME|XXX|TBD)\b")
-TEMPLATES = "ABCDEFGHIJKLMN"
+TEMPLATES = "ABCDEFGHIJKLMNO"
 CATALOG = "references/gemini-image-models.json"
 CATALOG_PREFIX = "references/gemini-image-models."
 STALE_DAYS = 90  # the catalog is a snapshot; past this age, the script only warns

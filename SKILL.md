@@ -1,6 +1,6 @@
 ---
 name: prompt-techniques
-description: Use when a prompt engineering technique applies to the current task (name/apply it), or when the request wants a prompt written for a specific tool (Claude, GPT, Cursor, Midjourney, coding agent) to paste elsewhere — includes natural forms like "how do I ask Midjourney for X?" or "how do I get Cursor to do Y?".
+description: Use when a prompt engineering technique applies to the current task (name/apply it), or when the request wants a prompt written for a specific tool (Claude, GPT, Cursor, Midjourney, coding agent) to paste elsewhere — includes natural forms like "how do I ask Midjourney for X?" or "how do I get Cursor to do Y?". Also for image prompts for any image model (Midjourney, GPT Image, FLUX, Ideogram, Recraft, Firefly, Seedream, Stable Diffusion, ComfyUI, Nano Banana): generate, improve, adapt or compare.
 ---
 
 ## Reference mode (passive)
@@ -32,6 +32,8 @@ Do not explain prompt engineering theory unless asked. Do not show framework nam
 Prefer simple techniques (role, few-shot, grounding) over complex frameworks (Mixture-of-Experts,
 Tree/Graph-of-Thought, Self-Consistency, layered prompt chaining) — those have higher fabrication risk
 in a single prompt; only use if explicitly requested and the tool supports them.
+**Image prompts for another model.** Write the brief once (Template O: subject, environment, composition, medium, lighting, colour, text, constraints, references, edit), then adapt it to the named target with `scripts/image_prompt.py`. Each target's syntax, negative mechanism and native settings are in [references/image-targets.md](references/image-targets.md), with the status of each fact (VERIFIED, PARTIAL, UNKNOWN) and its source. Name the target from the request ("Midjourney", "gpt image", "flux 3", "Ideogram"); ask only when the name fits several targets ("flux", "stable diffusion"). For a comparison, render the same brief for each named target. Never invent a parameter: a target without verified syntax gets a portable prompt and a warning.
+
 Never add CoT on reasoning-native models (GPT-6 family, DeepSeek V4 in thinking mode, Claude 5.x with thinking on) —
 they already think internally; CoT degrades output.
 
@@ -88,7 +90,8 @@ Limits, what is not verified and the file layout: [studio/README.md](studio/READ
 **Per-tool detail and templates — do not load here, read on demand**:
 - [references/tool-routing.md](references/tool-routing.md) — rules specific to Claude/GPT/Cursor/Midjourney/coding agent, and the Nano Banana / Gemini Image profile (routing by name, scene and edit briefs, references, text, web assets)
 - [references/patterns.md](references/patterns.md) — patterns that waste tokens/credits (task/context/format/scope/reasoning/agentic)
-- [references/templates.md](references/templates.md) — 14 structural templates A–N (RTF, CO-STAR, RISEN, CRISPE, Auditable Reasoning, Few-Shot, File-Scope, ReAct+Stop, Visual Descriptor, Reference Image Editing, ComfyUI, Prompt Decompiler, Claude Task Brief, Nano Banana Brief)
+- [references/templates.md](references/templates.md) — 15 structural templates A–O (RTF, CO-STAR, RISEN, CRISPE, Auditable Reasoning, Few-Shot, File-Scope, ReAct+Stop, Visual Descriptor, Reference Image Editing, ComfyUI, Prompt Decompiler, Claude Task Brief, Nano Banana Brief, Visual Brief for other image models)
+- [references/image-targets.md](references/image-targets.md) — image targets other than Nano Banana: status, sources, aliases, negative-prompt mechanism and native settings per target (read 2026-10-14)
 - [references/defenses.md](references/defenses.md) — defenses for prompts that process untrusted content (conceptual; categories and trade-offs)
 - [references/technique-catalog.md](references/technique-catalog.md) — detailed technique catalog: source, status, novelty and kind for each entry
 - [references/image-styles.md](references/image-styles.md) — style names for image prompts (Midjourney, GPT Image, Flux, ComfyUI)
