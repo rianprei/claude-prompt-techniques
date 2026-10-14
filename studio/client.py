@@ -12,7 +12,7 @@ import urllib.error
 import urllib.request
 import zlib
 
-from .core import ProviderError, StudioError
+from .core import INTERACTION_ID, ProviderError, StudioError
 from contracts import load_catalog  # studio/__init__.py put scripts/ on sys.path
 
 ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/interactions"
@@ -43,6 +43,12 @@ def build_request(brief, references):
             "image_size": brief["image_size"],
         },
     }
+    # Both fields are in the official image guide: previous_interaction_id in the multi-turn example,
+    # generation_config.thinking_level in the thinking section (lower case there).
+    if "previous_interaction_id" in brief:
+        body["previous_interaction_id"] = brief["previous_interaction_id"]
+    if "thinking_level" in brief:
+        body["generation_config"] = {"thinking_level": brief["thinking_level"]}
     return ENDPOINT, {"Content-Type": "application/json"}, json.dumps(body, ensure_ascii=False).encode("utf-8")
 
 
@@ -112,7 +118,10 @@ def parse_response(status, payload, api_key=""):
         data_bytes = base64.b64decode(image["data"], validate=True)
     except (ValueError, TypeError):
         raise ProviderError("bad_response", "The image data is not valid base64.") from None
-    return {"data": data_bytes, "mime_type": image.get("mime_type")}
+    interaction = data.get("id")  # documented as output of every interaction; kept only if it fits the local rule
+    if not (isinstance(interaction, str) and INTERACTION_ID.fullmatch(interaction)):
+        interaction = None
+    return {"data": data_bytes, "mime_type": image.get("mime_type"), "interaction_id": interaction, "provider": "gemini"}
 
 
 class GeminiClient:
@@ -134,7 +143,7 @@ class FakeClient:
     """Stand-in for demos and tests: no network call, no cost, and a plain grey placeholder."""
 
     def generate(self, brief, references):
-        return {"data": placeholder_png(), "mime_type": "image/png"}
+        return {"data": placeholder_png(), "mime_type": "image/png", "interaction_id": None, "provider": "fake"}
 
 
 def placeholder_png(width=64, height=64):

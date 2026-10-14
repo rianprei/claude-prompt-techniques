@@ -158,6 +158,7 @@ Source: Cloud blog (2026-03-05), section "Image generation". The image guide has
 - `input` is an array of parts: `{"type": "text", "text": ...}` and `{"type": "image", "data": <base64>, "mime_type": ...}`.
 - `response_format` takes `{"type": "image", "aspect_ratio": ..., "image_size": ...}`. Without `type: "image"` the response includes text too. The guide says it "defaults to returning both text and image responses".
 - Response shape (Interactions API reference, read again 2026-10-13): the interaction object has `steps`. A step of `type: "model_output"` carries `content` blocks. An image block has `data` (base64) and `mime_type` (enum). No live call was made, so the shape is confirmed by the reference only.
+- Multi-turn editing (guide, "Multi-turn image editing", read 2026-10-13): the request adds a top-level `previous_interaction_id` set to the `id` of the earlier interaction. The API reference describes `id` as "a unique identifier for the interaction completion" and `previous_interaction_id` as "the ID of the previous interaction, if any". The pages read do not say how long the server keeps an interaction, or whether `store` is on by default (the reference describes `store` as "whether to store the response and request for later retrieval"). The studio sends the parent's image as a reference too, so an edit does not depend on that.
 - Send the key in the `x-goog-api-key` header, as the guide does. Never in the URL.
 - The generate-content endpoint (`models/{model}:generateContent`) is documented in the API reference (earlier pass).
 

@@ -29,6 +29,7 @@ except ImportError:  # not POSIX: the store refuses to run instead of running un
 
 from validate_prompt import validate  # noqa: E402
 from contracts import model_ratios, reference_total  # noqa: E402
+from .checks import check_output  # noqa: E402
 
 APPROVAL_TTL = timedelta(minutes=30)  # approval window; the single-use design is credited in NOTICE
 APPROVAL_RETENTION = timedelta(hours=24)  # finished approvals stay this long, so a reuse says "used"
@@ -43,8 +44,13 @@ MAX_RUNS_LISTED = 50
 REVIEW_VERDICTS = ("pass", "targeted_fix", "regenerate", "blocked")
 NOTE_REQUIRED = ("targeted_fix", "blocked")
 RATINGS = (1, 2, 3, 4, 5)
+# Criteria a person rates on each image. The checks in checks.py measure format and size only; these are judgments.
+CRITERIA = ("fidelity", "composition", "text", "identity", "preservation", "constraints")
 EXTENSIONS = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp"}
 RUN_ID = re.compile(r"run_[0-9a-f]{16}")
+CASE_ID = re.compile(r"[a-z0-9][a-z0-9_\-]{0,63}")
+# Local rule for interaction ids we send or store. The format of the official id is not documented in the pages read.
+INTERACTION_ID = re.compile(r"[A-Za-z0-9_.\-]{1,200}")
 
 
 class StudioError(Exception):
@@ -120,6 +126,12 @@ def max_references(model):
     return reference_total(model)
 
 
+def thinking_levels(model):
+    """Thinking levels the guide lists for the model, in the lower case the Interactions API uses. Empty when none."""
+    levels = (model.get("thinking") or {}).get("levels") or []
+    return [level.lower() for level in levels]
+
+
 def offered_models(catalog):
     """Current or active models, never previews. Deprecated and shut-down models are not offered."""
     offers = []
@@ -134,8 +146,40 @@ def offered_models(catalog):
             "aspect_ratios": model_ratios(catalog, model),
             "prices_usd_per_image": {s: model["prices_usd_per_image"][s] for s in sizes},
             "max_references": max_references(model),
+            "thinking_levels": thinking_levels(model),
         })
     return offers
+
+
+def _check_thinking(offer, thinking_level):
+    """A thinking level the model's row in the guide lists. A model with no level control refuses any value."""
+    if not offer["thinking_levels"]:
+        raise StudioError("thinking_not_supported",
+                          f"{offer['id']} has no thinking level control in the guide. Leave the level out.")
+    level = thinking_level.strip().lower() if isinstance(thinking_level, str) else ""
+    if level not in offer["thinking_levels"]:
+        raise StudioError("thinking_level_not_allowed",
+                          f"{thinking_level!r} is not a thinking level of {offer['id']}; "
+                          f"it accepts {', '.join(offer['thinking_levels'])}.")
+    return level
+
+
+def _check_interaction(value):
+    if not isinstance(value, str) or not INTERACTION_ID.fullmatch(value):
+        raise StudioError("bad_interaction_id", "The interaction id is not in the form the studio accepts.")
+    return value
+
+
+def _check_run_id(value):
+    if not isinstance(value, str) or not RUN_ID.fullmatch(value):
+        raise StudioError("run_unknown", "Unknown run.", 404)
+    return value
+
+
+def _check_case_id(value):
+    if not isinstance(value, str) or not CASE_ID.fullmatch(value):
+        raise StudioError("bad_case_id", "A case id is lower-case letters, digits, '-' or '_', up to 64 characters.")
+    return value
 
 
 def inline_request_bytes(prompt, sizes):
@@ -143,10 +187,13 @@ def inline_request_bytes(prompt, sizes):
     return len(prompt.encode("utf-8")) + sum(4 * ((size + 2) // 3) for size in sizes)
 
 
-def build_brief(catalog, store, *, prompt, model_id, aspect_ratio, image_size, references):
+def build_brief(catalog, store, *, prompt, model_id, aspect_ratio, image_size, references,
+                thinking_level=None, previous_interaction_id=None, parent_run_id=None, case_id=None):
     """Check a request and freeze it as a brief. Returns the plan that the user approves.
 
-    `references` is a list of {"sha256", "mime_type"} entries uploaded earlier.
+    `references` is a list of {"sha256", "mime_type"} entries uploaded earlier. The optional fields are left out of
+    the brief when they are None, so a request without them keeps the hash it had before they existed.
+    `parent_run_id` and `case_id` only label the brief; the API never receives them.
     """
     offers = {offer["id"]: offer for offer in offered_models(catalog)}
     if not isinstance(model_id, str) or model_id not in offers:
@@ -180,6 +227,14 @@ def build_brief(catalog, store, *, prompt, model_id, aspect_ratio, image_size, r
         "image_size": image_size,
         "references": refs,
     }
+    if thinking_level is not None:
+        brief["thinking_level"] = _check_thinking(offer, thinking_level)
+    if previous_interaction_id is not None:
+        brief["previous_interaction_id"] = _check_interaction(previous_interaction_id)
+    if parent_run_id is not None:
+        brief["parent_run_id"] = _check_run_id(parent_run_id)
+    if case_id is not None:
+        brief["case_id"] = _check_case_id(case_id)
     return {
         "brief_sha256": store.save_brief(brief),
         "brief": brief,
@@ -284,7 +339,8 @@ class Store:
         """Create a single-use approval for one brief. Only the digest of the token is stored."""
         now = now or utcnow()
         self.load_brief(brief_sha)  # an approval must point at a stored brief
-        token = secrets.token_urlsafe(24)
+        # Hex, not urlsafe base64: a token that starts with "-" would be read as an option by `run --approval`.
+        token = secrets.token_hex(24)
         with self._locked():
             registry = self._read_registry()
             _prune(registry, now)
@@ -425,6 +481,9 @@ class Store:
                 changed += 1
         return changed
 
+    def output_path(self, output_name):
+        return self._path("outputs", output_name)
+
     def read_output(self, run_id):
         record = self.load_run(run_id)
         if record["status"] != "generated":
@@ -479,11 +538,15 @@ def run_brief(catalog, store, client_factory, brief_sha, approval_id, now=None):
         "model": brief["model"],
         "aspect_ratio": brief["aspect_ratio"],
         "image_size": brief["image_size"],
+        "thinking_level": brief.get("thinking_level"),
         "status": "running",
         "started_at": iso(now),
         "reviews": [],
         "evaluations": [],
     }
+    for key in ("parent_run_id", "case_id"):  # labels from the brief, so the history can show lineage and cases
+        if key in brief:
+            record[key] = brief[key]
     store.write_run(record)
     try:
         image = client.generate(brief, store.read_references(brief))
@@ -492,7 +555,11 @@ def run_brief(catalog, store, client_factory, brief_sha, approval_id, now=None):
             raise ProviderError("unsupported_output", "The provider returned data that is not PNG, JPEG or WebP.")
         output = run_id + EXTENSIONS[mime_type]
         store.write_output(output, image["data"])
-        record.update(status="generated", output=output, mime_type=mime_type)
+        record.update(status="generated", output=output, mime_type=mime_type,
+                      checks=check_output(image["data"], mime_type, brief["aspect_ratio"]),
+                      provider=image.get("provider", "unknown"))  # "fake" runs are placeholders, never compared
+        if image.get("interaction_id"):  # the id a later edit can chain from, when the user asks for it
+            record["interaction_id"] = image["interaction_id"]
     except StudioError as exc:
         record.update(status="failed", error=exc.code, error_message=exc.message)
     except Exception:
@@ -538,18 +605,77 @@ def record_review(store, run_id, verdict, note=None, now=None):
     return store.update_run(run_id, add_review)
 
 
-def record_evaluation(store, run_id, rating, note=None, now=None):
-    """Add a 1-5 rating to a generated image. Ratings are appended; the latest one counts."""
+def _clean_criteria(criteria):
+    """Per-criterion ratings, each from 1 to 5. Only the names in CRITERIA are accepted."""
+    if criteria is None:
+        return {}
+    if not isinstance(criteria, dict):
+        raise StudioError("bad_criteria", "Criteria must map a criterion name to a rating.")
+    for name, value in criteria.items():
+        if name not in CRITERIA:
+            raise StudioError("unknown_criterion", f"{name!r} is not a criterion. Use one of: {', '.join(CRITERIA)}.")
+        if isinstance(value, bool) or not isinstance(value, int) or value not in RATINGS:
+            raise StudioError("invalid_rating", f"The rating for {name} must be a whole number from 1 to 5.")
+    return dict(criteria)
+
+
+def record_evaluation(store, run_id, rating, note=None, now=None, criteria=None):
+    """Add a 1-5 rating to a generated image. Ratings are appended; the latest one counts.
+
+    `criteria` optionally rates each of CRITERIA on the same scale. Older entries have no criteria.
+    """
     now = now or utcnow()
     if isinstance(rating, bool) or not isinstance(rating, int) or rating not in RATINGS:
         raise StudioError("invalid_rating", "The rating must be a whole number from 1 to 5.")
     note = _clean_note(note)
+    scores = _clean_criteria(criteria)
     def add_evaluation(record):
         if record["status"] != "generated":
             raise StudioError("run_not_evaluable", "Only generated images can be rated.", 409)
-        record["evaluations"].append({"rating": rating, "note": note, "at": iso(now)})
+        record["evaluations"].append({"rating": rating, "note": note, "at": iso(now), "criteria": scores})
 
     return store.update_run(run_id, add_evaluation)
+
+
+REFINE_TEMPLATE = ("Edit the attached image. Change only this: {edit}. Keep everything else exactly as it is: "
+                   "the subject, the composition, the framing, the colours, the lighting, and every element that "
+                   "is not part of the change.")
+
+
+def plan_refinement(catalog, store, parent_run_id, edit, *, references=(), model_id=None, aspect_ratio=None,
+                    image_size=None, thinking_level=None, chain=False, case_id=None):
+    """Plan one targeted edit of a generated image. Nothing is spent here.
+
+    The parent's output goes in as a reference, byte for byte; its hash is checked against the run record when
+    the record has one. Model, ratio and size default to the parent's. `chain` also sends the parent's interaction
+    id, and only for the same model, because nothing documents a chain across models.
+    """
+    if not isinstance(edit, str) or not edit.strip():
+        raise StudioError("empty_edit", "Say what to change.")
+    parent = store.load_run(parent_run_id)
+    if parent["status"] != "generated":
+        raise StudioError("run_not_generated", "Only a generated image can be edited.", 409)
+    data, mime_type = store.read_output(parent_run_id)
+    if len(data) > MAX_REFERENCE_BYTES:
+        raise StudioError("parent_too_large",
+                          "The output is larger than the 10 MB reference limit, so it cannot be an edit reference.", 413)
+    expected = (parent.get("checks") or {}).get("sha256")
+    if expected and expected != sha256_hex(data):
+        raise StudioError("output_tampered", "The output file does not match its record. Nothing was planned.", 500)
+    target = model_id or parent["model"]
+    previous = None
+    if chain:
+        if target != parent["model"]:
+            raise StudioError("chain_model_mismatch", "A chained edit must use the same model as the run it chains from.")
+        if not parent.get("interaction_id"):
+            raise StudioError("chain_unavailable", "This run has no interaction id to chain from. Edit without chain.", 409)
+        previous = parent["interaction_id"]
+    parent_ref = store.save_reference(mime_type, data)
+    return build_brief(catalog, store, prompt=REFINE_TEMPLATE.format(edit=edit.strip()), model_id=target,
+                       aspect_ratio=aspect_ratio or parent["aspect_ratio"],
+                       image_size=image_size or parent["image_size"],
+                       references=[parent_ref, *references], thinking_level=thinking_level,
+                       previous_interaction_id=previous, parent_run_id=parent_run_id, case_id=case_id)
 
 
 def preferences(store):
@@ -583,4 +709,9 @@ def summarize_run(record):
         "error_message": record.get("error_message"),
         "verdict": reviews[-1]["verdict"] if reviews else None,
         "rating": evaluations[-1]["rating"] if evaluations else None,
+        "parent_run_id": record.get("parent_run_id"),
+        "case_id": record.get("case_id"),
+        "thinking_level": record.get("thinking_level"),
+        "provider": record.get("provider"),
+        "checks": record.get("checks"),
     }

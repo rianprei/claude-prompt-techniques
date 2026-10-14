@@ -38,7 +38,7 @@ Pronto. O resto deste README é detalhe — leia quando precisar.
 - [Princípios de persuasão](#princípios-de-persuasão)
 - [Regras fixas](#regras-fixas)
 - [Validação e testes](#validação-e-testes)
-- [Studio (GUI local com aprovação por execução paga)](#studio-gui-local-com-aprovação-por-execução-paga)
+- [Studio (página local e linha de comando, com aprovação por execução paga)](#studio-página-local-e-linha-de-comando-com-aprovação-por-execução-paga)
 - [Limitações conhecidas](#limitações-conhecidas)
 - [Uso fora do Claude Code](#uso-fora-do-claude-code)
 - [Customizar e estender](#customizar-e-estender)
@@ -171,7 +171,7 @@ prompt-techniques/
 │   ├── contracts.py            # catálogo, IDs, proporções e regex compartilhados
 │   ├── validate_prompt.py      # checa um prompt contra as regras do skill
 │   └── check_repo.py           # checa links e âncoras locais, formatação, marcadores de pendência, numeração e contratos de modelo e chave; avisa se o catálogo tem mais de 90 dias
-├── studio/                     # GUI local: brief, aprovação de uso única, revisão (README próprio)
+├── studio/                     # página local e CLI: brief, aprovação de uso única, revisão, avaliação (README próprio)
 ├── tests/                      # unittest: validador, golden cases, catálogo, contagens, contratos e studio
 ├── references/                 # pesados, carregados SÓ sob demanda
 │   ├── tool-routing.md         # regras por ferramenta e modelo
@@ -297,18 +297,24 @@ python3 -m unittest discover -s tests -v
 - **Limites conhecidos:** a maioria dos sinais é em inglês, com algumas formas em português (passo a passo, não, sem, formato, lista). Em prompts em português, as checagens de agente, CAPS e linguagem vaga não disparam, então a ausência de aviso não prova que o prompt está certo. A detecção de negação conta as negações antes da frase, dentro da mesma cláusula, e uma negação anula outra: "Não pule a checagem passo a passo" pede raciocínio e é marcado em modelo reasoning-native. Uma negação depois da frase não é lida.
 - **Hook opcional:** `git config core.hooksPath .githooks` (uma vez por clone) faz o `check_repo.py` e os testes rodarem antes de cada commit. Não é ativado sozinho.
 
-## Studio (GUI local com aprovação por execução paga)
+## Studio (página local e linha de comando, com aprovação por execução paga)
 
-GUI local para gerar imagens com Nano Banana. Ela monta o brief, mostra o plano e o custo nominal, e só chama a API paga depois que você aprova aquele brief exato pela interface. A aprovação é de uso único, vale 30 minutos e é gasta antes da chamada. Detalhes e limites estão em [`studio/README.md`](studio/README.md).
+Gera imagens com Nano Banana por uma página local ou pela linha de comando, que o Claude Code usa. Monta o brief, mostra o plano e o custo nominal, e só chama a API paga depois que você aprova aquele brief exato. A aprovação é de uso único, vale 30 minutos e é gasta antes da chamada. Você confirma digitando os 8 primeiros caracteres do hash do plano. A CLI não consegue verificar quem digitou, por isso a regra de pedir sua confirmação está no `SKILL.md`. Detalhes e limites estão em [`studio/README.md`](studio/README.md).
 
 ```bash
-python3 -m studio serve --fake-provider      # imagens de teste, sem rede e sem custo
-GEMINI_API_KEY=... python3 -m studio serve   # API real; a chave é lida em cada execução
+python3 -m studio serve --fake-provider      # página com imagens de teste, sem rede e sem custo
+GEMINI_API_KEY=... python3 -m studio serve   # página com a API real; a chave é lida em cada execução
+python3 -m studio cases                      # casos fixos; não gasta nada
+python3 -m studio plan --prompt "..." --model gemini-nano-banana-2.1 --aspect-ratio 1:1 --size 1K
+python3 -m studio approve <hash> --confirm <8 primeiros caracteres>   # só depois que você aprovar
+python3 -m studio run <hash> --approval <approval_id>                 # gasta essa aprovação
 ```
+
+A edição de uma imagem gerada usa `plan --from <run_id> --edit "o que mudar"`: o resto é mantido, e a imagem anterior entra como referência. Cada execução paga tem a sua própria aprovação.
 
 - Escuta só em 127.0.0.1. O token por processo protege contra outros sites: eles não leem a página que o contém nem enviam o cabeçalho sem CORS. Não protege contra processos locais: a página com o token é servida em `GET /`, então qualquer processo ou usuário que alcance 127.0.0.1 pode emitir aprovações e usar a API paga com a sua chave. Use o Studio em máquina de usuário único. A chave nunca vai para a página nem para uma URL.
 - Precisa de locks POSIX (`fcntl`): em Windows o store recusa operar. Plataforma e catálogo: [`studio/README.md`](studio/README.md).
-- Estado: P1 do plano da GUI. Nenhuma chamada real à API foi feita. O formato da resposta segue a referência da API (`steps`, com blocos `image`; lida em 2026-10-13). Só uma chamada real confirma que o serviço devolve esse formato para pedidos de imagem.
+- Estado: edição a partir de uma imagem gerada, avaliação por critérios, casos fixos e comparação por variante estão implementados e cobertos por testes com transporte simulado. Nenhuma chamada real à API foi feita, porque a chave não estava configurada. O formato da resposta segue a referência da API (`steps`, com blocos `image`; lida em 2026-10-13). Só uma chamada real confirma que o serviço devolve esse formato para pedidos de imagem e que a edição encadeada (`--chain`) se comporta como o exemplo oficial.
 
 ## Limitações conhecidas
 

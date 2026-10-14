@@ -68,6 +68,9 @@ that work's license notice here. Entries below are ideas and names only; no text
   The question of where critical instructions go in long prompts (references/tool-routing.md).
 - corralm/awesome-prompting (CC0): https://github.com/corralm/awesome-prompting
   A pointer to the White et al. categories. The categories were checked in the paper itself.
+- YouMind-OpenLab/nano-banana-pro-prompts-recommend-skill (no licence file in the repository): https://github.com/YouMind-OpenLab/nano-banana-pro-prompts-recommend-skill
+  Nothing is copied and nothing is downloaded. studio/library.py searches the headings of a local copy that the
+  person names with --library, and returns the file, the line and the heading only.
 
 ACADEMIC REFERENCES (cited, no text reproduced)
 -----------------------------------------------

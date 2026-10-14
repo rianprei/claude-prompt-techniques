@@ -38,6 +38,19 @@ Não é benchmark científico: N pequeno, avaliador é você, sem cegamento. É 
 
 `evals/golden_cases.json` tem 31 prompts fixos, cada um com o resultado esperado do validador (`scripts/validate_prompt.py`). Eles testam o validador: se uma regra mudar sem querer, um caso quebra. Não medem se a ferramenta-alvo responde bem; isso continua sendo o A/B manual acima. Rode com `python3 -m unittest discover -s tests -v`. Também existem `tests/test_image_catalog.py` (confere a consistência interna do catálogo de modelos de imagem: IDs, preços, proporções e tamanhos, e entre o JSON e o Markdown) e `tests/test_check_repo.py` (testa os contratos de `scripts/check_repo.py`). Nenhum desses testes chama a API: eles conferem consistência interna, não se o modelo ainda aceita o valor.
 
+## Avaliação de imagens (casos fixos)
+
+`evals/image_cases.json` tem 8 pedidos fixos para o Nano Banana: 6 de geração e 2 de edição. Cada caso lista os critérios que uma pessoa avalia: fidelidade, composição, texto, identidade, preservação e restrições. Um caso é um pedido, não um resultado. Cada execução paga precisa da sua própria aprovação, e nada nesse arquivo chama a API.
+
+- Rodar: `python3 -m studio plan --case ID`. Caso de edição: `plan --case ID --from RUN_ID`. Depois, o fluxo de aprovação de [`studio/README.md`](../studio/README.md).
+- Avaliar: `rate RUN --rating N --criterion NOME=N`, com nota de 1 a 5 por critério. Vale a nota mais recente.
+- Comparar: `compare ID` agrupa as execuções por variante (modelo, proporção, tamanho, nível de pensamento, geração ou edição) e mostra contagens e médias. Não aponta vencedor.
+- O que as checagens automáticas medem: formato, largura, altura, bytes, proporção dentro de 2 % (tolerância local). Não medem fidelidade, legibilidade do texto nem identidade. Essas são julgamentos de uma pessoa.
+- Não tire conclusão de superioridade com `n` pequeno. Uma diferença de médias com uma ou duas execuções por variante não é evidência.
+- Execuções com o provedor fake são excluídas da comparação.
+
+Limite desta rodada: nenhum caso foi executado na API, porque a chave não estava configurada. Os testes cobrem o caminho com transporte simulado.
+
 ## Toda claim carrega sua limitação junto, não separada
 
 Se um resultado do log virar afirmação em README/SKILL.md ("a skill reduz re-prompts em X%"),

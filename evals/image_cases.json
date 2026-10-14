@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "written_on": "2026-10-14",
+  "note": "Fixed requests for comparing image runs. A case is a request, not a result: each run needs its own approval, and nothing in this file calls the API. A generate case is planned with plan --case ID. An edit case also needs a parent run: plan --case ID --from RUN_ID, and its edit text is taken from the case. Ratings are a person's judgment on the listed criteria; the deterministic checks cover format, dimensions and aspect ratio only.",
+  "cases": [
+    {
+      "id": "scene-basic",
+      "kind": "generate",
+      "title": "Simple scene, square ratio",
+      "model": "gemini-nano-banana-2.1",
+      "aspect_ratio": "1:1",
+      "image_size": "1K",
+      "references_needed": 0,
+      "criteria": ["fidelity", "composition"],
+      "prompt": "A red ceramic teapot on a round wooden table, a single lemon beside it, soft morning light from the left, plain pale grey wall behind."
+    },
+    {
+      "id": "text-sign",
+      "kind": "generate",
+      "title": "Quoted text on a sign, legibility",
+      "model": "gemini-nano-banana-2.1",
+      "aspect_ratio": "16:9",
+      "image_size": "2K",
+      "references_needed": 0,
+      "criteria": ["fidelity", "text", "composition"],
+      "prompt": "A shop front at dusk with a black sign above the door that reads \"OPEN LATE\" in white capital letters, warm window light, wet pavement reflecting the sign."
+    },
+    {
+      "id": "product-constraints",
+      "kind": "generate",
+      "title": "Product shot with restrictions",
+      "model": "gemini-3-pro-image",
+      "aspect_ratio": "4:5",
+      "image_size": "2K",
+      "references_needed": 0,
+      "criteria": ["fidelity", "constraints", "composition"],
+      "prompt": "A matte white ceramic mug alone on a dark slate surface, one soft key light from above right. Plain surface, no logo, no lettering, no people, no other objects in the frame."
+    },
+    {
+      "id": "lite-1k",
+      "kind": "generate",
+      "title": "Lite model, its only size",
+      "model": "gemini-3.1-flash-lite-image",
+      "aspect_ratio": "1:1",
+      "image_size": "1K",
+      "references_needed": 0,
+      "criteria": ["fidelity", "composition"],
+      "prompt": "Three green glass bottles in a row on a white shelf, daylight from a window on the left, simple background."
+    },
+    {
+      "id": "thinking-high-count",
+      "kind": "generate",
+      "title": "Counted objects with high thinking",
+      "model": "gemini-nano-banana-2.1",
+      "aspect_ratio": "3:2",
+      "image_size": "2K",
+      "thinking_level": "high",
+      "references_needed": 0,
+      "criteria": ["fidelity", "composition", "constraints"],
+      "prompt": "A wooden shelf with exactly three blue books and one red mug, the mug at the right end, evenly lit studio photograph."
+    },
+    {
+      "id": "reference-identity",
+      "kind": "generate",
+      "title": "Keep the subject of a reference image",
+      "model": "gemini-nano-banana-2.1",
+      "aspect_ratio": "1:1",
+      "image_size": "1K",
+      "references_needed": 1,
+      "criteria": ["identity", "fidelity", "composition"],
+      "prompt": "Place the subject of the attached reference image in a park at sunset, standing on a grass path. Keep the same face, hair, clothing and pose as in the reference image."
+    },
+    {
+      "id": "edit-recolour",
+      "kind": "edit",
+      "title": "Targeted colour change, rest preserved",
+      "model": "gemini-nano-banana-2.1",
+      "aspect_ratio": "1:1",
+      "image_size": "1K",
+      "references_needed": 0,
+      "criteria": ["fidelity", "preservation", "constraints"],
+      "edit": "change the colour of the mug to green"
+    },
+    {
+      "id": "edit-sign-text",
+      "kind": "edit",
+      "title": "Change one line of text, rest preserved",
+      "model": "gemini-nano-banana-2.1",
+      "aspect_ratio": "16:9",
+      "image_size": "2K",
+      "references_needed": 0,
+      "criteria": ["text", "preservation", "fidelity"],
+      "edit": "change the sign text to \"CLOSED\" and keep the same letter style"
+    }
+  ]
+}
