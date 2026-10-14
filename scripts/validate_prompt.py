@@ -22,8 +22,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from contracts import (KEY_IN_URL, MODEL_ID, find_model, load_catalog,  # noqa: E402
                        model_ids_named, model_ratios, nearest_ratio, resolve_target)
 
-# Models that always reason internally (references/tool-routing.md).
-REASONING_NATIVE = ("o3", "o4-mini", "deepseek-r1", "gpt-6", "fable-5", "mythos-5", "opus-5-5")
+# Models that always reason internally (references/tool-routing.md). o3, o4-mini and deepseek-r1 are older
+# names, kept so that old prompts still get the rule.
+REASONING_NATIVE = ("gpt-6", "deepseek-v4", "deepseek-flash", "fable-5", "mythos-5", "opus-5-5",
+                    "o3", "o4-mini", "deepseek-r1")
 VENDOR_PREFIX = re.compile(r"^(?:claude|anthropic|openai|google|xai)-")
 CLAUDE_5 = re.compile(r"claude-(fable|mythos|opus|sonnet|haiku)-5")
 # Image models only: Gemini image IDs and the Nano Banana names. Text models such as gemini-2.5-pro do not match.

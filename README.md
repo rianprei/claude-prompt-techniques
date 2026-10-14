@@ -65,7 +65,7 @@ Antes de entregar qualquer prompt, a skill instrui o modelo a conferir o própri
 
 Dois problemas comuns:
 
-1. **Você não é especialista em cada ferramenta de IA.** Prompt bom pra Claude é diferente de prompt bom pra o3 (que degrada se você adicionar "think step by step"), que é diferente de Midjourney (descritores separados por vírgula, não prosa), que é diferente de Stable Diffusion (sintaxe de peso `(word:1.3)`, negative prompt obrigatório). Essa skill sabe as regras de cada uma.
+1. **Você não é especialista em cada ferramenta de IA.** Prompt bom pra Claude é diferente de prompt bom pra GPT-6 Astra (que degrada se você adicionar "think step by step"), que é diferente de Midjourney (descritores separados por vírgula, não prosa), que é diferente de Stable Diffusion (sintaxe de peso `(word:1.3)`, negative prompt obrigatório). Essa skill sabe as regras de cada uma.
 
 2. **Skills de prompt engineering costumam poluir o contexto.** A maioria joga 5.000+ palavras na janela de contexto em toda sessão. Essa skill usa *progressive disclosure*: o arquivo principal é mínimo, e o detalhe pesado só é lido no momento exato em que é necessário. Detalhe na [seção de arquitetura](#arquitetura-por-que-ela-não-estoura-seu-contexto).
 
@@ -143,7 +143,7 @@ O que acontece internamente:
 Retorna descritores separados por vírgula (não prosa), sujeito primeiro, depois estilo/mood/iluminação/composição, parâmetros `--ar 16:9 --v <atual>` no final (não fixa versão — confira a atual).
 
 **Modelo de raciocínio:**
-> "adapta esse meu prompt do Claude pro o3"
+> "adapta esse meu prompt do Claude pro GPT-6 Astra"
 
 Remove qualquer instrução de "pense passo a passo" (degrada modelos reasoning-native), encurta pra instrução limpa e direta, mantém só objetivo + formato de saída.
 
@@ -202,15 +202,15 @@ Regras específicas em `references/tool-routing.md`:
 
 | Categoria | Ferramentas |
 |---|---|
-| LLMs de texto | Claude (família 5.x), ChatGPT/GPT-6.x, Grok 4.7, Gemini 2.x/3 Pro, Qwen 2.5, Llama/Mistral, MiniMax M3/M2.7 |
-| Reasoning-native | o3, o4-mini, GPT-6, DeepSeek-R1, Qwen3 thinking (regra: NUNCA adicionar CoT) |
+| LLMs de texto | Claude (família 5.x), ChatGPT/GPT-6 (Astra, Sol, Luna), Grok 4.7, Gemini 4 Argon e 3.8 Flash, Qwen 3.8, Llama 4, Mistral Large 4, DeepSeek V4, MiniMax M3 |
+| Reasoning-native | GPT-6 Astra e GPT-6.1 Sol, DeepSeek V4 (thinking por padrão), Claude 5.x com thinking ligado (regra: NUNCA adicionar CoT) |
 | Local | Ollama (pergunta qual modelo antes de gerar) |
 | Agentes de código | Claude Code, Codex CLI, Cursor, Windsurf, Cline, GitHub Copilot, Devin, SWE-agent, Antigravity |
 | Geradores full-stack | Bolt, v0, Lovable, Figma Make, Google Stitch |
 | Pesquisa/orquestração | Perplexity, Manus AI |
 | Browser/computer-use | Comet, Atlas, Claude in Chrome |
-| Imagem | Midjourney, GPT Image, Stable Diffusion, SeeDream, Nano Banana / Gemini Image (2.1, 2 Lite, Pro; 2 descontinuado em 2026-10-06), Flux, Ideogram, ComfyUI |
-| Vídeo | Sora, Runway, Kling, LTX Video, Dream Machine, Seedance |
+| Imagem | Midjourney V8.2, GPT Image 2.5 (gpt-image-2.5-sunburst, gpt-image-2.5-flare), Stable Diffusion 3.5, Seedream 5.0 Pro, Nano Banana / Gemini Image (2.1, 2 Lite, Pro; 2 descontinuado em 2026-10-06), FLUX 3, Ideogram 4.5 (e 4.0), ComfyUI |
+| Vídeo | Sora 2, Runway Gen-4.5, Kling 4.0, LTX-2.5, Ray3.2 (Dream Machine), Seedance 2.5 |
 | Voz | ElevenLabs |
 | Música | Suno |
 | 3D | Meshy, Tripo, Rodin, Unity AI, Blender AI |
@@ -256,7 +256,7 @@ Inclui tabela de qual combinação usar por tipo de prompt (disciplina/guidance/
 Regras do gerador, válidas em todo pedido. São instruções ao modelo. O validador só as verifica, por heurística textual, nas regras 2 e 6 (`check_cot` e `check_agent_stop`); as demais não têm verificação automática:
 
 1. **Nunca gera prompt sem confirmar a ferramenta-alvo** — prompt genérico é prompt ruim.
-2. **Nunca adiciona CoT em modelo reasoning-native** (o3, o4-mini, DeepSeek-R1, Qwen3 thinking) — eles já pensam internamente; CoT explícito degrada a saída.
+2. **Nunca adiciona CoT em modelo reasoning-native** (GPT-6 Astra e GPT-6.1 Sol, DeepSeek V4, Claude 5.x com thinking) — eles já pensam internamente; CoT explícito degrada a saída.
 3. **Máximo 3 perguntas de esclarecimento** antes de gerar.
 4. **Framework pesado só com pedido explícito** — Mixture of Experts, Tree/Graph of Thoughts, Self-Consistency e chaining em camadas têm risco de fabricação maior em prompt único.
 5. **Sem nome de framework no output final** — você recebe o prompt, não a aula.
@@ -333,7 +333,7 @@ Não deveria: o modo gerador só dispara com pedido explícito de prompt, e o mo
 **Claude não leu as regras da minha ferramenta.**
 Confirme que `references/tool-routing.md` existe e que o link relativo em `SKILL.md` bate com o nome do arquivo. Se a ferramenta não tem seção, adicione uma (ver [Customizar](#customizar-e-estender)).
 
-**Pedi prompt pro o3 e veio com "think step by step".**
+**Pedi prompt pro GPT-6 Astra e veio com "think step by step".**
 Bug — não deveria acontecer (regra fixa nº 2). Confira se seu `SKILL.md` está atualizado (`git pull`).
 
 **Funciona no claude.ai web ou só no Claude Code?**

@@ -32,8 +32,8 @@ Do not explain prompt engineering theory unless asked. Do not show framework nam
 Prefer simple techniques (role, few-shot, grounding) over complex frameworks (Mixture-of-Experts,
 Tree/Graph-of-Thought, Self-Consistency, layered prompt chaining) — those have higher fabrication risk
 in a single prompt; only use if explicitly requested and the tool supports them.
-Never add CoT on reasoning-native models (o3, o4-mini, DeepSeek-R1, Qwen3 thinking, GPT-6 family) — they already think
-internally; CoT degrades output.
+Never add CoT on reasoning-native models (GPT-6 family, DeepSeek V4 in thinking mode, Claude 5.x with thinking on) —
+they already think internally; CoT degrades output.
 
 **Fast path**: simple, unambiguous request (clear tool, clear task, no exotic format) →
 generate directly, no template, no checklist, no questions. The full ceremony below is only for

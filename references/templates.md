@@ -126,7 +126,7 @@ Experiment: Give 3 variants ranging from minimal to bold.
 
 *Use for logic-heavy tasks, math, debugging, and multi-factor analysis where the result must be checkable. Works on every model. It asks for conclusions, assumptions, evidence, and checks, not for private reasoning.*
 
-**Models without native thinking only** (GPT-4o-class, Gemini non-thinking, Qwen2.5 instruct, Llama): add "Think through this step by step before answering." and put the final answer in `<answer>` tags so it can be extracted. Claude models with thinking off by default (Opus 4.6–4.8, Sonnet 4.6) use the same fallback. Never add it to o1/o3/o4-mini/DeepSeek-R1/Qwen3-thinking or GPT-6. On Claude 5.x, rely on thinking and `effort`: a prompt that asks for reasoning in `<thinking>` tags can be declined.
+**Models without native thinking only** (GPT-6 Luna with reasoning effort `none`, and models whose card says thinking is off): add "Think through this step by step before answering." and put the final answer in `<answer>` tags so it can be extracted. Claude models with thinking off by default (Opus 4.6–4.8, Sonnet 4.6) use the same fallback. Never add it to GPT-6 Astra, GPT-6.1 Sol, DeepSeek V4 with thinking on, or to o1/o3/o4-mini/DeepSeek-R1/Qwen3-thinking. On Claude 5.x, rely on thinking and `effort`: a prompt that asks for reasoning in `<thinking>` tags can be declined.
 
 ```
 [Task statement]
@@ -149,7 +149,7 @@ Keep the rationale concise and decision-relevant.
 
 **When NOT to use:**
 - Simple tasks where the answer is clear (unnecessary overhead)
-- Reasoning-native models (o3, GPT-6, Claude 5.x with thinking on): they think internally, so step-by-step instructions hurt
+- Reasoning-native models (GPT-6 Astra and GPT-6.1 Sol, DeepSeek V4 in thinking mode, Claude 5.x with thinking on): they think internally, so step-by-step instructions hurt
 - Creative tasks (structured audit fields can flatten natural voice)
 
 ---
@@ -303,8 +303,8 @@ fields; use these as a starting point, not an exhaustive list:
 
 **Tool-specific syntax:**
 - **Midjourney**: Comma-separated descriptors, not prose. Add `--ar`, `--style`, `--v <current>` at the end (do not hardcode a version).
-- **Stable Diffusion**: Use `(word:1.3)` weight syntax. CFG scale 7 to 12. Negative prompt is mandatory.
-- **Sora / video**: Add camera movement (slow dolly, static shot, crane up), duration in seconds, and cut style.
+- **Stable Diffusion 1.5 / SDXL**: Use `(word:1.3)` weight syntax. CFG scale 7 to 12. Negative prompt is mandatory.
+- **Sora 2 / video** (rule written for Sora, not re-verified for Sora 2): Add camera movement (slow dolly, static shot, crane up), duration in seconds, and cut style.
 
 ---
 
@@ -316,9 +316,9 @@ fields; use these as a starting point, not an exhaustive list:
 "Attach your reference image to [tool name] before sending this prompt."
 
 **Detect the tool's editing capability:**
-- Midjourney V7+: use `--oref [image URL]` (Omni-Reference) for character or object reference, and `--sref` for style reference. Check the current version's syntax; `--cref` is the older form.
+- Midjourney V8.2 (default since 2026-07-24): the Edit Model replaces Omni Reference, Character Reference and the Retexture tool. Check the Version page before writing a reference flag; `--oref` and `--cref` belong to the older versions.
 - GPT Image (ChatGPT): use the Edit capability in ChatGPT's image tool, not a fresh Generate request
-- Stable Diffusion: use img2img mode, not txt2img. Set denoising strength 0.3-0.6 to preserve the original
+- Stable Diffusion 1.5 / SDXL (older checkpoints): use img2img mode, not txt2img. Set denoising strength 0.3-0.6 to preserve the original
 
 ```
 Reference image: [attached / URL]
@@ -369,23 +369,23 @@ Do not distort or regenerate the original center image
 *Use for ComfyUI node-based workflows. Always output Positive and Negative prompts as separate blocks. Ask for the checkpoint model before writing — syntax and token limits differ per model.*
 
 **Ask first if not stated:**
-"Which checkpoint model are you using? (SD 1.5, SDXL, Flux, or other)"
+"Which checkpoint model are you using? (Stable Diffusion 3.5, SDXL, FLUX 3, FLUX.2, or other)"
 
 **Model-specific notes:**
-- SD 1.5: shorter prompts work better, under 75 tokens per block, use (word:weight) syntax
+- SD 1.5 (legacy): shorter prompts work better, under 75 tokens per block, use (word:weight) syntax
 - SDXL: handles longer prompts, supports more natural language alongside weighted syntax
-- Flux: natural language works well, less reliance on weighted syntax, very responsive to style descriptions. For Flux dev in ComfyUI, use CFG 1.0 and set guidance on the FluxGuidance node.
+- FLUX (FLUX 3 is the latest family; the rules in this line were written for FLUX.1 dev and are not re-verified for FLUX 3): natural language works well, less reliance on weighted syntax, very responsive to style descriptions. For FLUX.1 dev in ComfyUI, use CFG 1.0 and set guidance on the FluxGuidance node.
 
 ```
 POSITIVE PROMPT:
 [subject], [style], [mood], [lighting], [composition], [quality boosters: highly detailed, sharp focus, 8k]
 
-NEGATIVE PROMPT (SD/SDXL; leave empty for Flux dev):
+NEGATIVE PROMPT (SD/SDXL; leave empty for FLUX.1 dev):
 [what to exclude: blurry, low quality, watermark, extra limbs, bad anatomy, distorted, oversaturated]
 
 CHECKPOINT: [model name]
 SAMPLER: Euler a (recommended starting point)
-CFG SCALE: 7 for SD/SDXL (higher = stricter adherence); Flux dev: 1.0
+CFG SCALE: 7 for SD/SDXL (higher = stricter adherence); FLUX.1 dev: 1.0
 STEPS: 20-30
 RESOLUTION: [width x height — multiple of 64 for SD/SDXL]
 ```

@@ -97,8 +97,11 @@ ACADEMIC REFERENCES (cited, no text reproduced)
 
 VENDOR DOCUMENTATION
 --------------------
-Model-routing rules were checked against public documentation from Anthropic,
-OpenAI, xAI, and Cursor's published model list. The rules are stated in this project's own words, and no
+Model-routing rules were checked against public documentation from Anthropic, OpenAI, xAI, and Cursor's
+published model list. On 2026-10-13, model names were also checked against the vendors' own pages (Google,
+Meta, Mistral, Alibaba Model Studio, DeepSeek, MiniMax, Midjourney, Black Forest Labs, Stability AI, ByteDance
+Seed, Runway, Kuaishou, Lightricks, Luma, and Ideogram's developer page; the main Ideogram site returned HTTP
+403). The rules are stated in this project's own words, and no
 vendor text is reproduced, except short quoted sentences, which are attributed where used. Anthropic, "Prompting best practices" (platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices), section "Long context prompting", read 2026-10-12.
 
 Google, Gemini API documentation (ai.google.dev: the image generation guide, the model pages for the Nano Banana

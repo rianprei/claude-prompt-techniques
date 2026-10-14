@@ -67,7 +67,7 @@ class Validate(unittest.TestCase):
         self.assertIn("E-COT-REASONING", codes)
 
     def test_double_negative_cot_is_an_error_on_reasoning_native(self):
-        codes = [f["code"] for f in validate("Don't skip the step-by-step check. Return JSON.", "o3")]
+        codes = [f["code"] for f in validate("Don't skip the step-by-step check. Return JSON.", "gpt-6-astra")]
         self.assertIn("E-COT-REASONING", codes)
 
 
@@ -188,6 +188,7 @@ class CatalogFailure(unittest.TestCase):
 class ReasoningNativeTargetTests(unittest.TestCase):
     def test_a_family_that_starts_the_name_matches(self):
         for target in ("gpt-6-astra", "gpt-6.1-sol", "o3", "o3-mini", "o4-mini", "deepseek-r1",
+                       "deepseek-v4-pro", "deepseek-flash",
                        "claude-opus-5-5", "claude-fable-5-1", "openai/gpt-6-luna",
                        "deepseek-r1:8b", "ollama/deepseek-r1", "openrouter/deepseek/deepseek-r1", "together/o3-mini"):
             with self.subTest(target=target):

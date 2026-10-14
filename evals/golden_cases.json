@@ -13,25 +13,25 @@
   },
   {
     "id": "cot-allowed-on-non-reasoning",
-    "target": "gpt-4o",
+    "target": "mistral-large-4",
     "prompt": "Think step by step and show your reasoning, then return the final answer as JSON.",
     "forbid": ["E-COT-REASONING"]
   },
   {
     "id": "negated-cot-allowed",
-    "target": "o3",
+    "target": "gpt-6-astra",
     "prompt": "Do not use chain-of-thought. Return only the final JSON object.",
     "forbid": ["E-COT-REASONING"]
   },
   {
     "id": "cot-pt-on-reasoning-native",
-    "target": "o3",
+    "target": "gpt-6-astra",
     "prompt": "Pense passo a passo e depois responda em JSON.",
     "expect": ["E-COT-REASONING"]
   },
   {
     "id": "cot-pt-negated-allowed",
-    "target": "o3",
+    "target": "gpt-6-astra",
     "prompt": "Não pense passo a passo. Responda em JSON.",
     "forbid": ["E-COT-REASONING"]
   },
@@ -79,13 +79,13 @@
   },
   {
     "id": "double-negative-pt-cot-on-reasoning-native",
-    "target": "o3",
+    "target": "gpt-6-astra",
     "prompt": "Não pule o passo a passo. Responda só com o objeto JSON final.",
     "expect": ["E-COT-REASONING"]
   },
   {
     "id": "negation-clause-does-not-leak",
-    "target": "o3",
+    "target": "gpt-6-astra",
     "prompt": "Be brief, and do not think step by step. Return only the JSON object.",
     "forbid": ["E-COT-REASONING"]
   },

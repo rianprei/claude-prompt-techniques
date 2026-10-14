@@ -3,11 +3,11 @@ Reference file for the `prompt-techniques` skill. Loaded on demand by SKILL.md's
 > Last verified: 2026-10-13. The Nano Banana profile and the image model facts were re-read on 2026-10-13 against Google's image generation guide, the Nano Banana 2.1 model page, the pricing and deprecations pages, the DeepMind prompt guide and the Cloud blog dated 2026-03-05 (see gemini-image-models.md). The Claude bullets were re-read on 2026-10-13 against the models overview, best-practices, refusal and stop-reason pages, and corrected where a quote or claim was not in them. GPT-6 model IDs, reasoning levels and the guide's advice were re-read on OpenAI's models and GPT-6 guide pages, plus the post "Rethinking skills and prompts for GPT-6 Astra"; the GPT-6 launch post was not read. Grok rules were re-read on xAI's models, reasoning, API reference and caching pages, on Cursor's model list, and on Grok Build's overview. The Codex section follows the GPT-6 docs plus workflow notes. Midjourney and Flux rules were checked against secondary sources only. All other sections were last checked 2026-07-07 and may be stale. Model-specific rules age fast: if the target model is newer than the verification date or absent below, do NOT guess version-specific behavior; apply generic rules (explicit instruction, output contract, format lock) and say the entry may be stale.
 
 **Contents** (jump to the section you need, don't read the whole file):
-- Text/chat LLMs: Claude, ChatGPT/GPT-6.x, Grok, Gemini, Qwen 2.5/3, Ollama, Llama/Mistral, DeepSeek-R1, MiniMax
+- Text/chat LLMs: Claude 5.x, ChatGPT/GPT-6, Grok 4.7, Gemini 4 Argon and 3.8 Flash, Qwen 3.8, Ollama, Llama 4, Mistral Large 4, DeepSeek V4, MiniMax M3
 - Coding agents: Claude Code, Codex CLI, Antigravity, Cursor/Windsurf, Cline, GitHub Copilot, Bolt/v0/Lovable/Figma Make/Stitch, Devin/SWE-agent
 - Research/browser agents: Perplexity/Manus, Comet/Atlas/Claude in Chrome
 - Image: Generation, Nano Banana / Gemini Image, Reference Editing, ComfyUI, 3D (Text to 3D, In-Engine AI)
-- Video/Voice/Music: Sora/Runway/Kling/etc, ElevenLabs, Suno
+- Video/Voice/Music: Sora 2, Runway Gen-4.5, Kling 4.0, etc, ElevenLabs, Suno
 - Workflow automation: Zapier/Make/n8n
 - Safety: Credential Safety, Input Sanitization, Sandwich Defense
 - Diagnostics: Prompt Decompiler, Unknown-tool fallback, Diagnostic Checklist, Memory Block
@@ -72,7 +72,7 @@ Current models (Anthropic models overview, read 2026-10-13): Fable 5.1, Opus 5.5
 
 ---
 
-**o3 / o4-mini / OpenAI reasoning models**
+**GPT-6 Astra and GPT-6.1 Sol (reasoning models; OpenAI's all-models page marks o4-mini as Deprecated and lists o3 as succeeded by GPT-5)**
 - SHORT clean instructions ONLY — these models reason across thousands of internal tokens
 - NEVER add CoT, "think step by step", or reasoning scaffolding — it actively degrades output
 - Prefer zero-shot first — add few-shot only if strictly needed and tightly aligned
@@ -81,7 +81,7 @@ Current models (Anthropic models overview, read 2026-10-13): Fable 5.1, Opus 5.5
 
 ---
 
-**Gemini 2.x / Gemini 3 Pro**
+**Gemini text: Gemini 4 Argon and 3.8 Flash** (rules carried over from the Gemini 2.x/3 Pro notes; not re-verified for these versions)
 - Strong at long-context and multimodal — leverage its large context window for document-heavy prompts
 - Prone to hallucinated citations — always add "Cite only sources you are certain of. If uncertain, say [uncertain]."
 - Can drift from strict output formats — use explicit format locks with a labelled example
@@ -89,31 +89,31 @@ Current models (Anthropic models overview, read 2026-10-13): Fable 5.1, Opus 5.5
 
 ---
 
-**Qwen 2.5 (instruct variants)**
+**Qwen 3.8 (rules carried over from Qwen 2.5 instruct; re-verify on the Qwen docs)**
 - Excellent instruction following, JSON output, structured data — leverage these strengths
-- Provide a clear system prompt defining the role — Qwen2.5 responds well to role context
+- Provide a clear system prompt defining the role — Qwen 2.5 responded well to role context
 - Works well with explicit output format specs including JSON schemas
 - Shorter focused prompts outperform long complex ones — scope tightly
 
 ---
 
-**Qwen3 (thinking mode)**
+**Qwen thinking mode (Qwen3 notes; check whether Qwen 3.8 has it)**
 - Two modes: thinking mode (/think or enable_thinking=True) and non-thinking mode
-- Thinking mode: treat exactly like o3 — short clean instructions, no CoT, no scaffolding
-- Non-thinking mode: treat like Qwen2.5 instruct — full structure, explicit format, role assignment
+- Thinking mode: treat like a reasoning-native model — short clean instructions, no CoT, no scaffolding
+- Non-thinking mode: treat like the instruct models above — full structure, explicit format, role assignment
 
 ---
 
 **Ollama (local model deployment)**
-- ALWAYS ask which model is running before writing — Llama3, Mistral, Qwen2.5, CodeLlama all behave differently
+- ALWAYS ask which model is running before writing — Llama 4, Mistral Large 4, Qwen 3.8 and other open models behave differently
 - System prompt is the most impactful lever — include it in the output so user can set it in their Modelfile
 - Shorter simpler prompts outperform complex ones — local models lose coherence with deep nesting
 - Temperature 0.1 for coding/deterministic tasks, 0.7-0.8 for creative tasks
-- For coding: CodeLlama or Qwen2.5-Coder, not general Llama
+- For coding: choose a model tuned for code and check its card; do not assume a general model is tuned for it
 
 ---
 
-**Llama / Mistral / open-weight LLMs**
+**Llama 4 / Mistral Large 4 / open-weight LLMs** (rules carried over; not re-verified for these versions)
 - Shorter prompts work better — these models lose coherence with deeply nested instructions
 - Simple flat structure — avoid heavy nesting or multi-level hierarchies
 - Be more explicit than you would with Claude or GPT — instruction following is weaker
@@ -121,10 +121,10 @@ Current models (Anthropic models overview, read 2026-10-13): Fable 5.1, Opus 5.5
 
 ---
 
-**DeepSeek-R1**
-- Reasoning-native like o3 — do NOT add CoT instructions
+**DeepSeek V4 (V4-Pro and V4.1-Flash; thinking on by default)**
+- Reasoning-native (thinking is the default) — do NOT add CoT instructions
 - Short clean instructions only — state the goal and desired output format
-- Outputs reasoning in `<think>` tags by default — add "Output only the final answer, no reasoning." if needed
+- If the reply shows its reasoning, add "Output only the final answer, no reasoning." (the `<think>` tags were an R1 behaviour; not re-verified for V4)
 
 ---
 
@@ -139,10 +139,10 @@ Current models (Anthropic models overview, read 2026-10-13): Fable 5.1, Opus 5.5
 
 ---
 
-**MiniMax (M3 / M2.7)**
+**MiniMax (M3; M3.1-Flash-Preview is listed as a preview)**
 - OpenAI-compatible API — prompts that work with GPT models transfer directly
-- Strong at instruction following, structured output, and long-context synthesis — 1M context window on M3; M2.7/M2.7-highspeed is 204,800 tokens, not 1M
-- M2.7-highspeed is optimized for speed — use for latency-sensitive tasks
+- Strong at instruction following, structured output, and long-context synthesis — 1M context window on M3 (models table, read 2026-10-13)
+- M2.7-highspeed (older model) is listed with the same performance as M2.7; check the M3 page for a speed variant before using it for latency-sensitive tasks
 - Temperature must be between 0 and 1 (inclusive) — prompts that set temperature above 1 will fail
 - May output reasoning in `<think>` tags — add "Output only the final answer, no reasoning tags." if the user does not want visible thinking
 - Good at code generation, JSON output, and multi-step analysis — leverage these strengths
@@ -177,7 +177,7 @@ Current models (Anthropic models overview, read 2026-10-13): Fable 5.1, Opus 5.5
 
 ---
 
-**Antigravity (Google's agent-first IDE, powered by Gemini 3 Pro)**
+**Antigravity (Google's agent-first IDE; the Gemini model it uses changes, so confirm the model picker)**
 - Task-based prompting — describe outcomes, not steps
 - Prompt for an Artifact (task list, implementation plan) before execution so you can review it first
 - Browser automation is built-in — include verification steps: "After building, verify UI at 375px and 1440px using the browser agent"
@@ -253,16 +253,16 @@ Current models (Anthropic models overview, read 2026-10-13): Fable 5.1, Opus 5.5
 
 ---
 
-**Image AI — Generation** (Midjourney, GPT Image, Stable Diffusion, SeeDream, Flux, Ideogram)
+**Image AI — Generation** (Midjourney V8.2, GPT Image 2.5, Stable Diffusion, Seedream 5.0 Pro, FLUX, Ideogram 4.5)
 First detect: generation from scratch or editing an existing image?
 
 - **Midjourney**: Comma-separated descriptors, not prose. Subject first, then style, mood, lighting, composition. Parameters at end: `--ar 16:9 --v <current>` (check current default, do not hardcode a version) `--style raw`. Negative prompts via `--no [unwanted elements]`. Character or object reference: `--oref` on V7+ (Omni-Reference; `--cref` is the older syntax; secondary sources).
 - **GPT Image (ChatGPT / gpt-image, successor to the now-retired DALL-E 3)**: Prose description works for a single-subject scene. Add "do not include text in the image unless specified." For a text-heavy, multi-region layout — poster, infographic, exploded-view diagram, map, slide — switch to a JSON prompt instead: nest `header`/`layout`/`callout_labels`/`footer` (or whatever regions the design needs) as object keys, put each label's exact text as a string value. This gives the model a structural map of where each piece of text belongs, which prose reliably loses once there are more than 3-4 labeled regions.
-- **Stable Diffusion**: `(word:weight)` syntax. CFG 7-12. Use a negative prompt (standard for SD 1.5 and SDXL; Flux usually ignores it at CFG 1). Steps 20-30 for drafts, 40-50 for finals.
-- **SeeDream**: Strong at artistic and stylized generation. Specify art style explicitly (anime, cinematic, painterly) before scene content. Mood and atmosphere descriptors work well. Negative prompt recommended.
+- **Stable Diffusion 1.5 / SDXL (older checkpoints)**: `(word:weight)` syntax. CFG 7-12. Use a negative prompt (standard for SD 1.5 and SDXL; FLUX.1 dev usually ignores it at CFG 1). Steps 20-30 for drafts, 40-50 for finals.
+- **Seedream 5.0 Pro** (rule written for an earlier Seedream, not re-verified): Strong at artistic and stylized generation. Specify art style explicitly (anime, cinematic, painterly) before scene content. Mood and atmosphere descriptors work well. Negative prompt recommended.
 - **Nano Banana / Gemini Image**: not this bullet. Use the Nano Banana profile below. Its model names, aliases and limits are in [gemini-image-models.md](gemini-image-models.md).
-- **Flux**: Pure natural language, no parameter syntax at all — everything must be in the description, including camera and lens for photorealism. Longer, more descriptive prompts outperform short ones here (opposite of Midjourney). Strong at text rendering. In ComfyUI, Flux dev runs at CFG 1.0 with guidance set on the FluxGuidance node; a negative prompt usually has no effect (secondary sources).
-- **Ideogram**: Best-in-class text rendering — wrap the exact text to render in quotation marks inside the prompt. Style tags guide aesthetic direction separately from the text-rendering instruction. Best pick when the request is a logo, poster, or social graphic with specific on-image text.
+- **FLUX (FLUX 3 is the latest family; the rule was written for FLUX.1, not re-verified for FLUX 3)**: Pure natural language, no parameter syntax at all — everything must be in the description, including camera and lens for photorealism. Longer, more descriptive prompts outperform short ones here (opposite of Midjourney). Strong at text rendering. In ComfyUI, Flux dev runs at CFG 1.0 with guidance set on the FluxGuidance node; a negative prompt usually has no effect (secondary sources).
+- **Ideogram 4.5** (rule written for an earlier Ideogram, not re-verified for 4.5): Best-in-class text rendering — wrap the exact text to render in quotation marks inside the prompt. Style tags guide aesthetic direction separately from the text-rendering instruction. Best pick when the request is a logo, poster, or social graphic with specific on-image text.
 
 ---
 
@@ -350,13 +350,13 @@ Read references/templates.md Template K for the full ComfyUI template.
 
 ---
 
-**Video AI** (Sora, Runway, Kling, LTX Video, Dream Machine, Seedance)
-- Sora: describe as if directing a film shot. Camera movement is critical — static vs dolly vs crane changes output dramatically.
-- Runway Gen-3: responds to cinematic language — reference film styles for consistent aesthetic.
-- Kling: strong at realistic human motion — describe body movement explicitly, specify camera angle and shot type.
-- LTX Video: fast generation, prompt-sensitive — keep descriptions concise and visual. Specify resolution and motion intensity explicitly.
-- Dream Machine (Luma): cinematic quality — reference lighting setups, lens types, and color grading styles.
-- Seedance 2.0: multi-shot mode produces real cuts, not one flowing take. Sweet spot is 5-6 shots per 15s (~2.5-3s each) — under that wastes the multi-shot capability, over 7 shots drops consistency and needs budget for re-rolls (community observation, not verified). Front-load character/subject identity in the first 20-30 words — the model weights opening tokens heaviest for character anchoring across cuts. One clip with one audio decision beats stitching two renders — music won't match tempo/key across separate generations.
+**Video AI** (Sora 2, Runway Gen-4.5, Kling 4.0, LTX-2.5, Ray3.2 / Dream Machine, Seedance 2.5)
+- Sora 2 (rule written for Sora, not re-verified for Sora 2): describe as if directing a film shot. Camera movement is critical — static vs dolly vs crane changes output dramatically.
+- Runway Gen-4.5 (rule written for Gen-3, not re-verified): responds to cinematic language — reference film styles for consistent aesthetic.
+- Kling 4.0 (rule written for an earlier Kling, not re-verified): strong at realistic human motion — describe body movement explicitly, specify camera angle and shot type.
+- LTX-2.5 (rule written for LTX Video, not re-verified): fast generation, prompt-sensitive — keep descriptions concise and visual. Specify resolution and motion intensity explicitly.
+- Ray3.2 (rule written for Dream Machine, not re-verified): cinematic quality — reference lighting setups, lens types, and color grading styles.
+- Seedance 2.5 (rule written for Seedance 2.0, not re-verified): multi-shot mode produces real cuts, not one flowing take. Sweet spot is 5-6 shots per 15s (~2.5-3s each) — under that wastes the multi-shot capability, over 7 shots drops consistency and needs budget for re-rolls (community observation, not verified). Front-load character/subject identity in the first 20-30 words — the model weights opening tokens heaviest for character anchoring across cuts. One clip with one audio decision beats stitching two renders — music won't match tempo/key across separate generations.
 
 ---
 
@@ -477,7 +477,7 @@ to those IDs rather than inline prose links — "Tag each provided document with
 your answer, list every ID actually used to produce it — not what was merely read, what was used."
 This survives reformatting and is easy to consume programmatically, unlike inline citation prose.
 
-**Chain of Thought (manual)** — for logic, math, and debugging only where the model's thinking is off or absent: non-reasoning models (GPT-4o-class, Gemini non-thinking, Qwen2.5, Llama) and Claude models with thinking off by default (Opus 4.6–4.8, Sonnet 4.6). Never on o3/o4-mini/R1/Qwen3-thinking or the GPT-6 family. On Claude 5.x, rely on thinking and `effort`; do not ask for visible reasoning blocks, which can be declined. See Template E for the auditable format.
+**Chain of Thought (manual)** — for logic, math, and debugging only where the model's thinking is off or absent: non-reasoning models (GPT-6 Luna with reasoning effort none, Gemini non-thinking, and models whose card says thinking is off) and Claude models with thinking off by default (Opus 4.6–4.8, Sonnet 4.6). Never on GPT-6 Astra, GPT-6.1 Sol, DeepSeek V4 with thinking on, o3/o4-mini/R1 or Qwen3-thinking. On Claude 5.x, rely on thinking and `effort`; do not ask for visible reasoning blocks, which can be declined. See Template E for the auditable format.
 "Think through this step by step before answering."
 
 **Token-budget CoT** — when the task is simple enough that unconstrained CoT would ramble (basic arithmetic, short logic chains) on a model without native thinking: add an explicit token ceiling to the CoT instruction. "Think through this step by step in under 50 words before answering." Forces the same reasoning path more concisely — a heuristic for cutting output tokens (no measurement checked for this skill), but only below the task's real reasoning-complexity floor; on genuinely hard tasks a tight ceiling truncates reasoning before it's done and accuracy drops. Don't apply this reflexively — only when the task is simple enough that the model would otherwise pad.

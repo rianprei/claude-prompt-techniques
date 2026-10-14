@@ -63,7 +63,7 @@
 | # | Pattern | Bad Example | Fixed |
 |---|---------|------------|-------|
 | 27 | **No audit contract for logic task** | "which approach is better?" | Ask for conclusion, assumptions, evidence, and checks (Template E). Models without native thinking only: add "Think through both approaches step by step before recommending." Reasoning models: see row 28 |
-| 28 | **Adding CoT to reasoning models** | "think step by step" sent to o1/o3 | Remove it — reasoning models think internally, CoT instructions degrade output |
+| 28 | **Adding CoT to reasoning models** | "think step by step" sent to GPT-6 Astra or another reasoning model | Remove it — reasoning models think internally, CoT instructions degrade output |
 | 29 | **Expecting inter-session memory** | "you already know my project" | Always re-provide the Memory Block in every new session |
 | 30 | **Contradicting prior work** | New prompt ignores earlier architecture | Include Memory Block with all established decisions |
 | 31 | **No grounding rule for factual tasks** | "summarize what experts say about X" | "Use only information you are highly confident is accurate. Say [uncertain] if not." |
