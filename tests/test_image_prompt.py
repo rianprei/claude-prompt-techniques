@@ -249,7 +249,7 @@ class IdeogramTests(unittest.TestCase):
         result = image_prompt.render(brief(text=[{"content": "COFFEE", "placement": "top"}]), "ideogram")
         self.assertIn('"COFFEE"', result["prompt"])
         self.assertEqual(result["native_settings"]["rendering_quality"], "high")  # default without source images
-        self.assertEqual(result["native_settings"]["background"], "auto")
+        self.assertNotIn("background", result["native_settings"])  # no default is sent unless the brief sets one
 
     def test_an_edit_uses_precise_edit_with_context_window_none(self):
         result = image_prompt.render(brief(edit={"change": "make the mug blue", "preserve": ["the table"]}), "ideogram")
@@ -271,10 +271,11 @@ class RecraftTests(unittest.TestCase):
         self.assertEqual(result["negative_prompt"], "watermark")
         self.assertTrue(any("V2 and V3" in w for w in result["warnings"]))
 
-    def test_the_default_model_is_recorded(self):
+    def test_the_default_model_is_recorded_and_no_format_default_is_invented(self):
         result = image_prompt.render(brief(), "recraft")
         self.assertEqual(result["native_settings"]["model"], "recraftv4_1")
-        self.assertEqual(result["native_settings"]["image_format"], "webp")
+        self.assertNotIn("image_format", result["native_settings"])
+        self.assertEqual(image_prompt.render(brief(options={"image_format": "png"}), "recraft")["native_settings"]["image_format"], "png")
 
     def test_text_layout_is_v3_only(self):
         result = image_prompt.render(brief(text=[{"content": "HELLO", "placement": "top"}]), "recraft")
@@ -312,7 +313,7 @@ class SecondaryTargetTests(unittest.TestCase):
 
     def test_sdxl_is_unknown_and_emits_no_weights_or_cfg(self):
         result = image_prompt.render(brief(), "sdxl")
-        self.assertEqual(result["verification"], "UNKNOWN")
+        self.assertEqual(result["verification"], "PARTIAL")  # resolution and refiner are verified; weights and CFG are not
         self.assertEqual(result["native_settings"], {})
         self.assertNotIn("cfg", json.dumps(result).lower())
 
@@ -444,11 +445,14 @@ class FieldHandlingTests(unittest.TestCase):
         with self.assertRaises(image_prompt.BriefError):
             image_prompt.render(brief(references=[{"role": "mood", "use": "x"}]), "midjourney")
 
-    def test_an_ideogram_seed_outside_its_range_is_refused(self):
+    def test_an_ideogram_seed_below_zero_is_refused_and_a_large_one_is_warned_not_refused(self):
         with self.assertRaises(image_prompt.BriefError):
-            image_prompt.render(brief(options={"seed": 2147483648}), "ideogram")
+            image_prompt.render(brief(options={"seed": -1}), "ideogram")
         ok = image_prompt.render(brief(options={"seed": 7}), "ideogram")
         self.assertEqual(ok["native_settings"]["seed"], 7)
+        big = image_prompt.render(brief(options={"seed": 2147483648}), "ideogram")
+        self.assertEqual(big["native_settings"]["seed"], 2147483648)
+        self.assertTrue(any("2147483647" in w for w in big["warnings"]))
 
     def test_a_plain_target_writes_its_exclusions_as_one_sentence(self):
         result = image_prompt.render(brief(), "sdxl")
@@ -462,6 +466,128 @@ class FieldHandlingTests(unittest.TestCase):
     def test_firefly_says_when_a_non_structure_reference_is_not_used(self):
         result = image_prompt.render(brief(references=[{"role": "style", "use": "the palette"}]), "firefly")
         self.assertTrue(any("only structure references" in w for w in result["warnings"]))
+
+
+class UltragoalRoutingTests(unittest.TestCase):
+    """Facts read on 2026-10-14 (ultragoal): Seedream request options, OpenAI model IDs, Ideogram and Midjourney notes."""
+
+    def test_seedream_sends_only_the_options_the_brief_sets(self):
+        result = image_prompt.render(brief(options={"model": "dola-seedream-5-0-pro-260628", "size": "2K",
+                                                    "watermark": False}), "seedream")
+        self.assertEqual(result["native_settings"], {"model": "dola-seedream-5-0-pro-260628", "size": "2K",
+                                                     "watermark": False})
+
+    def test_seedream_default_watermark_is_named_as_a_warning_not_sent(self):
+        result = image_prompt.render(brief(options={"model": "dola-seedream-5-0-pro-260628"}), "seedream")
+        self.assertNotIn("watermark", result["native_settings"])
+        self.assertTrue(any("watermark is on by default" in w for w in result["warnings"]))
+
+    def test_seedream_fast_optimization_is_refused_on_flash_lite_and_4_5(self):
+        for model in ("seedream-5-0-flash", "seedream-5-0-lite", "seedream-4-5"):
+            with self.subTest(model=model), self.assertRaises(image_prompt.BriefError):
+                image_prompt.render(brief(options={"model": model, "optimize_mode": "fast"}), "seedream")
+
+    def test_seedream_sequential_is_refused_on_pro_and_flash(self):
+        with self.assertRaises(image_prompt.BriefError):
+            image_prompt.render(brief(options={"model": "seedream-5-0-pro", "sequential": "auto"}), "seedream")
+        ok = image_prompt.render(brief(options={"model": "seedream-4-5", "sequential": "auto"}), "seedream")
+        self.assertEqual(ok["native_settings"]["sequential_image_generation"], "auto")
+
+    def test_seedream_size_is_a_tier_or_an_exact_size_in_the_pixel_range(self):
+        with self.assertRaises(image_prompt.BriefError):
+            image_prompt.render(brief(options={"size": "3K"}), "seedream")
+        with self.assertRaises(image_prompt.BriefError):
+            image_prompt.render(brief(options={"size": "512x512"}), "seedream")  # below 921,600 pixels
+        ok = image_prompt.render(brief(options={"size": "2048x1024"}), "seedream")
+        self.assertEqual(ok["native_settings"]["size"], "2048x1024")
+
+    def test_seedream_reference_limits_follow_the_model_family(self):
+        ten = [{"role": "subject", "use": "x"}] * 11
+        with self.assertRaises(image_prompt.BriefError):
+            image_prompt.render(brief(references=ten, options={"model": "seedream-5-0-pro"}), "seedream")
+        fourteen = [{"role": "subject", "use": "x"}] * 14
+        ok = image_prompt.render(brief(references=fourteen, options={"model": "seedream-4-5"}), "seedream")
+        self.assertEqual(ok["status"], "ok")
+
+    def test_gpt_image_2_and_1_5_are_accepted_with_a_note_that_they_are_on_other_pages(self):
+        for model in ("gpt-image-2", "gpt-image-1.5"):
+            with self.subTest(model=model):
+                result = image_prompt.render(brief(options={"model": model}), "gpt-image")
+                self.assertEqual(result["native_settings"]["model"], model)
+                self.assertTrue(any("other than the generation guide" in w for w in result["warnings"]))
+
+    def test_ideogram_quoted_text_carries_a_note_that_the_api_rendering_is_not_stated(self):
+        result = image_prompt.render(brief(text=[{"content": "COFFEE", "placement": "top"}]), "ideogram")
+        self.assertTrue(any("API developer pages" in w for w in result["warnings"]))
+
+    def test_midjourney_long_prompt_is_flagged_with_the_prompt_basics_advice(self):
+        long_subject = " ".join(["word"] * 45)
+        result = image_prompt.render(brief(subject=long_subject), "midjourney")
+        self.assertTrue(any("Prompt Basics" in w for w in result["warnings"]))
+
+
+class ReviewRegressionTests(unittest.TestCase):
+    """Defects found in the brutal review of 2026-10-14. Each one stays pinned."""
+
+    def test_a_string_false_is_refused_for_grounding_and_raw_instead_of_being_read_as_true(self):
+        with self.assertRaises(image_prompt.BriefError):
+            image_prompt.render(brief(options={"grounding": "false"}), "flux-3")
+        with self.assertRaises(image_prompt.BriefError):
+            image_prompt.render(brief(options={"raw": "false"}), "midjourney")
+        self.assertIs(image_prompt.render(brief(options={"grounding": False}), "flux-3")["native_settings"]["grounding"], False)
+        self.assertNotIn("--raw", image_prompt.render(brief(options={"raw": False}), "midjourney")["native_parameters"])
+
+    def test_a_boolean_is_not_accepted_as_a_safety_tolerance(self):
+        with self.assertRaises(image_prompt.BriefError):
+            image_prompt.render(brief(options={"safety_tolerance": True}), "flux-3")
+
+    def test_seedream_model_names_are_matched_without_regard_to_letter_case(self):
+        with self.assertRaises(image_prompt.BriefError):
+            image_prompt.render(brief(options={"model": "Seedream-5-0-Flash", "optimize_mode": "fast"}), "seedream")
+        with self.assertRaises(image_prompt.BriefError):
+            image_prompt.render(brief(options={"model": "DOLA-SEEDREAM-5-0-PRO-260628", "sequential": "auto"}), "seedream")
+
+    def test_briefs_with_only_text_or_only_an_exclusion_do_not_start_with_a_stop_or_a_space(self):
+        for only in ({"text": [{"content": "HELLO", "placement": "top"}]}, {"constraints": ["no watermark"]}):
+            for target_id in ("ideogram", "recraft", "comfyui", "seedream", "flux-2", "firefly", "sdxl", "sd-3-5"):
+                prompt = image_prompt.render(only, target_id)["prompt"]
+                self.assertFalse(prompt.startswith((".", " ")), (target_id, prompt))
+        self.assertEqual(image_prompt.render({"text": [{"content": "HELLO"}]}, "ideogram")["prompt"],
+                         'The text reads "HELLO"')
+
+    def test_recraft_style_is_not_sent_to_v4_1_and_the_page_that_says_so_is_named(self):
+        result = image_prompt.render(brief(options={"style": "digital_illustration"}), "recraft")
+        self.assertNotIn("style", result["native_settings"])
+        self.assertTrue(any("not supported by V4.1" in w for w in result["warnings"]))
+
+    def test_xhigh_and_max_quality_are_refused_on_the_models_that_do_not_list_them(self):
+        with self.assertRaises(image_prompt.BriefError):
+            image_prompt.render(brief(options={"quality": "xhigh", "model": "gpt-image-1.5"}), "gpt-image")
+        with self.assertRaises(image_prompt.BriefError):
+            image_prompt.render(brief(options={"quality": "max", "model": "gpt-image-2"}), "gpt-image")
+        self.assertEqual(image_prompt.render(brief(options={"quality": "max"}), "gpt-image")["native_settings"]["quality"], "max")
+
+    def test_an_unknown_gpt_image_model_lists_all_four_documented_ids(self):
+        with self.assertRaises(image_prompt.BriefError) as caught:
+            image_prompt.render(brief(options={"model": "gpt-image-9"}), "gpt-image")
+        for name in ("gpt-image-2.5-sunburst", "gpt-image-2.5-flare", "gpt-image-2", "gpt-image-1.5"):
+            self.assertIn(name, str(caught.exception))
+
+    def test_ideogram_count_is_refused_below_one_and_warned_above_the_app_limit(self):
+        with self.assertRaises(image_prompt.BriefError):
+            image_prompt.render(brief(options={"num_images": 0}), "ideogram")
+        many = image_prompt.render(brief(options={"num_images": 9}), "ideogram")
+        self.assertEqual(many["native_settings"]["num_images"], 9)
+        self.assertTrue(any("1 to 8" in w for w in many["warnings"]))
+
+    def test_ideogram_background_is_sent_only_when_the_brief_sets_it(self):
+        self.assertNotIn("background", image_prompt.render(brief(), "ideogram")["native_settings"])
+        set_ = image_prompt.render(brief(options={"background": "transparent"}), "ideogram")
+        self.assertEqual(set_["native_settings"]["background"], "transparent")
+
+    def test_kontext_without_an_edit_says_that_no_input_image_is_sent(self):
+        result = image_prompt.render(brief(), "flux-kontext")
+        self.assertTrue(any("input_image" in w for w in result["warnings"]))
 
 
 class TemplateOSyncTests(unittest.TestCase):

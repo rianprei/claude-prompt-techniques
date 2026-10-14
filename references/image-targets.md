@@ -20,7 +20,7 @@
 | [Adobe Firefly Services (Image 5)](#adobe-firefly-services-image-5) | Adobe | PARTIAL | unknown | renderer |
 | [Seedream 5.0 (BytePlus ModelArk)](#seedream-50-byteplus-modelark) | ByteDance (BytePlus ModelArk) | PARTIAL | unknown | renderer |
 | [Stable Diffusion 3.5](#stable-diffusion-35) | Stability AI | PARTIAL | unknown | renderer |
-| [Stable Diffusion XL (SDXL)](#stable-diffusion-xl-sdxl) | Stability AI (community checkpoints) | UNKNOWN | unknown | renderer |
+| [Stable Diffusion XL (SDXL)](#stable-diffusion-xl-sdxl) | Stability AI (community checkpoints) | PARTIAL | unknown | renderer |
 | [ComfyUI node graph](#comfyui-node-graph) | ComfyUI | VERIFIED | field | renderer |
 | [Nano Banana (Gemini Image)](#nano-banana-gemini-image) | Google | VERIFIED | none | gemini |
 
@@ -34,22 +34,22 @@
 
 | Topic | Status | Fact | Source |
 |---|---|---|---|
-| Prompt form | PARTIAL | Descriptive phrases, separated by commas, are the traditional form. The Edit model also accepts written instructions (conversational). The parameter list says parameters go at the end, with a space before the dashes and no punctuation inside them. The order of descriptors is not documented; the renderer uses subject first as a convention. | [link](https://docs.midjourney.com/hc/en-us/articles/32859204029709-Parameter-List) |
+| Prompt form | VERIFIED | Short and simple prompts typically generate the best images. Use phrases that clearly describe what you want to see; avoid long lists or detailed instructions, which can confuse the process (Prompt Basics). The page does not say whether descriptors are comma-separated: the renderer uses commas as its own convention. | [link](https://docs.midjourney.com/hc/en-us/articles/32023408776205-Prompt-Basics) |
 | Negative prompt | VERIFIED | --no lists what to leave out. Each word after --no is read separately by the moderation system, so '--no modern clothing' is read as 'no modern' and 'no clothing'. Name the clothing you want instead. Same effect as weighting part of a multi-prompt at -0.5. | [link](https://docs.midjourney.com/hc/en-us/articles/32173351982093-No) |
 | Text in image | UNKNOWN | No text-rendering guidance was found in the pages read. Put the wording in quotes, and check the output. | none |
-| Reference images | VERIFIED | --sref takes an image URL or a style code. The Style Reference page says style references are compatible with Midjourney versions 6 and later. | [link](https://docs.midjourney.com/hc/en-us/articles/32180011136653-Style-Reference) |
+| Reference images | VERIFIED | An image can go into the prompt with text or on its own: one image with text, or several images without text (Image Prompts). In Discord the image URL goes at the beginning of the text prompt. Style references and Moodboards are separate features. | [link](https://docs.midjourney.com/hc/en-us/articles/32040250122381-Image-Prompts) |
 | Editing | VERIFIED | The Edit model (--edit with image URLs, up to four) changes an image from written instructions, combines up to four images, or edits regions in the Editor. Compatible with V8.1 and V8.2. Not compatible with --tile. The output matches the first image's aspect ratio unless --ar is set. | [link](https://docs.midjourney.com/hc/en-us/articles/48495453462797-Edit-Model) |
 
 | Native setting | Values | Status | Source |
 |---|---|---|---|
 | `--ar` | W:H, whole numbers only (1.39:1 is written 139:100) | VERIFIED | [link](https://docs.midjourney.com/hc/en-us/articles/31894244298125-Aspect-Ratio) |
 | `--no` | comma-separated list | VERIFIED | [link](https://docs.midjourney.com/hc/en-us/articles/32173351982093-No) |
-| `--raw` | flag; reduces default styling so the prompt has more influence | VERIFIED | [link](https://docs.midjourney.com/hc/en-us/articles/32859204029709-Parameter-List) |
+| `--raw` | flag: 'Gain more control over your images with Raw Mode' (Parameter List) | VERIFIED | [link](https://docs.midjourney.com/hc/en-us/articles/32859204029709-Parameter-List) |
 | `--sref` | image URL or style code; 'random' creates a code | VERIFIED | [link](https://docs.midjourney.com/hc/en-us/articles/32180011136653-Style-Reference) |
 | `--sw` | 0 to 1000, default 100; not with Moodboards | VERIFIED | [link](https://docs.midjourney.com/hc/en-us/articles/32180011136653-Style-Reference) |
 | `--edit` | image URLs, up to four | VERIFIED | [link](https://docs.midjourney.com/hc/en-us/articles/48495453462797-Edit-Model) |
 | `--v` | current default V8.2 (since 2026-07-24) | VERIFIED | [link](https://docs.midjourney.com/hc/en-us/articles/32199405667853-Version) |
-| `--hd / --sd` | HD gives 2K images on V8.1 and later; costs 1.3 GPU minutes against 0.8 | VERIFIED | [link](https://docs.midjourney.com/hc/en-us/articles/32199405667853-Version) |
+| `--hd / --sd` | HD gives 2K images on V8.1; costs 1.3 GPU minutes against 0.8 for SD | VERIFIED | [link](https://docs.midjourney.com/hc/en-us/articles/32199405667853-Version) |
 | `max aspect ratio` | 14:1 (4:1 for HD) | VERIFIED | [link](https://docs.midjourney.com/hc/en-us/articles/32199405667853-Version) |
 
 **Limitations**
@@ -57,6 +57,8 @@
 - The product is Discord and the web app. No API page was read, so no API fields are listed.
 - --style raw (an older form in earlier notes) is not in the current parameter list; the flag is --raw.
 - --oref is replaced by the Edit model in V8.X.
+- The Editor on the web uses the Edit Model for inpainting and outpainting in V8.X (Editor page, read 2026-10-14).
+- Image Prompts in Discord take the URL at the start of the text prompt; the API is not covered by the pages read.
 
 **Sources**
 
@@ -66,6 +68,9 @@
 - [Style Reference](https://docs.midjourney.com/hc/en-us/articles/32180011136653-Style-Reference), checked 2026-10-14 (primary-read)
 - [Midjourney: Edit Model](https://docs.midjourney.com/hc/en-us/articles/48495453462797-Edit-Model), checked 2026-10-14 (primary-read)
 - [Midjourney: Aspect Ratio](https://docs.midjourney.com/hc/en-us/articles/31894244298125-Aspect-Ratio), checked 2026-10-14 (primary-read)
+- [Midjourney: Prompt Basics](https://docs.midjourney.com/hc/en-us/articles/32023408776205-Prompt-Basics), checked 2026-10-14 (primary-read)
+- [Midjourney: Image Prompts](https://docs.midjourney.com/hc/en-us/articles/32040250122381-Image-Prompts), checked 2026-10-14 (primary-read)
+- [Midjourney: Editor](https://docs.midjourney.com/hc/en-us/articles/32764383466893-Editor), checked 2026-10-14 (primary-read)
 
 ## GPT Image 2.5 (OpenAI API)
 
@@ -85,13 +90,16 @@
 
 | Native setting | Values | Status | Source |
 |---|---|---|---|
-| `model` | gpt-image-2.5-sunburst (precise editing), gpt-image-2.5-flare (fast) | VERIFIED | [link](https://developers.openai.com/api/docs/guides/image-generation) |
+| `model` | gpt-image-2.5-sunburst (precise editing), gpt-image-2.5-flare (fast) in the generation guide; gpt-image-2 appears in the prompting guide table and gpt-image-1.5 in the edit reference examples | VERIFIED | [link](https://developers.openai.com/api/docs/guides/image-generation) |
 | `size` | 1024x1024, 1536x1024, 1024x1536 recommended; custom WIDTHxHEIGHT: multiples of 16, aspect between 1:3 and 3:1, edges up to 3840, total 655,360 to 8,294,400 pixels | VERIFIED | [link](https://developers.openai.com/api/docs/guides/image-generation) |
 | `quality` | low, medium, high, xhigh, max, auto (default auto); xhigh and max exist only on the 2.5 models | VERIFIED | [link](https://developers.openai.com/api/docs/guides/image-generation) |
-| `background` | transparent, opaque, auto; transparent needs output_format png or webp | VERIFIED | [link](https://developers.openai.com/api/docs/guides/image-generation) |
-| `output_format` | png (default), jpeg, webp | VERIFIED | [link](https://developers.openai.com/api/docs/guides/image-generation) |
-| `output_compression` | 0 to 100, only for jpeg or webp | VERIFIED | [link](https://developers.openai.com/api/docs/guides/image-generation) |
-| `moderation` | auto (default), low | VERIFIED | [link](https://developers.openai.com/api/docs/guides/image-generation) |
+| `background` | transparent, opaque, auto (default auto); transparent needs output_format png or webp | VERIFIED | [link](https://developers.openai.com/api/reference/python/resources/images/methods/edit) |
+| `output_format` | png (default), jpeg, webp | VERIFIED | [link](https://developers.openai.com/api/reference/python/resources/images/methods/edit) |
+| `output_compression` | 0 to 100 (compression level), for JPEG and WebP only | VERIFIED | [link](https://developers.openai.com/api/docs/guides/tools-image-generation) |
+| `moderation` | auto (default), low | VERIFIED | [link](https://developers.openai.com/api/reference/python/resources/images/methods/generate) |
+| `input_fidelity` | gpt-image-1.5: low or high. gpt-image-2: omit it; image inputs are always processed at high fidelity. gpt-image-2.5: not stated in the pages read. | PARTIAL | [link](https://developers.openai.com/api/docs/guides/image-prompting) |
+| `responses tool` | Responses API image_generation tool: action auto, generate or edit (edit an image already in the conversation); partial_images 1 to 3; the examples use gpt-image-2.5-sunburst | VERIFIED | [link](https://developers.openai.com/api/docs/guides/tools-image-generation) |
+| `images.edit parameters` | image (file or list), prompt, mask, model, n, size, quality, background, output_format, output_compression, input_fidelity (GPT Image 1.5), partial_images (streaming) | VERIFIED | [link](https://developers.openai.com/api/reference/python/resources/images/methods/edit) |
 
 **Limitations**
 
@@ -104,6 +112,12 @@
 - [Image prompting (GPT Image 2.5)](https://developers.openai.com/api/docs/guides/image-prompting), checked 2026-10-14 (primary-read)
 - [Image generation (API, output options)](https://developers.openai.com/api/docs/guides/image-generation), checked 2026-10-14 (primary-read)
 - [GPT Image prompting guide (cookbook, older model name gpt-image-2)](https://developers.openai.com/cookbook/examples/multimodal/image-gen-models-prompting-guide), checked 2026-10-14 (primary-read)
+- [OpenAI: Creating images with ChatGPT (product page)](https://openai.com/academy/image-generation/), checked 2026-10-14 (primary-read)
+- [OpenAI: image generation tool (Responses API)](https://developers.openai.com/api/docs/guides/tools-image-generation), checked 2026-10-14 (primary-read)
+- [OpenAI: images.edit reference (Python SDK)](https://developers.openai.com/api/reference/python/resources/images/methods/edit), checked 2026-10-14 (primary-read)
+- [OpenAI: images.generate reference (Python SDK)](https://developers.openai.com/api/reference/python/resources/images/methods/generate), checked 2026-10-14 (primary-read)
+- [OpenAI: Images resource index (Python SDK)](https://developers.openai.com/api/reference/python/resources/images), checked 2026-10-14 (primary-read)
+- [OpenAI: images.edit at the URL given in the objective (HTTP 404; replaced by the link on the reference page)](https://developers.openai.com/api/reference/resources/images/methods/edit), checked 2026-10-14 (not-found)
 
 ## FLUX 3 Image
 
@@ -124,10 +138,11 @@
 | Native setting | Values | Status | Source |
 |---|---|---|---|
 | `aspect_ratio` | 21:9, 2:1, 16:9, 3:2, 7:5, 4:3, 5:4, 1:1, 4:5, 3:4, 5:7, 2:3, 9:16, 1:2, 9:21, or auto (first reference, else 1:1) | VERIFIED | [link](https://docs.bfl.ai/flux_3/flux3_image_overview) |
-| `resolution` | 768sq (fastest, for drafts), 1k, 1.5k, 2k, 4k | VERIFIED | [link](https://docs.bfl.ai/flux_3/flux3_image_overview) |
+| `resolution` | 768sq, 1k, 1.5k, 2k, 4k | VERIFIED | [link](https://docs.bfl.ai/flux_3/flux3_image_overview) |
 | `safety_tolerance` | integer 0 (strictest) to 4; default 2 | VERIFIED | [link](https://docs.bfl.ai/flux_3/flux3_image_overview) |
 | `grounding` | boolean, default true (web and image search before generating); false gives faster results from the prompt alone | VERIFIED | [link](https://docs.bfl.ai/flux_3/flux3_image_overview) |
 | `boxes` | appended after the caption as a JSON array of {id, bbox, desc} rows; bbox is [top, left, bottom, right] in integers from 0 to 1000; the caption names each element as <id> | VERIFIED | [link](https://docs.bfl.ai/flux_3/flux3_image_bounding_boxes) |
+| `box rows: from` | a row with from: "ref_image_1" takes an element from a named reference image; the rest of the prompt describes the scene | VERIFIED | [link](https://docs.bfl.ai/guides/prompting_editing_multi_reference) |
 
 **Limitations**
 
@@ -142,6 +157,13 @@
 - [FLUX 3 Image: generate](https://docs.bfl.ai/flux_3/flux3_image_generate), checked 2026-10-14 (primary-read)
 - [FLUX 3 Image: layout prompts](https://docs.bfl.ai/flux_3/flux3_image_layout), checked 2026-10-14 (primary-read)
 - [FLUX prompting reference](https://docs.bfl.ai/guides/prompting_unified_reference), checked 2026-10-14 (primary-read)
+- [BFL: FLUX 3 multi-reference editing](https://docs.bfl.ai/guides/prompting_editing_multi_reference), checked 2026-10-14 (primary-read)
+- [BFL: FLUX 3 single-reference editing](https://docs.bfl.ai/guides/prompting_editing_single_reference), checked 2026-10-14 (primary-read)
+- [BFL: prompting, technical parameters](https://docs.bfl.ai/guides/prompting_unified_technical), checked 2026-10-14 (primary-read)
+- [BFL: prompting, style, aesthetics and text](https://docs.bfl.ai/guides/prompting_unified_style), checked 2026-10-14 (primary-read)
+- [BFL: prompting, building a good prompt](https://docs.bfl.ai/guides/prompting_unified_building), checked 2026-10-14 (primary-read)
+- [BFL: prompting guide index](https://docs.bfl.ai/guides/prompting_summary), checked 2026-10-14 (primary-read)
+- [BFL: JSON structured prompting (saved copy has only navigation text)](https://docs.bfl.ai/guides/usecases_t2i_json_prompting), checked 2026-10-14 (primary-unreadable)
 
 ## FLUX.2 [pro] and [flex]
 
@@ -149,7 +171,7 @@
 - **Vendor:** Black Forest Labs
 - **Access:** API: API reference pages exist for [pro] and [flex]; field names were not read; UI: not read
 - **Overall status:** PARTIAL
-- **Aliases:** `flux 2`, `flux 2 pro`, `flux.2 flex`
+- **Aliases:** `flux 2`, `flux 2 pro`, `flux.2 flex`, `flux 2 klein`, `flux 2 max`, `flux 2 dev`
 
 | Topic | Status | Fact | Source |
 |---|---|---|---|
@@ -163,6 +185,8 @@
 |---|---|---|---|
 | `hex colour in prompt` | tie each hex code to a specific object: 'the car is #FF0000' | VERIFIED | [link](https://docs.bfl.ai/guides/prompting_guide_flux2) |
 | `JSON prompt` | structured JSON is accepted directly or flattened into prose | VERIFIED | [link](https://docs.bfl.ai/guides/prompting_guide_flux2) |
+| `families` | [klein]: sub-second, open weights (4B Apache 2.0, 9B FLUX NCL); [pro]: production scale; [flex]: fine-grained control; [max]: maximum quality and grounding search; [dev] | VERIFIED | [link](https://docs.bfl.ai/flux_2/flux2_overview) |
+| `width and height` | integers in the request; the text-to-image example uses width 1024 and height 1024. Other request fields are not listed on the page read. | PARTIAL | [link](https://docs.bfl.ai/flux_2/flux2_text_to_image) |
 
 **Limitations**
 
@@ -173,6 +197,9 @@
 
 - [Prompting guide, FLUX.2 [pro] and [max]](https://docs.bfl.ai/guides/prompting_guide_flux2), checked 2026-10-14 (primary-read)
 - [FLUX.2 image editing (read in part)](https://docs.bfl.ai/flux_2/flux2_image_editing), checked 2026-10-14 (primary-read)
+- [BFL: FLUX.2 overview](https://docs.bfl.ai/flux_2/flux2_overview), checked 2026-10-14 (primary-read)
+- [BFL: FLUX.2 text to image](https://docs.bfl.ai/flux_2/flux2_text_to_image), checked 2026-10-14 (primary-read)
+- [BFL: documentation index (redirects to the quick start)](https://docs.bfl.ai/), checked 2026-10-14 (primary-read)
 
 ## FLUX.1 Kontext (previous generation)
 
@@ -205,6 +232,7 @@
 
 - [Kontext image editing](https://docs.bfl.ai/kontext/kontext_image_editing), checked 2026-10-14 (primary-read)
 - [Prompt reference](https://docs.bfl.ai/guides/prompting_unified_reference), checked 2026-10-14 (primary-read)
+- [BFL: FLUX.1 Kontext overview (previous generation; FLUX.2 recommended for new projects)](https://docs.bfl.ai/kontext/kontext_overview), checked 2026-10-14 (primary-read)
 
 ## Ideogram 4.5 (API v2)
 
@@ -216,9 +244,9 @@
 
 | Topic | Status | Fact | Source |
 |---|---|---|---|
-| Prompt form | VERIFIED | A natural-language prompt is rewritten or expanded by magic_prompt (auto by default). A structured JSON prompt is used as is. The developer page describes 4.5 as known for prompt fidelity and crisp typography. | [link](https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5) |
+| Prompt form | VERIFIED | A natural-language prompt is rewritten or expanded by magic_prompt (auto by default); a structured JSON prompt is used as written. JSON schema (4.5 and 4.0): high_level_description (required), style_description (optional), compositional_deconstruction with background and elements (required). bbox is [y_min, x_min, y_max, x_max] on 0 to 1000; palettes take up to 16 colours overall and 5 per element, as uppercase #RRGGBB. | [link](https://docs.ideogram.ai/prompting/json-prompting.md) |
 | Negative prompt | VERIFIED | Neither the generate nor the precise-edit reference has a negative field. Exclusions must be written as positive description. | [link](https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5) |
-| Text in image | UNKNOWN | The developer page mentions crisp typography, but no quoting rule for text was found in the pages read. Quoting is the renderer's default, and it is not a verified Ideogram rule. | none |
+| Text in image | VERIFIED | Put the exact words in quotation marks and say where they sit; name the text early in the prompt; keep the text short and the scene simple. Fonts cannot be picked by name, so describe the lettering. For several text blocks, describe them in reading order, or use a JSON prompt with text elements for exact placement. English works best; non-Latin scripts and accents can fail (Image app docs, 4.5 and 4.0). The API documentation pages do not state this rendering behaviour, so it is not assumed for the API. | [link](https://docs.ideogram.ai/prompting/text-in-images.md) |
 | Reference images | VERIFIED | Generation with source images takes up to 5 images, up to 25 MB each (JPEG, PNG or WEBP). The first image is the one edited; the others are extra references. | [link](https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5) |
 | Editing | VERIFIED | Precise edit: the image to edit (up to 50 MB, raw bytes), an instruction in prompt, optional reference_images and mask. The result keeps the image's width and height. context_window confines the edit to one region. | [link](https://developer.ideogram.ai/api-reference/images/precise-edit/ideogram-4-5) |
 
@@ -228,21 +256,40 @@
 | `magic_prompt` | auto (default), on, off | VERIFIED | [link](https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5) |
 | `resolution` | auto, source, or an exact WIDTHxHEIGHT; without source images an exact size must be a 1K or 2K preset (for example 1024x1024, 2048x2048, 1440x2880); with source images, auto is the default | VERIFIED | [link](https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5) |
 | `rendering_quality` | very_low, low, medium, high; default high without source images, medium with them; very_low needs source images | VERIFIED | [link](https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5) |
-| `background` | auto, transparent, opaque | VERIFIED | [link](https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5) |
-| `num_images` | 1 to 8, default 1 | VERIFIED | [link](https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5) |
-| `seed` | 0 to 2147483647 | VERIFIED | [link](https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5) |
+| `background` | auto, transparent, opaque (the reference does not state a default) | VERIFIED | [link](https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5) |
+| `num_images` | integer, optional: number of images (API reference, no range given). The Image app allows Auto or 1 to 8 images per run | PARTIAL | [link](https://docs.ideogram.ai/create/image-settings.md) |
+| `seed` | integer, optional: random seed for reproducible generation (API reference). The Image app's Seed field takes digits up to 2147483647; the API range is not stated | PARTIAL | [link](https://docs.ideogram.ai/create/image-settings.md) |
 | `context_window` | none (default), auto (needs a mask), or four integers y_min,x_min,y_max,x_max | VERIFIED | [link](https://developer.ideogram.ai/api-reference/images/precise-edit/ideogram-4-5) |
+| `logo guidance` | exact name in quotation marks; flat, minimal or badge style in plain words; two or three colours; one icon and one or two text lines; for a transparent PNG, the Ideogram 4.0 Transparent model in the Image app | VERIFIED | [link](https://docs.ideogram.ai/create/logos.md) |
+| `reference images in the Image app` | Auto takes up to 10; Ideogram 4.5 up to 5; Ideogram 4.0 and 3.0 none. With references, 4.5 reads the prompt as an edit instruction and hides Magic Prompt | VERIFIED | [link](https://docs.ideogram.ai/create/reference-images.md) |
 
 **Limitations**
 
 - Image URLs in responses expire; download results you want to keep.
 - Ideogram 4.0 has its own endpoint pages; its fields were not compared with 4.5 here.
+- Ideogram 3.0 has style presets, style reference images, negative prompts and colour palettes in the Image app (models page, UI). Those are not API claims for 4.5.
+- The Image app also runs partner models (GPT Image 2.5, Nano Banana 2 and Pro, Z-Image); this is product behaviour, not an Ideogram API fact.
 
 **Sources**
 
 - [Generate with Ideogram 4.5](https://developer.ideogram.ai/api-reference/images/generate/ideogram-4-5), checked 2026-10-14 (primary-read)
 - [Precise edit with Ideogram 4.5](https://developer.ideogram.ai/api-reference/images/precise-edit/ideogram-4-5), checked 2026-10-14 (primary-read)
 - [Developer home (overview wording)](https://developer.ideogram.ai), checked 2026-10-14 (primary-read)
+- [Ideogram documentation index](https://docs.ideogram.ai/), checked 2026-10-14 (primary-read)
+- [Ideogram documentation index (llms.txt)](https://docs.ideogram.ai/llms.txt), checked 2026-10-14 (primary-read)
+- [Ideogram developer index (llms.txt)](https://developer.ideogram.ai/llms.txt), checked 2026-10-14 (primary-read)
+- [Ideogram: prompting basics (Image app)](https://docs.ideogram.ai/prompting/prompting.md), checked 2026-10-14 (primary-read)
+- [Ideogram: prompt structure (Image app)](https://docs.ideogram.ai/prompting/prompt-structure.md), checked 2026-10-14 (primary-read)
+- [Ideogram: text in images (Image app)](https://docs.ideogram.ai/prompting/text-in-images.md), checked 2026-10-14 (primary-read)
+- [Ideogram: JSON prompting (Image app and API)](https://docs.ideogram.ai/prompting/json-prompting.md), checked 2026-10-14 (primary-read)
+- [Ideogram: refine and iterate](https://docs.ideogram.ai/prompting/refine-and-iterate.md), checked 2026-10-14 (primary-read)
+- [Ideogram: reference images (Image app)](https://docs.ideogram.ai/create/reference-images.md), checked 2026-10-14 (primary-read)
+- [Ideogram: models (Image app)](https://docs.ideogram.ai/create/models.md), checked 2026-10-14 (primary-read)
+- [Ideogram: edit (Image app)](https://docs.ideogram.ai/edit/edit.md), checked 2026-10-14 (primary-read)
+- [Ideogram: make a logo (Image app)](https://docs.ideogram.ai/create/logos.md), checked 2026-10-14 (primary-read)
+- [Ideogram: image settings (Image app)](https://docs.ideogram.ai/create/image-settings.md), checked 2026-10-14 (primary-read)
+- [Ideogram: transparent backgrounds (Image app)](https://docs.ideogram.ai/create/transparent-backgrounds.md), checked 2026-10-14 (primary-read)
+- [Ideogram developer site (redirects to the API overview)](https://developer.ideogram.ai/), checked 2026-10-14 (primary-read)
 
 ## Recraft (V4.1 default)
 
@@ -250,24 +297,25 @@
 - **Vendor:** Recraft
 - **Access:** API: Recraft API: /generations, /generations/raster, /generations/vector; UI: Recraft Studio (negative prompt field and an 'Avoid text in image' switch)
 - **Overall status:** VERIFIED
-- **Aliases:** `recraft`, `recraft v4`, `recraft v4.1`, `recraft v3`
+- **Aliases:** `recraft`, `recraft v4`, `recraft v4.1`, `recraft v3`, `recraft v4.1 flash`
 
 | Topic | Status | Fact | Source |
 |---|---|---|---|
 | Prompt form | VERIFIED | If the model does not read the prompt as expected, try a more general style (Recraft V3, Photorealism, Illustration) instead of a custom or niche style. | [link](https://www.recraft.ai/docs/best-practices/prompting-and-image-generation) |
 | Negative prompt | VERIFIED | The Studio has a negative prompt field. Write the unwanted item as a plain noun ('apples', not 'no apples'): the Studio page says 'no' can confuse the model. The API negative_prompt field is listed under native settings. | [link](https://www.recraft.ai/docs/recraft-studio/image-generation/working-with-text-and-prompts/negative-prompts) |
-| Text in image | PARTIAL | The Studio switch 'Avoid text in image' disables text generation; it may introduce typos for logos. The API equivalent is not confirmed. text_layout exists, for V3 models only. | [link](https://www.recraft.ai/docs/recraft-studio/image-generation/working-with-text-and-prompts/negative-prompts) |
-| Reference images | VERIFIED | style_references (multipart) and style_reference_urls (JSON) take style reference images on all models except V4.1 Flash. style_id uses a stored style as the visual reference, with style_match regular, precise or flexible. | [link](https://www.recraft.ai/docs/api-reference/endpoints) |
-| Editing | UNKNOWN | No API edit endpoint was read for Recraft in this pass. Prompt-based editing is described for the Studio only. | none |
+| Text in image | PARTIAL | The Studio switch 'Avoid text in image' turns text generation off. The API equivalent is not confirmed. | [link](https://www.recraft.ai/docs/recraft-studio/image-generation/working-with-text-and-prompts/negative-prompts) |
+| Reference images | VERIFIED | style_references (multipart) and style_reference_urls (up to 10 image URLs) carry style references on the models that take them; the style is matched with style_match, flexible or precise (V4.1 model page) | [link](https://www.recraft.ai/docs/api-reference/models/recraft-v4-1.md) |
+| Editing | VERIFIED | Three editing endpoints are documented on the endpoints page: POST /v1/images/imageToImage, POST /v1/images/inpaint and POST /v1/images/outpaint. The image-to-image page says it works with Recraft V3, V4 and V4.1, and that strength sets how far the result moves from the original. Prompt-based editing in the Studio is not covered here. | [link](https://www.recraft.ai/docs/api-reference/endpoints) |
 
 | Native setting | Values | Status | Source |
 |---|---|---|---|
-| `model` | recraftv4_1 (default); style references switch the default to recraftv4_styles | VERIFIED | [link](https://www.recraft.ai/docs/api-reference/endpoints) |
-| `style` | a style name; all models except V4.1 Flash | VERIFIED | [link](https://www.recraft.ai/docs/api-reference/endpoints) |
-| `negative_prompt` | V2 and V3 models only | VERIFIED | [link](https://www.recraft.ai/docs/api-reference/endpoints) |
+| `model` | recraftv4_1 (default, raster); names ending in _vector return SVG; _raster aliases; V4.1 Flash is raster and takes no style; style references switch the default to recraftv4_styles | VERIFIED | [link](https://www.recraft.ai/docs/api-reference/models/overview.md) |
+| `style` | curated styles. The V4.1 model page lists style among the fields 'Not supported by V4.1' (with negative_prompt, text_layout, artistic_level and no_text). The endpoint reference says all models except V4.1 Flash. The pages disagree, so the renderer does not send style for recraftv4_1. | PARTIAL | [link](https://www.recraft.ai/docs/api-reference/models/recraft-v4-1.md) |
+| `negative_prompt` | V2 and V3 models only; V4.1 does not take negative_prompt (V4.1 model page: not supported by V4.1) | VERIFIED | [link](https://www.recraft.ai/docs/api-reference/models/recraft-v4-1.md) |
 | `text_layout` | V3 models only | VERIFIED | [link](https://www.recraft.ai/docs/api-reference/endpoints) |
-| `image_format` | webp (default) or png | VERIFIED | [link](https://www.recraft.ai/docs/api-reference/endpoints) |
+| `image_format` | webp (lossless) or png; ignored for vector output, which is always SVG | VERIFIED | [link](https://www.recraft.ai/docs/api-reference/models/recraft-v4-1.md) |
 | `random_seed` | integer, all models | VERIFIED | [link](https://www.recraft.ai/docs/api-reference/endpoints) |
+| `style_match and style_reference_urls` | style_reference_urls takes up to 10 image URLs; style_match is flexible or precise | VERIFIED | [link](https://www.recraft.ai/docs/api-reference/models/recraft-v4-1.md) |
 
 **Limitations**
 
@@ -279,6 +327,16 @@
 - [Endpoints](https://www.recraft.ai/docs/api-reference/endpoints), checked 2026-10-14 (primary-read)
 - [Negative prompts (Studio)](https://www.recraft.ai/docs/recraft-studio/image-generation/working-with-text-and-prompts/negative-prompts), checked 2026-10-14 (primary-read)
 - [Prompting and image generation](https://www.recraft.ai/docs/best-practices/prompting-and-image-generation), checked 2026-10-14 (primary-read)
+- [Recraft: V4.1 model](https://www.recraft.ai/docs/api-reference/models/recraft-v4-1.md), checked 2026-10-14 (primary-read)
+- [Recraft: all models](https://www.recraft.ai/docs/api-reference/models/overview.md), checked 2026-10-14 (primary-read)
+- [Recraft: V4 Styles model](https://www.recraft.ai/docs/api-reference/models/recraft-v4-styles.md), checked 2026-10-14 (primary-read)
+- [Recraft: image to image](https://www.recraft.ai/docs/api-reference/tools/image-to-image.md), checked 2026-10-14 (primary-read)
+- [Recraft: inpainting](https://www.recraft.ai/docs/api-reference/tools/inpainting.md), checked 2026-10-14 (primary-read)
+- [Recraft: outpainting](https://www.recraft.ai/docs/api-reference/tools/outpainting.md), checked 2026-10-14 (primary-read)
+- [Recraft: enhance prompt](https://www.recraft.ai/docs/api-reference/tools/enhance-prompt.md), checked 2026-10-14 (primary-read)
+- [Recraft: API index for AI agents](https://www.recraft.ai/docs/api-reference/agents.md), checked 2026-10-14 (primary-read)
+- [Recraft: prompt-engineering guide (redirects to introduction)](https://www.recraft.ai/docs/prompt-engineering-guide), checked 2026-10-14 (primary-read)
+- [Recraft: prompting blog guide](https://www.recraft.ai/blog/prompt-engineering-guide), checked 2026-10-14 (primary-read)
 
 ## Adobe Firefly Services (Image 5)
 
@@ -290,7 +348,7 @@
 
 | Topic | Status | Fact | Source |
 |---|---|---|---|
-| Prompt form | PARTIAL | The tutorial shows a plain prompt, with customisation by prompt biasing locale, style presets and customPrompt. A prompt length of 1 to 1024 characters (Image5: 1 to 1500) was seen only in a secondary summary. | [link](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/how-tos/firefly-generate-image-api-tutorial) |
+| Prompt form | PARTIAL | The tutorial shows a plain prompt, with customisation by prompt biasing locale, style presets and customPrompt. The prompt length limit was not confirmed on the pages read. | [link](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/how-tos/firefly-generate-image-api-tutorial) |
 | Negative prompt | PARTIAL | A negativePrompt string (up to 1024 characters) was reported in a secondary summary, not in a page read. The API reference page is rendered by JavaScript and did not return its fields. Do not send it until the reference is checked. | [link](https://developer.adobe.com/firefly-services/docs/firefly-api/api/) |
 | Text in image | UNKNOWN | No text-rendering guidance was read for Firefly. | none |
 | Reference images | VERIFIED | Structure reference uses an uploaded image (imageReference.source.uploadId) and a structure object with strength from 1 to 100, default 50, for outline and depth. Style reference is a separate feature. | [link](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/concepts/structure-image-reference/) |
@@ -300,18 +358,26 @@
 |---|---|---|---|
 | `structure` | {strength: 1 to 100, default 50, imageReference.source.uploadId} | VERIFIED | [link](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/concepts/structure-image-reference/) |
 | `promptBiasingLocaleCode` | locale code, for example en-US | VERIFIED | [link](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/how-tos/firefly-generate-image-api-tutorial) |
-| `style presets` | preset names such as doodle_drawing; the list was not read | VERIFIED | [link](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/how-tos/firefly-generate-image-api-tutorial) |
+| `style presets` | a presets array in the Generate Images API request; every preset in the array applies, and strength adjusts its impact | VERIFIED | [link](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/concepts/style-presets/) |
+| `style reference strength` | a strength value from 1 to 100 in the style object; default 50 when not given | VERIFIED | [link](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/concepts/style-image-reference/) |
 
 **Limitations**
 
 - The API reference page did not render, so its field table, model names and limits are not verified.
 - The Firefly endpoint paths in secondary summaries (/v3/images/generate) are not confirmed.
+- Web app guidance (Portuguese help page): at least three words in a request; avoid words such as 'gerar' or 'criar'; simple, direct language with subject, descriptors and keywords. This is product advice, not an API rule.
+- Image5 is offered with the Generate Image API (feature guide). Its prompt length (1 to 1500 characters) is still from a secondary summary.
 
 **Sources**
 
 - [Structure reference](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/concepts/structure-image-reference/), checked 2026-10-14 (primary-read)
 - [Generate image API tutorial](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/how-tos/firefly-generate-image-api-tutorial), checked 2026-10-14 (primary-read)
 - [API reference (client-rendered; not parsed)](https://developer.adobe.com/firefly-services/docs/firefly-api/api/), checked 2026-10-14 (primary-unreadable)
+- [Adobe Firefly: writing effective text prompts (Portuguese help page, web app)](https://helpx.adobe.com/br/firefly/web/work-with-images/generate-images/writing-effective-text-prompts.html), checked 2026-10-14 (primary-read)
+- [Adobe Firefly Services: API guides index](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/), checked 2026-10-14 (primary-read)
+- [Adobe Firefly Services: style image reference](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/concepts/style-image-reference/), checked 2026-10-14 (primary-read)
+- [Adobe Firefly Services: style presets](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/concepts/style-presets/), checked 2026-10-14 (primary-read)
+- [Adobe Firefly Services: Image5 feature guide](https://developer.adobe.com/firefly-services/docs/firefly-api/guides/how-tos/cm-generate-image/feature-guide), checked 2026-10-14 (primary-read)
 
 ## Seedream 5.0 (BytePlus ModelArk)
 
@@ -319,27 +385,44 @@
 - **Vendor:** ByteDance (BytePlus ModelArk)
 - **Access:** API: BytePlus ModelArk image generation API (named in a secondary summary); UI: Dreamina (product name, not read)
 - **Overall status:** PARTIAL
-- **Aliases:** `seedream`, `seedream 5`, `seedream 5.0`, `seedream 5.0 pro`, `seedream 5.0 flash`, `dreamina`, `dreamina seedream`, `bytedance seedream`
+- **Aliases:** `seedream`, `seedream 5`, `seedream 5.0`, `seedream 5.0 pro`, `seedream 5.0 flash`, `dreamina`, `dreamina seedream`, `bytedance seedream`, `seedream 5.0 lite`, `seedream 4.5`, `seedream 4.0`
 
 | Topic | Status | Fact | Source |
 |---|---|---|---|
-| Prompt form | PARTIAL | Name the art style before scene content (for example anime, cinematic, painterly); mood and atmosphere work well. The docs reportedly suggest about 600 English words at most. Both points come from a secondary summary; the cited page rendered without its content. | [link](https://docs.byteplus.com/en/docs/ModelArk/1541523) |
-| Negative prompt | UNKNOWN | Not found in any page read. The pages rendered without their content. Do not assume a field. | none |
+| Prompt form | VERIFIED | The Seedream 4.0 and 4.5 prompt guide: if a particular style is needed, use precise style keywords or reference images. For edits, use concise, unambiguous instructions, avoid vague pronouns, and say what should stay unchanged. | [link](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/seedream-4-0-5-0-prompt-guide.md) |
+| Negative prompt | PARTIAL | No negative_prompt field appears in the request fields of the API reference page read (image-generation-api.md, 2026-10-14). Absence on one page; not confirmed on other pages. | [link](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/image-generation-api.md) |
 | Text in image | UNKNOWN | No text-rendering guidance was read. | none |
-| Reference images | UNKNOWN | Not read. | none |
-| Editing | UNKNOWN | An 'interactive editing guide' page exists in the docs index; its content was not read. | none |
+| Reference images | VERIFIED | Seedream 5.0 pro and flash: up to 10 reference images; Seedream 5.0 lite, 4.5 and 4.0: up to 14. The batch mode (sequential) with several references keeps the total of inputs and outputs at 15 or fewer. | [link](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/image-generation-api.md) |
+| Editing | VERIFIED | Seedream 5.0 pro and flash: interactive editing by coordinates, selection boxes and arrows; the editing guide marks regions with <bbox> tags in the prompt. | [link](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/seedream-5-0-pro-editing-guide.md) |
+
+| Native setting | Values | Status | Source |
+|---|---|---|---|
+| `model ID in the examples` | dola-seedream-5-0-pro-260628 (tutorial and API examples); check the ID in your console | VERIFIED | [link](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/seedream-5-0-pro.md) |
+| `size` | default 2K; 1K, 1.5K or 2K, or an exact WIDTHxHEIGHT with a total of 921,600 to 4,624,220 pixels and an aspect ratio range of 1/16 to 16 (API reference) | VERIFIED | [link](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/image-generation-api.md) |
+| `watermark` | default true: adds an 'AI-generated' mark to the lower-right corner; false turns it off | VERIFIED | [link](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/image-generation-api.md) |
+| `optimize_prompt_options.mode` | standard (default, higher quality, slower) or fast; fast is not supported on Seedream 5.0 flash, 5.0 lite or 4.5 | VERIFIED | [link](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/image-generation-api.md) |
+| `sequential_image_generation` | disabled (default: one image) or auto (a batch of related images, Seedream 5.0 lite, 4.5 and 4.0); not supported for sequences on Seedream 5.0 pro and flash | VERIFIED | [link](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/image-generation-api.md) |
+| `output_format and response_format` | output_format png or jpeg (the 5.0 pro tutorial's parameter table); response_format url | VERIFIED | [link](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/seedream-5-0-pro.md) |
 
 **Limitations**
 
-- The pages read for Seedream 4.0-4.5, 5.0 pro and the API reference rendered as navigation only.
-- Model names (5.0 pro, 5.0 flash, 5.0 lite) come from the page titles and a secondary summary.
-- optimize_prompt_options (standard or fast mode) was reported in a secondary summary only.
+- The docs.byteplus.com HTML pages rendered as navigation; the Markdown copies on ai.byteplus.com were read in their place.
+- The model IDs in the examples come from the 5.0 pro tutorial; the API reference lists Seedream 5.0 pro, 5.0 flash, 5.0 lite, 4.5 and 4.0.
 
 **Sources**
 
 - [Image generation API (client-rendered; partly read)](https://docs.byteplus.com/en/docs/ModelArk/1541523), checked 2026-10-14 (primary-unreadable)
 - [Seedream 4.0-4.5 prompt guide (client-rendered; not read)](https://docs.byteplus.com/en/docs/ModelArk/1829186), checked 2026-10-14 (primary-unreadable)
 - [Seedream 5.0 pro tutorial (client-rendered; not read)](https://docs.byteplus.com/en/docs/modelark/seedream-5-0-pro), checked 2026-10-14 (primary-unreadable)
+- [BytePlus ModelArk: image generation API (Markdown)](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/image-generation-api.md), checked 2026-10-14 (primary-read)
+- [BytePlus ModelArk: image generation API (page)](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/image-generation-api), checked 2026-10-14 (primary-read)
+- [BytePlus ModelArk: Seedream 5.0 pro and flash tutorial](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/seedream-5-0-pro.md), checked 2026-10-14 (primary-read)
+- [BytePlus ModelArk: Seedream 5.0 pro and flash interactive editing guide](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/seedream-5-0-pro-editing-guide.md), checked 2026-10-14 (primary-read)
+- [BytePlus ModelArk: Seedream 4.0 to 5.0 image generation tutorial](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/seedream-4-0-5-0.md), checked 2026-10-14 (primary-read)
+- [BytePlus ModelArk: Seedream 4.0 and 4.5 prompt guide](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/seedream-4-0-5-0-prompt-guide.md), checked 2026-10-14 (primary-read)
+- [BytePlus ModelArk: documentation index (llms.txt)](https://ai.byteplus.com/ark/llms.txt), checked 2026-10-14 (primary-read)
+- [BytePlus ModelArk: Seedream 4.0 to 5.0 tutorial (page)](https://docs.byteplus.com/en/docs/ModelArk/seedream-4-0-5-0), checked 2026-10-14 (primary-read)
+- [Dreamina product page (read; no facts taken from it)](https://dreamina.capcut.com/), checked 2026-10-14 (primary-read)
 
 ## Stable Diffusion 3.5
 
@@ -347,12 +430,12 @@
 - **Vendor:** Stability AI
 - **Access:** API: Stability API (reference page client-rendered; not read); UI: ComfyUI workflows (local models)
 - **Overall status:** PARTIAL
-- **Aliases:** `stable diffusion 3.5`, `sd 3.5`, `stable diffusion 3.5 large`, `sd 3.5 large`
+- **Aliases:** `stable diffusion 3.5`, `sd 3.5`, `stable diffusion 3.5 large`, `sd 3.5 large`, `sd 3.5 turbo`, `stable diffusion 3.5 turbo`
 
 | Topic | Status | Fact | Source |
 |---|---|---|---|
 | Prompt form | UNKNOWN | No official SD 3.5 prompt guide was read. Third-party guides disagree on how much the negative prompt matters for SD 3.5. | none |
-| Negative prompt | UNKNOWN | The ComfyUI Stable Diffusion 3.5 partner-node page was not read: the saved copy is the partner-node overview, which has no SD 3.5 field. A secondary summary says an optional negative text field exists there. Not verified. | [link](https://docs.comfy.org/tutorials/partner-nodes/stability-ai/stable-diffusion-3-5-image) |
+| Negative prompt | UNKNOWN | The Stability API reference pages were not readable (client-rendered). The model card example has a prompt only, with no negative prompt and no guidance value. Negative syntax and CFG for SD 3.5 are not verified. | [link](https://huggingface.co/stabilityai/stable-diffusion-3.5-large) |
 | Text in image | UNKNOWN | Not read. | none |
 | Reference images | UNKNOWN | Not read. | none |
 | Editing | UNKNOWN | Inpainting for SD 3.5 was not read. | none |
@@ -361,6 +444,9 @@
 |---|---|---|---|
 | `weight syntax (word:1.2)` | not verified for SD 3.5 | UNKNOWN | none |
 | `cfg` | not verified for SD 3.5; set it per the model card | UNKNOWN | none |
+| `variants` | Large (8.1 billion parameters); Large Turbo (distilled, 4 steps); Medium (2.5 billion parameters) | VERIFIED | [link](https://stability.ai/news-updates/introducing-stable-diffusion-3-5) |
+| `Large Turbo in ComfyUI` | sd3.5_large_turbo: steps 4 and cfg 1.2 in the example workflow | VERIFIED | [link](https://comfyanonymous.github.io/ComfyUI_examples/sd3/) |
+| `text encoders` | sd3.5_large and sd3.5_medium checkpoints do not include text encoders; load clip_l, clip_g and t5xxl | VERIFIED | [link](https://comfyanonymous.github.io/ComfyUI_examples/sd3/) |
 
 **Limitations**
 
@@ -370,14 +456,20 @@
 **Sources**
 
 - [ComfyUI partner node: Stable Diffusion 3.5 (not read; the download returned the partner-node overview)](https://docs.comfy.org/tutorials/partner-nodes/stability-ai/stable-diffusion-3-5-image), checked 2026-10-14 (primary-unreadable)
-- [Stability API reference (client-rendered; not read)](https://platform.stability.ai/docs/api-reference), checked 2026-10-14 (primary-unreadable)
+- [Stability AI: API reference (saved copy: title only)](https://platform.stability.ai/docs/api-reference), checked 2026-10-14 (primary-unreadable)
+- [Stability AI: introducing Stable Diffusion 3.5](https://stability.ai/news-updates/introducing-stable-diffusion-3-5), checked 2026-10-14 (primary-read)
+- [Hugging Face: stabilityai/stable-diffusion-3.5-large model card](https://huggingface.co/stabilityai/stable-diffusion-3.5-large), checked 2026-10-14 (primary-read)
+- [ComfyUI examples: SD3 and SD3.5](https://comfyanonymous.github.io/ComfyUI_examples/sd3/), checked 2026-10-14 (primary-read)
+- [Stability AI developer docs (saved copy: title only)](https://platform.stability.ai/docs), checked 2026-10-14 (primary-unreadable)
+- [Stability AI: Stable Image API (saved copy: title only)](https://platform.stability.ai/docs/getting-started/stable-image), checked 2026-10-14 (primary-unreadable)
+- [Stability AI: multi-prompting and weights (saved copy: title only)](https://platform.stability.ai/docs/features/multi-prompting), checked 2026-10-14 (primary-unreadable)
 
 ## Stable Diffusion XL (SDXL)
 
 - **id:** `sdxl`
 - **Vendor:** Stability AI (community checkpoints)
 - **Access:** API: not read; UI: ComfyUI or other local tools
-- **Overall status:** UNKNOWN
+- **Overall status:** PARTIAL
 - **Aliases:** `sdxl`, `stable diffusion xl`, `stable diffusion xl base`
 
 | Topic | Status | Fact | Source |
@@ -388,6 +480,11 @@
 | Reference images | UNKNOWN | Not read. | none |
 | Editing | UNKNOWN | Not read. | none |
 
+| Native setting | Values | Status | Source |
+|---|---|---|---|
+| `resolution` | 1024x1024 gives optimal performance with the SDXL base checkpoint; other resolutions with about the same pixel count are also given, for example 896x1152 and 1536x640 | VERIFIED | [link](https://comfyanonymous.github.io/ComfyUI_examples/sdxl/) |
+| `base and refiner` | the base output can be finished by a separate refinement model for the last denoising steps; ComfyUI has a base plus refiner workflow | VERIFIED | [link](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0) |
+
 **Limitations**
 
 - No SDXL primary page was read in this pass. Nothing about weights, guidance scale or steps is asserted.
@@ -395,6 +492,8 @@
 **Sources**
 
 - [ComfyUI text to image (its examples are SD 1.5)](https://docs.comfy.org/tutorials/basic/text-to-image), checked 2026-10-14 (primary-read)
+- [Hugging Face: stabilityai/stable-diffusion-xl-base-1.0 model card](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0), checked 2026-10-14 (primary-read)
+- [ComfyUI examples: SDXL](https://comfyanonymous.github.io/ComfyUI_examples/sdxl/), checked 2026-10-14 (primary-read)
 
 ## ComfyUI node graph
 
@@ -416,6 +515,7 @@
 |---|---|---|---|
 | `cfg` | classifier-free guidance scale on the sampler node; controls prompt constraint strength (too high overfits) | VERIFIED | [link](https://docs.comfy.org/tutorials/basic/text-to-image) |
 | `checkpoint` | the model file loaded by the checkpoint loader node; node values depend on it | VERIFIED | [link](https://docs.comfy.org/tutorials/basic/text-to-image) |
+| `denoise` | image to image: the KSampler denoise is below 1; a lower value keeps more of the reference, and 0 stops sampling; denoise 1 starts from random noise | VERIFIED | [link](https://docs.comfy.org/tutorials/basic/image-to-image) |
 
 **Limitations**
 
@@ -426,6 +526,11 @@
 
 - [ComfyUI text to image](https://docs.comfy.org/tutorials/basic/text-to-image), checked 2026-10-14 (primary-read)
 - [ComfyUI FLUX.1 text to image](https://docs.comfy.org/tutorials/flux/flux-1-text-to-image), checked 2026-10-14 (primary-read)
+- [ComfyUI documentation index](https://docs.comfy.org/), checked 2026-10-14 (primary-read)
+- [ComfyUI: image to image](https://docs.comfy.org/tutorials/basic/image-to-image), checked 2026-10-14 (primary-read)
+- [ComfyUI: inpainting](https://docs.comfy.org/tutorials/basic/inpaint), checked 2026-10-14 (primary-read)
+- [ComfyUI examples: SDXL](https://comfyanonymous.github.io/ComfyUI_examples/sdxl/), checked 2026-10-14 (primary-read)
+- [ComfyUI examples: SD3 and SD3.5](https://comfyanonymous.github.io/ComfyUI_examples/sd3/), checked 2026-10-14 (primary-read)
 
 ## Nano Banana (Gemini Image)
 
@@ -446,7 +551,13 @@
 **Limitations**
 
 - This entry does not render prompts. The renderer returns a redirect for it, so the Nano Banana path stays unchanged.
+- Changelog (read 2026-10-14): the 3.1 flash-image model is deprecated (2026-10-06, no shutdown date announced); two Gemini 3 preview image models are scheduled to shut down on 2026-06-25 (announced 2026-05-28); Imagen 4 is marked shut down on the models page. The model IDs and dates are in gemini-image-models.md. The deprecations table (read 2026-10-14) gives 2027-03-15 as the earliest possible shutdown date of gemini-2.5-flash-image; the pricing page warning gives 2026-10-02. The two conflict, so the catalog keeps the shutdown date open (see gemini-image-models.md).
 
 **Sources**
 
 - [Gemini image generation (read in earlier passes; see gemini-image-models.md)](https://ai.google.dev/gemini-api/docs/image-generation), checked 2026-10-13 (primary-read)
+- [Google DeepMind: Gemini image prompt guide](https://deepmind.google/models/gemini-image/prompt-guide/), checked 2026-10-14 (primary-read)
+- [Gemini API: models](https://ai.google.dev/gemini-api/docs/models), checked 2026-10-14 (primary-read)
+- [Gemini API: changelog (deprecation and shutdown dates)](https://ai.google.dev/gemini-api/docs/changelog), checked 2026-10-14 (primary-read)
+- [Gemini API: deprecations (shutdown dates table)](https://ai.google.dev/gemini-api/docs/deprecations), checked 2026-10-14 (primary-read)
+- [Gemini API: pricing (model deprecation warnings)](https://ai.google.dev/gemini-api/docs/pricing), checked 2026-10-14 (primary-read)

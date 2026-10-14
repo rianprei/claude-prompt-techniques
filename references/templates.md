@@ -673,7 +673,7 @@ Prompt:
 a ceramic teapot, a pale oak table by a window, product photograph, soft morning light from the left, terracotta and cream, glazed stoneware, centred, with empty space above, eye level. The text reads "TEA" on a small paper label on the side, small serif capitals. No watermark, no extra text.
 ```
 
-Native settings (sent as fields, not in the prompt): `endpoint`: /v2/image/generate/ideogram-4-5; `rendering_quality`: high; `background`: auto
+Native settings (sent as fields, not in the prompt): `endpoint`: /v2/image/generate/ideogram-4-5; `rendering_quality`: high (no background is sent unless the brief sets one)
 
 #### ComfyUI (positive and negative blocks)
 

@@ -183,6 +183,140 @@ class AliasResolutionTests(unittest.TestCase):
                 seen[key] = target["id"]
 
 
+class UltragoalFactTests(unittest.TestCase):
+    """Facts and routes added on 2026-10-14 (ultragoal), each pinned to the page that states it."""
+
+    def claim(self, target_id, field):
+        return image_targets.target(REGISTRY, target_id)[field]
+
+    def setting(self, target_id, name):
+        item = image_targets.target(REGISTRY, target_id)
+        return next(s for s in item["native_settings"] if s["name"] == name)
+
+    def test_new_routes_resolve_to_their_targets(self):
+        cases = {"FLUX.2 klein": "flux-2", "flux 2 max": "flux-2", "SD 3.5 Turbo": "sd-3-5",
+                 "stable diffusion 3.5 turbo": "sd-3-5", "Seedream 5.0 lite": "seedream", "Seedream 4.5": "seedream",
+                 "Recraft V4.1 Flash": "recraft"}
+        for name, target_id in cases.items():
+            with self.subTest(name=name):
+                self.assertEqual(image_targets.resolve(name, REGISTRY).get("target"), target_id)
+
+    def test_gpt_image_2_alias_is_still_one_target_after_the_new_model_notes(self):
+        self.assertEqual(image_targets.resolve("gpt image 2", REGISTRY)["target"], "gpt-image")
+
+    def test_the_ideogram_text_rule_is_verified_for_the_image_app_only(self):
+        claim = self.claim("ideogram", "text_in_image")
+        self.assertEqual(claim["status"], "VERIFIED")
+        self.assertIn("quotation marks", claim["text"])
+        self.assertIn("API documentation pages", claim["text"])
+
+    def test_the_ideogram_json_bbox_order_is_y_min_x_min_y_max_x_max(self):
+        self.assertIn("[y_min, x_min, y_max, x_max]", self.claim("ideogram", "prompt_style")["text"])
+
+    def test_the_recraft_v41_does_not_take_negative_prompts(self):
+        self.assertIn("V2 and V3", self.setting("recraft", "negative_prompt")["values"])
+        self.assertIn("V4.1", self.setting("recraft", "negative_prompt")["values"])
+
+    def test_the_recraft_edit_endpoints_are_documented(self):
+        edit = self.claim("recraft", "edit")
+        self.assertEqual(edit["status"], "VERIFIED")
+        self.assertIn("/v1/images/imageToImage", edit["text"])
+        self.assertIn("/v1/images/inpaint", edit["text"])
+
+    def test_the_seedream_reference_limits_are_verified_per_family(self):
+        refs = self.claim("seedream", "references")
+        self.assertEqual(refs["status"], "VERIFIED")
+        self.assertIn("up to 10", refs["text"])
+        self.assertIn("up to 14", refs["text"])
+
+    def test_the_seedream_negative_field_is_partial_because_one_page_was_read(self):
+        self.assertEqual(self.claim("seedream", "negative_prompt")["status"], "PARTIAL")
+
+    def test_the_sd35_turbo_steps_and_cfg_come_from_the_comfyui_example(self):
+        setting = self.setting("sd-3-5", "Large Turbo in ComfyUI")
+        self.assertIn("steps 4", setting["values"])
+        self.assertIn("cfg 1.2", setting["values"])
+        self.assertEqual(setting["source"], "https://comfyanonymous.github.io/ComfyUI_examples/sd3/")
+
+    def test_the_sdxl_resolution_comes_from_the_comfyui_example(self):
+        self.assertIn("1024x1024", self.setting("sdxl", "resolution")["values"])
+
+    def test_the_comfyui_denoise_rule_is_verified_on_the_image_to_image_page(self):
+        setting = self.setting("comfyui", "denoise")
+        self.assertEqual(setting["status"], "VERIFIED")
+        self.assertIn("below 1", setting["values"])
+
+    def test_the_gpt_image_input_fidelity_is_partial_because_2_5_is_not_stated(self):
+        setting = self.setting("gpt-image", "input_fidelity")
+        self.assertEqual(setting["status"], "PARTIAL")
+        self.assertIn("2.5: not stated", setting["values"])
+
+    def test_the_firefly_style_strength_default_is_50(self):
+        self.assertIn("default 50", self.setting("firefly", "style reference strength")["values"])
+
+    def test_the_objective_urls_that_failed_are_recorded_as_not_found(self):
+        kinds = {source["url"]: source["kind"] for target in REGISTRY["targets"] for source in target["sources"]}
+        self.assertEqual(kinds.get("https://developers.openai.com/api/reference/resources/images/methods/edit"), "not-found")
+
+    def test_the_client_rendered_stability_pages_are_recorded_as_unreadable(self):
+        kinds = {source["url"]: source["kind"] for source in image_targets.target(REGISTRY, "sd-3-5")["sources"]}
+        self.assertEqual(kinds.get("https://platform.stability.ai/docs/features/multi-prompting"), "primary-unreadable")
+
+
+class ReviewFactTests(unittest.TestCase):
+    """Corrections from the brutal review of 2026-10-14: each attribution points at the page that states the fact."""
+
+    def setting(self, target_id, name):
+        item = image_targets.target(REGISTRY, target_id)
+        return next(s for s in item["native_settings"] if s["name"] == name)
+
+    def test_the_ideogram_seed_range_is_partial_because_it_is_the_app_limit(self):
+        seed = self.setting("ideogram", "seed")
+        self.assertEqual(seed["status"], "PARTIAL")
+        self.assertEqual(seed["source"], "https://docs.ideogram.ai/create/image-settings.md")
+
+    def test_the_recraft_style_is_partial_and_names_the_disagreement(self):
+        style = self.setting("recraft", "style")
+        self.assertEqual(style["status"], "PARTIAL")
+        self.assertIn("V4.1 Flash", style["values"])
+
+    def test_the_seedream_size_range_is_cited_to_the_api_reference(self):
+        self.assertEqual(self.setting("seedream", "size")["source"],
+                         "https://ai.byteplus.com/ark/region:ap-southeast-1/docs/image-generation-api.md")
+
+    def test_the_gpt_image_output_format_and_background_are_cited_to_the_images_edit_reference(self):
+        edit = "https://developers.openai.com/api/reference/python/resources/images/methods/edit"
+        self.assertEqual(self.setting("gpt-image", "output_format")["source"], edit)
+        self.assertEqual(self.setting("gpt-image", "background")["source"], edit)
+
+    def test_the_gpt_image_moderation_default_is_cited_to_the_images_generate_reference(self):
+        moderation = self.setting("gpt-image", "moderation")
+        self.assertIn("auto (default)", moderation["values"])
+        self.assertTrue(moderation["source"].endswith("methods/generate"))
+
+    def test_the_gemini_shutdown_date_is_the_earliest_possible_one_and_its_conflict_is_recorded(self):
+        target = image_targets.target(REGISTRY, "nano-banana")
+        text = " ".join(target["limitations"])
+        self.assertIn("2027-03-15", text)
+        self.assertIn("earliest possible", text)
+        self.assertIn("2026-10-02", text)
+        kinds = {source["url"]: source["kind"] for source in target["sources"]}
+        self.assertEqual(kinds.get("https://ai.google.dev/gemini-api/docs/deprecations"), "primary-read")
+        self.assertEqual(kinds.get("https://ai.google.dev/gemini-api/docs/pricing"), "primary-read")
+
+    def test_the_seedream_limitations_no_longer_call_the_optimize_options_unread(self):
+        text = " ".join(image_targets.target(REGISTRY, "seedream")["limitations"])
+        self.assertNotIn("optimize_prompt_options", text)
+
+    def test_the_sdxl_resolution_says_optimal_performance_as_the_example_page_does(self):
+        value = self.setting("sdxl", "resolution")["values"]
+        self.assertIn("optimal performance", value)
+        self.assertNotIn("best", value)
+
+    def test_the_flux_3_resolution_list_carries_only_the_names_the_overview_gives(self):
+        self.assertEqual(self.setting("flux-3", "resolution")["values"], "768sq, 1k, 1.5k, 2k, 4k")
+
+
 class GeneratedReferenceTests(unittest.TestCase):
     def test_the_markdown_reference_is_the_generated_text(self):
         with open(image_targets.MARKDOWN_PATH, encoding="utf-8") as handle:

@@ -119,14 +119,31 @@ source; no page text is reproduced at length.
 
 On 2026-10-14, the facts for image targets other than Gemini (references/image-targets.json and .md) were read in the
 vendors' own documentation pages: Midjourney (docs.midjourney.com: parameter list, No, Version, Style Reference, Edit
-Model, Aspect Ratio), OpenAI (developers.openai.com: image prompting and image generation guides, and the GPT Image prompting cookbook,
-which names an older model), Black Forest Labs (docs.bfl.ai: FLUX 3 Image overview, generate, layout and bounding boxes,
-FLUX.2 prompting guide, FLUX.1 Kontext image editing, prompt basics and prompt reference), Ideogram (developer.ideogram.ai: Ideogram 4.5
-generate and precise-edit references), Recraft (recraft.ai/docs: endpoints, negative prompts, prompting best practices),
-Adobe Firefly (developer.adobe.com: structure reference and the generate tutorial), and ComfyUI (docs.comfy.org: text to
-image and FLUX.1 pages). Pages that rendered only as navigation (Seedream and BytePlus ModelArk, the Firefly API reference,
-the Stability AI API reference) were not read; their claims are marked PARTIAL or UNKNOWN in the registry. Quoted phrases
+Model, Aspect Ratio), OpenAI (developers.openai.com: image prompting and image generation guides, and the GPT Image prompting
+cookbook, which names an older model), Black Forest Labs (docs.bfl.ai: FLUX 3 Image overview, generate, layout and bounding
+boxes, FLUX.2 prompting guide, FLUX.1 Kontext image editing, prompt basics and prompt reference), Ideogram
+(developer.ideogram.ai: Ideogram 4.5 generate and precise-edit references), Recraft (recraft.ai/docs: endpoints, negative
+prompts, prompting best practices), Adobe Firefly (developer.adobe.com: structure reference and the generate tutorial), and
+ComfyUI (docs.comfy.org: text to image and FLUX.1 pages). Pages that rendered only as navigation (the Firefly API reference
+and the Stability AI API reference) were not read; their claims are marked PARTIAL or UNKNOWN in the registry. Quoted phrases
 are short and attributed where used; no page text is reproduced at length. The rules are in this project's own words.
+
+On 2026-10-14 a second pass read further official pages, in read-only HTTP GET: OpenAI (ChatGPT image page, image generation
+tool, images.edit and images.generate references), Black Forest Labs (FLUX.2 overview and text to image, FLUX 3 multi-reference
+editing, prompting technical, style and building pages, FLUX.1 Kontext overview), Midjourney (Prompt Basics, Image Prompts,
+Editor), Ideogram (Markdown documentation pages and the llms.txt indexes), BytePlus ModelArk (Seedream Markdown tutorials,
+editing guide and prompt guide), Recraft (Markdown API pages for V4.1, models, styles and the edit tools), Adobe Firefly
+Services (style reference, style presets, Image5 feature guide, web prompt help), Hugging Face model cards (Stable Diffusion 3.5
+Large, SDXL base), the ComfyUI examples and tutorials, and the Gemini changelog and models pages.
+
+A review pass on the same day re-fetched the pages that the registry cites but had not saved: Midjourney's No and Aspect
+Ratio pages, the OpenAI image generation guide and GPT Image cookbook, the FLUX 3 bounding boxes page, the FLUX prompting
+reference, the FLUX.2 prompting guide, the Ideogram 4.5 generate and precise-edit references, the Recraft endpoints, negative
+prompt and best practices pages, the ComfyUI FLUX.1 text-to-image page, the ComfyUI partner-node overview, the BytePlus
+ModelArk pages, and the Gemini deprecations and pricing pages. Pages that rendered only as a shell (the Stability AI
+developer pages, the BFL JSON prompting page, the Firefly API reference, the BytePlus HTML copies) are recorded as not
+readable; the BytePlus Markdown copies were read instead. Short quoted phrases are attributed where used; no page text is
+reproduced.
 
 MIT LICENSE (nidhinjs/prompt-master)
 ------------------------------------
