@@ -32,7 +32,7 @@ Do not explain prompt engineering theory unless asked. Do not show framework nam
 Prefer simple techniques (role, few-shot, grounding) over complex frameworks (Mixture-of-Experts,
 Tree/Graph-of-Thought, Self-Consistency, layered prompt chaining) — those have higher fabrication risk
 in a single prompt; only use if explicitly requested and the tool supports them.
-**Image prompts for another model.** Write the brief once (Template O: subject, environment, composition, medium, lighting, colour, text, constraints, references, edit), then adapt it to the named target with `scripts/image_prompt.py`. Each target's syntax, negative mechanism and native settings are in [references/image-targets.md](references/image-targets.md), with the status of each fact (VERIFIED, PARTIAL, UNKNOWN) and its source. Name the target from the request ("Midjourney", "gpt image", "flux 3", "Ideogram"); ask only when the name fits several targets ("flux", "stable diffusion"). For a comparison, render the same brief for each named target. Never invent a parameter: a target without verified syntax gets a portable prompt and a warning.
+**Image prompts for another model.** Write the brief once (Template O: subject, environment, composition, medium, lighting, colour, text, constraints, references, edit), then adapt it to the named target with `scripts/image_prompt.py`, run from the skill folder (the one that holds this file). Each target's syntax, negative mechanism and native settings are in [references/image-targets.md](references/image-targets.md), with the status of each fact (VERIFIED, PARTIAL, UNKNOWN) and its source. Name the target from the request ("Midjourney", "gpt image", "flux 3", "Ideogram"); ask only when the name fits several targets ("flux", "stable diffusion"). For a comparison, render the same brief for each named target. Never invent a parameter: a target without verified syntax gets a portable prompt and a warning.
 
 Never add CoT on reasoning-native models (GPT-6 family, DeepSeek V4 in thinking mode, Claude 5.x with thinking on) —
 they already think internally; CoT degrades output.
@@ -78,11 +78,11 @@ adjust ONLY the dimension that failed, deliver a new version. Do not rewrite fro
 
 ## Image generation with Nano Banana (studio, from the shell)
 
-Use when the request is to generate, edit or refine an image with Nano Banana, not only to write its prompt. Always in this order:
+Run these commands from the skill folder (the one that holds this file): `cd` there first. Use when the request is to generate, edit or refine an image with Nano Banana, not only to write its prompt. Always in this order:
 1. `python3 -m studio plan ...` (or `--case ID`, or `--from RUN_ID --edit "what to change"`). It spends nothing. Show the user the model, ratio, size, nominal cost, prompt, reference hashes and warnings.
 2. Run `approve <brief_sha256> --confirm <first 8 characters>` only after the user has agreed in this conversation. Never pass `--confirm` without that answer.
 3. `run <brief_sha256> --approval <approval_id>`. One approval is one paid call. Never loop generation; for another attempt, plan again and ask again.
-4. Open the file at `output_path` with the Read tool (it shows PNG and JPEG) and say what you see.
+4. Open the file at `output_path` with your file viewer (it shows PNG and JPEG) and say what you see.
 5. To correct: `plan --from RUN_ID --edit "..."`, which keeps everything not named. To record: `review` (with a note) and `rate` (with `--criterion NAME=N`).
 
 Limits, what is not verified and the file layout: [studio/README.md](studio/README.md). Models and thinking levels: [references/gemini-image-models.md](references/gemini-image-models.md).

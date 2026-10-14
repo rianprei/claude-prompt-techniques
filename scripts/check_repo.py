@@ -22,6 +22,8 @@ TEMPLATES = "ABCDEFGHIJKLMNO"
 CATALOG = "references/gemini-image-models.json"
 CATALOG_PREFIX = "references/gemini-image-models."
 STALE_DAYS = 90  # the catalog is a snapshot; past this age, the script only warns
+ROUTING = "references/tool-routing.md"
+IMAGE_REGISTRY = "references/image-targets.json"
 
 
 def read(rel):
@@ -152,6 +154,34 @@ def check_key_in_url(texts):
     return problems
 
 
+def dated_facts(texts):
+    """The facts that carry a verification date: the Gemini catalog, the routing rules and the image registry."""
+    dated = {}
+    routing = re.search(r"Last verified: (\d{4}-\d{2}-\d{2})", texts.get(ROUTING, ""))
+    if routing:
+        dated[ROUTING] = routing.group(1)
+    for path in (CATALOG, IMAGE_REGISTRY):
+        try:
+            dated[path] = json.loads(texts[path])["verified_on"]
+        except (KeyError, TypeError, ValueError):
+            pass
+    return dated
+
+
+def stale_warnings(dated, today):
+    """One warning per dated fact older than STALE_DAYS. Warnings only: the facts need a re-read, not a failed check."""
+    warnings = []
+    for label, day in sorted(dated.items()):
+        try:
+            age = (today - date.fromisoformat(day)).days
+        except (TypeError, ValueError):
+            warnings.append(f"warning: {label} has no readable verification date ({day!r}); fix it")
+            continue
+        if age > STALE_DAYS:
+            warnings.append(f"warning: {label} was verified {age} days ago ({day}); re-check the official pages")
+    return warnings
+
+
 def main():
     files = repo_files()
     problems = []
@@ -173,9 +203,8 @@ def main():
         problems.append(f"{CATALOG}: missing or not valid JSON")
     if catalog is not None:
         problems += check_model_ids(texts, catalog)
-        age = (date.today() - date.fromisoformat(catalog["verified_on"])).days
-        if age > STALE_DAYS:
-            print(f"warning: {CATALOG} was verified {age} days ago; re-check the official pages")
+    for warning in stale_warnings(dated_facts(texts), date.today()):
+        print(warning)
     problems += check_key_in_url(texts)
     print(f"markdown files: {sum(f.endswith('.md') for f in files)}")
     print(f"patterns: {patterns}, templates: {templates}")

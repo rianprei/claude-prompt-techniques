@@ -99,6 +99,9 @@ def parse_response(status, payload, api_key=""):
     text = payload.decode("utf-8", "replace") if isinstance(payload, bytes) else str(payload)
     if status != 200:
         message = f"Gemini API returned HTTP {status}. {_provider_message(text)}".strip()
+        if status == 429:  # the approval was spent before the call, so a retry needs a new plan and a new approval
+            message += (" Limits are per project and per usage tier; the figures are in Google AI Studio, not in the API docs."
+                        " The approval is spent: plan again to retry.")
         if api_key:
             message = message.replace(api_key, "[redacted]")
         raise ProviderError(f"http_{status}", message)

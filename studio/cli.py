@@ -1,4 +1,4 @@
-"""Command line for the studio, so that Claude Code can plan, approve, run, inspect and rate images from a shell.
+"""Command line for the studio, so that an agent with a shell can plan, approve, run, inspect and rate images.
 
 Every command prints one JSON object on stdout. A refused request prints {"error", "message"} on stderr and exits 2;
 a provider or machine failure exits 1. Only `run` calls the paid API, and only with an unspent approval issued for

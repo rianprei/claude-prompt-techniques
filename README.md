@@ -1,6 +1,6 @@
 # prompt-engineering-master
 
-**Skill de Claude Code: referência de prompt engineering + gerador de prompts otimizados por ferramenta-alvo.**
+**Skill de prompt engineering para agentes de código (Claude Code, Codex e outras CLIs): referência + gerador de prompts otimizados por ferramenta-alvo.**
 
 Você pede "escreve um prompt pra Midjourney gerar um gato samurai" e recebe um prompt pronto pra colar, com a sintaxe e as regras específicas do Midjourney. Ou trabalha normalmente e o Claude aplica (e nomeia na resposta) a técnica de prompt engineering relevante.
 
@@ -11,10 +11,11 @@ Você pede "escreve um prompt pra Midjourney gerar um gato samurai" e recebe um 
 ## Quick Start (30 segundos)
 
 ```bash
-git clone https://github.com/rianprei/prompt-engineering-master ~/.claude/skills/prompt-techniques
+git clone https://github.com/rianprei/prompt-engineering-master ~/src/prompt-engineering-master
+cd ~/src/prompt-engineering-master && python3 scripts/install.py install
 ```
 
-Abra sessão nova do Claude Code e peça:
+Abra uma sessão nova da sua CLI e peça:
 
 ```
 escreve um prompt pra Midjourney: gato samurai em estilo ukiyo-e
@@ -40,7 +41,7 @@ Pronto. O resto deste README é detalhe — leia quando precisar.
 - [Validação e testes](#validação-e-testes)
 - [Studio (página local e linha de comando, com aprovação por execução paga)](#studio-página-local-e-linha-de-comando-com-aprovação-por-execução-paga)
 - [Limitações conhecidas](#limitações-conhecidas)
-- [Uso fora do Claude Code](#uso-fora-do-claude-code)
+- [Uso em outras CLIs](#uso-em-outras-clis)
 - [Customizar e estender](#customizar-e-estender)
 - [Troubleshooting / FAQ](#troubleshooting--faq)
 - [Desinstalar](#desinstalar)
@@ -71,44 +72,52 @@ Dois problemas comuns:
 
 ## Instalação
 
-**Pré-requisito:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) instalado.
+**Pré-requisitos:** Python 3 (só biblioteca padrão; o instalador e os scripts não têm dependências) e uma CLI de agente que leia arquivos locais. A skill foi usada até aqui com o [Claude Code](https://docs.anthropic.com/en/docs/claude-code); a seção [Uso em outras CLIs](#uso-em-outras-clis) cobre as demais.
 
-**Via git (recomendado — permite atualizar com `git pull`):**
+**Via git (recomendado: uma cópia, e todas as CLIs apontam para ela):**
 
 ```bash
-git clone https://github.com/rianprei/prompt-engineering-master ~/.claude/skills/prompt-techniques
+git clone https://github.com/rianprei/prompt-engineering-master ~/src/prompt-engineering-master
+cd ~/src/prompt-engineering-master
+python3 scripts/install.py status    # onde a skill vai ficar, por CLI, e se há conflito
+python3 scripts/install.py install   # cria o link em cada pasta de skills conhecida
 ```
+
+O `install` põe um link chamado `prompt-techniques` nas pastas de skills (`~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`). Ele nunca substitui uma pasta real e nunca remove o que não criou. Se a pasta já tem outra skill de prompt engineering, recusa a instalação: a regra é uma por vez. Use `--target codex` para uma CLI só, e `--force` para ignorar essa regra.
 
 **Sem git:**
 
 ```bash
-mkdir -p ~/.claude/skills/prompt-techniques/references
+DEST=~/src/prompt-techniques
+mkdir -p $DEST/references
 base=https://raw.githubusercontent.com/rianprei/prompt-engineering-master/master
-curl -fL $base/SKILL.md -o ~/.claude/skills/prompt-techniques/SKILL.md
-curl -fL $base/README.md -o ~/.claude/skills/prompt-techniques/README.md
-curl -fL $base/LICENSE -o ~/.claude/skills/prompt-techniques/LICENSE
-curl -fL $base/NOTICE -o ~/.claude/skills/prompt-techniques/NOTICE
+curl -fL $base/SKILL.md -o $DEST/SKILL.md
+curl -fL $base/README.md -o $DEST/README.md
+curl -fL $base/LICENSE -o $DEST/LICENSE
+curl -fL $base/NOTICE -o $DEST/NOTICE
 for f in tool-routing patterns templates persuasion taxonomy technique-catalog defenses image-styles gemini-image-models gemini-image-examples; do
-  curl -fL $base/references/$f.md -o ~/.claude/skills/prompt-techniques/references/$f.md
+  curl -fL $base/references/$f.md -o $DEST/references/$f.md
 done
 ```
 
-Sem git, a instalação traz o skill, a licença e o NOTICE: `SKILL.md`, `README.md`, `LICENSE`, `NOTICE` e os 11 arquivos `.md` de `references/`. Ficam de fora `scripts/`, `studio/`, `tests/`, `evals/`, `references/gemini-image-models.json` e `references/image-targets.json`, que só os scripts, o Studio e os testes usam; para eles, use a instalação via git.
+Sem git, a instalação traz o skill, a licença e o NOTICE: `SKILL.md`, `README.md`, `LICENSE`, `NOTICE` e os 11 arquivos `.md` de `references/`. Ficam de fora `scripts/`, `studio/`, `tests/`, `evals/`, `references/gemini-image-models.json` e `references/image-targets.json`, que só os scripts, o Studio e os testes usam; e sem git não há `scripts/install.py`. Aponte a sua CLI para `$DEST/SKILL.md`, ou copie a pasta para a pasta de skills dela.
 
 **Verificar:**
 
 ```bash
-ls ~/.claude/skills/prompt-techniques/ ~/.claude/skills/prompt-techniques/references/
-# Esperado: SKILL.md, README.md, LICENSE, NOTICE e references/ com 11 arquivos .md
+cd ~/src/prompt-engineering-master && python3 scripts/install.py status
+# Esperado: cada destino em `keep` (já ligado) ou `create`, e nenhum `refuse` sem motivo que você conheça
 ```
 
-**Ativar:** abra uma sessão nova do Claude Code. A skill carrega automaticamente — zero configuração. Pra confirmar, pergunte ao Claude: "qual skill de prompt engineering você tem disponível?"
+**Ativar:** abra uma sessão nova da CLI. No Claude Code, a skill carrega sozinha da pasta `~/.claude/skills`; pra confirmar, pergunte: "qual skill de prompt engineering você tem disponível?". Nas outras CLIs, veja [Uso em outras CLIs](#uso-em-outras-clis).
 
 **Atualizar:**
 
 ```bash
-cd ~/.claude/skills/prompt-techniques && git pull
+cd ~/src/prompt-engineering-master && git pull
 ```
+
+Os links apontam para esta pasta, então todas as CLIs pegam a versão nova sem reinstalar.
 
 ## Como usar — modo referência (passivo)
 
@@ -317,7 +326,7 @@ python3 -m unittest discover -s tests -v
 
 ## Studio (página local e linha de comando, com aprovação por execução paga)
 
-Gera imagens com Nano Banana por uma página local ou pela linha de comando, que o Claude Code usa. Monta o brief, mostra o plano e o custo nominal, e só chama a API paga depois que você aprova aquele brief exato. A aprovação é de uso único, vale 30 minutos e é gasta antes da chamada. Você confirma digitando os 8 primeiros caracteres do hash do plano. A CLI não consegue verificar quem digitou, por isso a regra de pedir sua confirmação está no `SKILL.md`. Detalhes e limites estão em [`studio/README.md`](studio/README.md).
+Gera imagens com Nano Banana por uma página local ou pela linha de comando, que qualquer agente com shell pode usar. Monta o brief, mostra o plano e o custo nominal, e só chama a API paga depois que você aprova aquele brief exato. A aprovação é de uso único, vale 30 minutos e é gasta antes da chamada. Você confirma digitando os 8 primeiros caracteres do hash do plano. A CLI não consegue verificar quem digitou, por isso a regra de pedir sua confirmação está no `SKILL.md`. Detalhes e limites estão em [`studio/README.md`](studio/README.md).
 
 ```bash
 python3 -m studio serve --fake-provider      # página com imagens de teste, sem rede e sem custo
@@ -331,20 +340,18 @@ python3 -m studio run <hash> --approval <approval_id>                 # gasta es
 A edição de uma imagem gerada usa `plan --from <run_id> --edit "o que mudar"`: o resto é mantido, e a imagem anterior entra como referência. Cada execução paga tem a sua própria aprovação.
 
 - Escuta só em 127.0.0.1. O token por processo protege contra outros sites: eles não leem a página que o contém nem enviam o cabeçalho sem CORS. Não protege contra processos locais: a página com o token é servida em `GET /`, então qualquer processo ou usuário que alcance 127.0.0.1 pode emitir aprovações e usar a API paga com a sua chave. Use o Studio em máquina de usuário único. A chave nunca vai para a página nem para uma URL.
-- Precisa de locks POSIX (`fcntl`): em Windows o store recusa operar. Plataforma e catálogo: [`studio/README.md`](studio/README.md).
+- Trava de arquivos: `fcntl` em Linux e macOS, `msvcrt` em Windows. O caminho do Windows é testado com um módulo de substituição, não numa máquina Windows. Plataforma e catálogo: [`studio/README.md`](studio/README.md).
 - Estado: edição a partir de uma imagem gerada, avaliação por critérios, casos fixos e comparação por variante estão implementados e cobertos por testes com transporte simulado. Nenhuma chamada real à API foi feita, porque a chave não estava configurada. O formato da resposta segue a referência da API (`steps`, com blocos `image`; lida em 2026-10-13). Só uma chamada real confirma que o serviço devolve esse formato para pedidos de imagem e que a edição encadeada (`--chain`) se comporta como o exemplo oficial.
 
 ## Limitações conhecidas
 
-Documentadas de propósito — melhor você saber antes de instalar:
+O que ainda não dá para eliminar, e por quê. Limitações que foram resolvidas (por código, teste ou verificação) saíram desta lista.
 
-1. **Sem benchmarks automatizados da qualidade.** Não há evals automáticos nem A/B tests cegos dos prompts gerados. O validador e os golden cases testam só as regras do próprio skill ([Validação e testes](#validação-e-testes)). As regras vêm de documentação oficial dos vendors e prática da comunidade. O que existe: [`evals/protocol.md`](evals/protocol.md) — protocolo manual de A/B (seu prompt vs. prompt da skill, métrica = re-prompts até funcionar) com log de resultados, ainda sem nenhum registro. Barato, honesto, sem fingir ciência.
-2. **Regras de routing envelhecem.** Modelos novos saem toda semana. `tool-routing.md` carrega uma data **"Last verified"**; se a ferramenta/modelo for mais novo que a data ou não estiver listado, a skill aplica regras genéricas e avisa em vez de chutar comportamento de versão. PRs de atualização são bem-vindos.
-3. **Nativa do Claude Code.** O carregamento sob demanda depende de `~/.claude/skills/`. Uso parcial em outros agentes é possível — ver [Uso fora do Claude Code](#uso-fora-do-claude-code).
-4. **Agregação, não invenção.** O valor está na curadoria, fusão e arquitetura de contexto — as fontes estão todas nos [Créditos](#créditos). Se você prefere as fontes originais separadas, use-as.
-5. **Ativação depende de pedido explícito** no modo gerador. É decisão de design (evita a skill sequestrar tarefas normais), com o custo de pedidos vagos não dispararem. Reformule com "escreve/melhora um prompt pra...".
-6. **Escopo amplo tem custo.** Cobrir texto/imagem/vídeo/3D/agentes significa que nenhuma seção é tão profunda quanto uma skill dedicada a uma ferramenta só. Se 90% do seu uso é uma ferramenta única, uma skill especializada nela pode servir melhor.
-7. **Não instale junto com outra skill de prompt engineering.** Duas skills com trigger parecido = Claude pode ativar a errada ou misturar as duas. Uma por vez.
+1. **Não há medida automática de qualidade de prompt.** Medir se um prompt funcionou exige rodar modelos e ter alguém que julgue o resultado; sem isso, qualquer número seria inventado. O protocolo manual está em [`evals/protocol.md`](evals/protocol.md), com o log em `evals/results.md`, que ainda não tem nenhum registro. As regras do skill são testadas: o validador e os golden cases.
+2. **Fatos de fornecedor envelhecem.** Modelos mudam toda semana, e nenhum teste sabe o que mudou sem ler a página oficial. O `check_repo` avisa automaticamente quando o roteamento, o registro de imagens ou o catálogo do Gemini passam de 90 dias sem reverificação. Quem atualiza precisa ler as páginas; algumas são casca JS e estão listadas no [NOTICE](NOTICE).
+3. **Ativação depende de pedido explícito** no modo gerador. É uma escolha de design: evita a skill sequestrar tarefas normais, ao custo de pedidos vagos não dispararem. Se você quiser que dispare com "me ajuda com o Midjourney", a regra muda no `SKILL.md`, com mais falsos positivos.
+4. **Escopo amplo tem custo.** Cobrir texto, imagem, vídeo, 3D e agentes significa que nenhuma seção é tão profunda quanto uma skill dedicada a uma ferramenta só. Dividir em skills menores é decisão sua.
+5. **Pastas de skills com outras skills de prompt.** O `install.py` recusa instalar ao lado de outra skill de prompt engineering (`--force` ignora a recusa). Ele não remove o que já está instalado: `status` mostra o que há em cada pasta, e a remoção é sua decisão.
 
 ## Troubleshooting / FAQ
 
@@ -360,21 +367,27 @@ Confirme que `references/tool-routing.md` existe e que o link relativo em `SKILL
 **Pedi prompt pro GPT-6 Astra e veio com "think step by step".**
 Bug — não deveria acontecer (regra fixa nº 2). Confira se seu `SKILL.md` está atualizado (`git pull`).
 
-**Funciona no claude.ai web ou só no Claude Code?**
-Skill de Claude Code (depende da pasta `~/.claude/skills/`). No claude.ai web, você pode colar o conteúdo do `SKILL.md` como instrução de projeto, mas perde o carregamento sob demanda das references.
+**Funciona em outras CLIs ou só no Claude Code?**
+Funciona em qualquer CLI que leia arquivos locais; veja [Uso em outras CLIs](#uso-em-outras-clis). O que precisa de arquivos e não os tem é o claude.ai web: lá, cole o conteúdo do `SKILL.md` como instrução de projeto e você perde os links de `references/` (ou cole só o bloco da ferramenta que você usa, de `tool-routing.md`).
 
 **Preciso reiniciar depois de editar os arquivos?**
-Sessão nova do Claude Code garante recarga do `SKILL.md`. As references são lidas do disco na hora do uso, então edições nelas valem imediatamente.
+Abra uma sessão nova da CLI para recarregar o `SKILL.md`. As references são lidas do disco na hora do uso, então edições nelas valem imediatamente.
 
-## Uso fora do Claude Code
+## Uso em outras CLIs
 
-A skill é markdown puro — funciona parcialmente em qualquer agente que leia arquivos de regras:
+Há dois jeitos de uma CLI usar a skill. O repositório cobre os dois.
 
-- **Cursor**: copie `SKILL.md` pra `.cursor/rules/prompt-techniques.mdc` (ou cole em Rules). Os links relativos de `references/` funcionam se você copiar a pasta pro repo e o agente puder ler arquivos.
-- **Cline / Windsurf / Codex CLI**: cole o `SKILL.md` no arquivo de regras do agente (`.clinerules`, `AGENTS.md`, etc.) e mantenha `references/` no repo — agentes com acesso a arquivo conseguem seguir os links sob demanda.
-- **claude.ai web / ChatGPT**: cole o `SKILL.md` como instrução de projeto. Sem filesystem, os links de `references/` morrem — cole junto só a seção da ferramenta que você usa (ex: só o bloco Midjourney do `tool-routing.md`).
+**1. Pasta de skills (automático).** Algumas CLIs procuram, numa pasta, uma subpasta que contenha `SKILL.md`. O `install.py` põe o link nessas pastas:
 
-O que se perde fora do Claude Code: descoberta automática da skill e garantia do carregamento sob demanda. O conteúdo em si é portátil.
+| `--target` | Pasta | Quem usa |
+|---|---|---|
+| `claude` | `~/.claude/skills/` | Claude Code |
+| `codex` | `~/.codex/skills/` | Codex CLI |
+| `agents` | `~/.agents/skills/` | pasta compartilhada entre ferramentas |
+
+**2. Arquivo de instruções (manual).** Para uma CLI que lê um arquivo de regras, rode `python3 scripts/install.py snippet` e cole o bloco no arquivo de instruções dela: `GEMINI.md` (Gemini CLI), `AGENTS.md` (OpenCode e outras), regras do Cursor, `.clinerules`, `.windsurfrules`, `.github/copilot-instructions.md`. O bloco traz o caminho absoluto do `SKILL.md`, e diz que os links de `references/` são relativos ao repositório.
+
+**O que foi verificado.** Só o Claude Code usou a skill de ponta a ponta até aqui. Os testes de `tests/test_install.py` verificam que o link leva ao `SKILL.md`, que os links relativos resolvem por ele, que o instalador recusa substituir pasta real e não apaga nada que não criou, e que o bloco do `snippet` não depende de ferramenta do Claude Code. Nenhum teste sobe uma CLI de verdade: que cada CLI carregue a skill é coisa a confirmar na sua máquina, numa sessão nova.
 
 ## Desinstalar
 
@@ -383,7 +396,8 @@ O Studio guarda, fora da pasta da skill, em `~/.local/share/prompt-techniques-st
 **Antes de desinstalar, copie esse diretório se quiser manter as imagens geradas.** O comando abaixo apaga só a skill; ele não apaga os dados do Studio. Para removê-los também, apague esse diretório à parte. Se você usou `--data-dir` com outro caminho, esse caminho também não é removido.
 
 ```bash
-rm -rf ~/.claude/skills/prompt-techniques
+cd ~/src/prompt-engineering-master && python3 scripts/install.py remove   # remove só os links que apontam para cá
+rm -rf ~/src/prompt-engineering-master                                    # depois, se quiser apagar o repositório
 ```
 
 ## Créditos

@@ -1,7 +1,7 @@
 # Studio: local page and command line, one approval per paid run
 
 The studio generates Nano Banana images. It has two front ends over the same rules in `core.py`: a local page
-(`serve`) and a command line (`plan`, `approve`, `run`, and the rest). Claude Code uses the command line, so the
+(`serve`) and a command line (`plan`, `approve`, `run`, and the rest). An agent with a shell uses the command line, so the
 person does not have to operate a separate interface. The paid API is called only after an approval for that exact
 brief. Stdlib only. Nothing runs at import time.
 
@@ -165,10 +165,12 @@ a chained edit behaves as the example suggests, the upstream timeout (the client
 
 ## Platform and catalog
 
-- The store locks files with `fcntl`, which exists only on POSIX systems (Linux, macOS). On Windows the store refuses to
-  run, so the studio stops at startup with `unsupported_platform`.
-- The studio does not check the age of the catalog. Its date is `verified_on` in `references/gemini-image-models.json`.
-  `scripts/check_repo.py` warns when that date is more than 90 days old, but only for whoever runs that check.
+- The store locks files with `fcntl` on POSIX systems (Linux, macOS) and with `msvcrt` on Windows. A lock that stays busy
+  for 30 seconds ends the operation with `store_busy` (503). The Windows path is tested with a stand-in module
+  (`tests/test_studio_platform.py`), not on a Windows machine. Without either module the store refuses to run.
+- A plan warns (`catalog_stale`) when the catalog's `verified_on` date is more than 90 days old. The warning does not
+  block the plan and is not part of the brief's hash. `scripts/check_repo.py` warns on the same date and on the routing
+  and image-target dates.
 
 ## Tests
 
@@ -183,6 +185,8 @@ a chained edit behaves as the example suggests, the upstream timeout (the client
   edits and chaining, cases, ratings, history, and the refusals.
 - `test_studio_checks.py`: image headers (PNG, JPEG, WebP), the aspect tolerance, the library search, the fixed cases,
   and the comparison.
+- `test_studio_platform.py`: the Windows lock path (against a stand-in module), the catalog age warning and the 429 hint.
+- `test_studio_browser.py`: the page rendered in headless Chrome or Chromium, skipped when no browser is installed.
 
 No test calls Google's API. The tests use localhost and simulated transports.
 
@@ -190,11 +194,15 @@ No test calls Google's API. The tests use localhost and simulated transports.
 
 - Live API calls. None were made: `GEMINI_API_KEY` was not set where this was built, so the paid path is tested only
   with a simulated transport.
-- Real browser rendering. The page was not changed in this round. `tests/studio_page_check.mjs` drives the page script
-  through a small DOM stub; no real browser was used.
+- Clicking through the page. `tests/test_studio_browser.py` renders the page in headless Chrome or Chromium and checks
+  that its script ran; it is skipped when no browser is on PATH. Plan, approve and run are not clicked in a browser by
+  the tests. `tests/studio_page_check.mjs` drives those steps through a small DOM stub.
 - Server behaviour of a chained edit, the default of `store`, the format of the response `id`, and the 512 px option:
   not verified by a live call.
-- Official rate and text limits. None is documented in the pages read, so the studio sets none beyond the 20 MB inline limit above.
+- Rate limits. The API documents how they work (per project, per usage tier, images per minute for image models, and
+  429 RESOURCE_EXHAUSTED), but not the numbers for each model: those are shown in Google AI Studio (page read 2026-10-14).
+  The studio sets none beyond the 20 MB inline limit. A 429 comes back with a hint: the approval is already spent, so
+  plan again.
 - Content policy. It is not enforced by code: no real brands and no real people in prompts, and no sexualized
   depictions of real people.
 

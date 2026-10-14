@@ -20,12 +20,17 @@ import secrets
 import sys
 import tempfile
 import threading
-from datetime import datetime, timedelta, timezone
+import time
+from datetime import date, datetime, timedelta, timezone
 
 try:
     import fcntl
-except ImportError:  # not POSIX: the store refuses to run instead of running unlocked
+except ImportError:  # not POSIX; the store falls back to msvcrt, and refuses to run if neither exists
     fcntl = None
+try:
+    import msvcrt
+except ImportError:  # not Windows
+    msvcrt = None
 
 from validate_prompt import validate  # noqa: E402
 from contracts import model_ratios, reference_total  # noqa: E402
@@ -216,7 +221,7 @@ def build_brief(catalog, store, *, prompt, model_id, aspect_ratio, image_size, r
     refs = [store.check_reference(ref) for ref in references]
     if inline_request_bytes(prompt, [store.reference_size(ref) for ref in refs]) > MAX_INLINE_REQUEST_BYTES:
         raise StudioError("request_too_large", "The prompt and the reference images together are over the 20 MB inline request limit.", 413)
-    findings = validate(prompt, model_id, catalog)
+    findings = validate(prompt, model_id, catalog) + catalog_age_findings(catalog)
     blocking = [f for f in findings if f["level"] == "ERROR"]
     if blocking:
         raise StudioError("prompt_blocked", "; ".join(f"{f['code']}: {f['message']}" for f in blocking))
@@ -254,6 +259,8 @@ class Store:
             os.makedirs(os.path.join(root, sub), mode=0o700, exist_ok=True)
         self._runs_cache = {}  # run file name -> (file identity, record); see list_runs
         self._runs_lock = threading.Lock()
+        # msvcrt locks belong to the process, not the thread: the threads of the server queue here before the file lock.
+        self._msvcrt_mutex = threading.Lock()
         self._runs_warned = set()  # (file name, identity) of each unreadable run record already reported
 
     def _path(self, *parts):
@@ -261,15 +268,24 @@ class Store:
 
     @contextlib.contextmanager
     def _locked(self):
-        if fcntl is None:
+        if fcntl is None and msvcrt is None:
             raise StudioError("unsupported_platform",
-                              "The studio needs POSIX file locks and refuses to run without them.", 500)
-        with open(self._path(".lock"), "a") as handle:
-            fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
-            try:
-                yield
-            finally:
-                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+                              "The studio needs file locks (fcntl on POSIX, msvcrt on Windows) and refuses to run without them.",
+                              500)
+        with open(self._path(".lock"), "a+b") as handle:
+            if fcntl is not None:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+                try:
+                    yield
+                finally:
+                    fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+            else:
+                with self._msvcrt_mutex:
+                    _msvcrt_lock(handle, msvcrt)
+                    try:
+                        yield
+                    finally:
+                        _msvcrt_unlock(handle, msvcrt)
 
     # Briefs are content-addressed: a changed field makes a new brief with a new hash.
     def save_brief(self, brief):
@@ -493,6 +509,46 @@ class Store:
                 return handle.read(), record["mime_type"]
         except FileNotFoundError:
             raise StudioError("output_missing", "The generated image file is missing from the studio data.", 404) from None
+
+
+LOCK_TIMEOUT_SECONDS = 30  # Windows only: how long an operation waits for the store lock before it gives up
+CATALOG_STALE_DAYS = 90
+
+
+def _msvcrt_lock(handle, module, timeout=LOCK_TIMEOUT_SECONDS):
+    """msvcrt locks byte ranges from the current position. The lock file has at least one byte, so byte 0 is locked."""
+    handle.seek(0, os.SEEK_END)
+    if handle.tell() == 0:
+        handle.write(b"\0")
+        handle.flush()
+    limit = time.monotonic() + timeout
+    while True:
+        handle.seek(0)
+        try:
+            module.locking(handle.fileno(), module.LK_NBLCK, 1)
+            return
+        except OSError:
+            if time.monotonic() >= limit:
+                raise StudioError("store_busy", "Another studio operation holds the store lock. Try again in a moment.",
+                                  503) from None
+            time.sleep(0.05)
+
+
+def _msvcrt_unlock(handle, module):
+    handle.seek(0)
+    module.locking(handle.fileno(), module.LK_UNLCK, 1)
+
+
+def catalog_age_findings(catalog, today=None):
+    """A warning, not an error, when the model catalog was verified long ago: its IDs, prices and limits may have changed."""
+    today = today or date.today()
+    verified = date.fromisoformat(catalog["verified_on"])
+    age = (today - verified).days
+    if age <= CATALOG_STALE_DAYS:
+        return []
+    return [{"level": "WARN", "code": "catalog_stale",
+             "message": (f"The model catalog was verified {age} days ago (on {verified.isoformat()}). Check the Google "
+                         "model pages before relying on its IDs, prices and limits.")}]
 
 
 def _write_atomic(path, data):

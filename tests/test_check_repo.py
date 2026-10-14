@@ -8,7 +8,7 @@ import unittest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
-from check_repo import check_key_in_url, check_model_ids, repo_files  # noqa: E402
+from check_repo import check_key_in_url, check_model_ids, dated_facts, repo_files, stale_warnings  # noqa: E402
 
 CATALOG = {
     "models": [
@@ -109,6 +109,37 @@ class RepoIsCleanTest(unittest.TestCase):
         script = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts", "check_repo.py")
         result = subprocess.run([sys.executable, script], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+
+class StaleDatedFactsTest(unittest.TestCase):
+    TODAY = __import__("datetime").date(2026, 10, 14)
+
+    def test_a_fact_older_than_ninety_days_gets_a_warning_and_a_fresh_one_does_not(self):
+        warnings = stale_warnings({"fresh.json": "2026-10-13", "old.md": "2026-01-01"}, self.TODAY)
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("old.md", warnings[0])
+        self.assertIn("re-check", warnings[0])
+
+    def test_every_dated_fact_of_the_repo_is_read_from_its_file(self):
+        texts = {
+            "references/tool-routing.md": "> Last verified: 2026-10-13. Image targets re-read 2026-10-14.",
+            "references/image-targets.json": '{"verified_on": "2026-10-14"}',
+            "references/gemini-image-models.json": '{"verified_on": "2026-10-12"}',
+        }
+        self.assertEqual(dated_facts(texts), {
+            "references/tool-routing.md": "2026-10-13",
+            "references/image-targets.json": "2026-10-14",
+            "references/gemini-image-models.json": "2026-10-12",
+        })
+
+    def test_an_unreadable_date_is_reported_instead_of_crashing_the_check(self):
+        warnings = stale_warnings({"references/image-targets.json": "2026-13-40"}, self.TODAY)
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("no readable verification date", warnings[0])
+
+    def test_a_missing_or_broken_dated_file_is_skipped_not_crashed_on(self):
+        self.assertEqual(dated_facts({"references/image-targets.json": "{not json"}), {})
+        self.assertEqual(dated_facts({}), {})
 
 
 if __name__ == "__main__":
