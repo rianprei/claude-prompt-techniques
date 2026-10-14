@@ -12,7 +12,8 @@ from validate_prompt import (check_edit_preservation, check_negative_list,  # no
                              check_reference_roles, check_text_quotes, validate)
 
 OFFICIAL_RATIOS = ["1:1", "1:4", "4:1", "1:8", "8:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"]
-CURRENT = ("gemini-nano-banana-2.1", "gemini-3.1-flash-image", "gemini-3.1-flash-lite-image", "gemini-3-pro-image")
+# Models whose tables the guide still lists. The 3.1 Flash model is deprecated but still listed, so it stays here.
+LISTED = ("gemini-nano-banana-2.1", "gemini-3.1-flash-image", "gemini-3.1-flash-lite-image", "gemini-3-pro-image")
 
 
 class AliasTest(unittest.TestCase):
@@ -69,13 +70,13 @@ class PerModelLimitsTest(unittest.TestCase):
         cls.catalog = load_catalog()
         cls.models = {m["id"]: m for m in cls.catalog["models"]}
 
-    def test_each_current_model_accepts_only_official_ratios(self):
-        for model_id in CURRENT:
+    def test_each_listed_model_accepts_only_official_ratios(self):
+        for model_id in LISTED:
             for ratio in model_ratios(self.catalog, self.models[model_id]):
                 self.assertIn(ratio, OFFICIAL_RATIOS, model_id)
 
     def test_fourteen_ratios_only_for_the_two_models_the_guide_lists_them_for(self):
-        full = {m for m in CURRENT if len(model_ratios(self.catalog, self.models[m])) == 14}
+        full = {m for m in LISTED if len(model_ratios(self.catalog, self.models[m])) == 14}
         self.assertEqual(full, {"gemini-nano-banana-2.1", "gemini-3.1-flash-image"})
 
     def test_pro_has_no_extreme_ratios(self):
@@ -83,8 +84,8 @@ class PerModelLimitsTest(unittest.TestCase):
         for ratio in ("1:4", "4:1", "1:8", "8:1"):
             self.assertNotIn(ratio, ratios)
 
-    def test_reference_total_is_fourteen_for_each_current_model(self):
-        for model_id in CURRENT:
+    def test_reference_total_is_fourteen_for_each_listed_model(self):
+        for model_id in LISTED:
             self.assertEqual(reference_total(self.models[model_id]), 14, model_id)
 
     def test_per_type_limits_add_up_to_the_total_where_they_are_listed(self):
@@ -164,6 +165,30 @@ class DocumentedFactsTest(unittest.TestCase):
                 for alias in model.get("aliases", []):
                     self.assertIn(f'"{alias}"', routing, f"{model['id']}: alias {alias!r} is not in the profile")
 
+    def test_deprecated_flash_names_nano_banana_2_1_as_replacement(self):
+        model = next(m for m in load_catalog()["models"] if m["id"] == "gemini-3.1-flash-image")
+        self.assertEqual(model["status"], "deprecated")
+        self.assertEqual(model["replacement"], "gemini-nano-banana-2.1")
+
+    def test_shutdown_of_2_5_is_not_invented_and_both_dates_are_kept(self):
+        model = next(m for m in load_catalog()["models"] if m["id"] == "gemini-2.5-flash-image")
+        self.assertIsNone(model["shutdown"])
+        self.assertEqual(model["shutdown_earliest_per_table"], "2027-03-15")
+        self.assertIn("October 2, 2026", model["shutdown_conflict"])
+
+    def test_lite_token_limits_come_from_its_model_page(self):
+        model = next(m for m in load_catalog()["models"] if m["id"] == "gemini-3.1-flash-lite-image")
+        self.assertEqual((model["input_token_limit"], model["output_token_limit"]), (65536, 4096))
+
+    def test_gemini_4_argon_is_outside_the_image_catalog(self):
+        catalog = load_catalog()
+        self.assertNotIn("gemini-4-argon", [m["id"] for m in catalog["models"]])
+        self.assertEqual([o["id"] for o in catalog["outside_catalog"]], ["gemini-4-argon"])
+
+    def test_validator_warns_that_nano_banana_2_is_deprecated(self):
+        findings = validate("Make a poster of a lighthouse.", target="Nano Banana 2", catalog=load_catalog())
+        self.assertIn("W-MODEL-DEPRECATED", [f["code"] for f in findings])
+
 
 class SourceHostsTest(unittest.TestCase):
     """Image facts cite only Google's own pages, and the API endpoint, so each one can be checked at its source."""
@@ -198,6 +223,13 @@ class MarkdownAgreementTest(unittest.TestCase):
             if model["status"] in ("current", "active", "deprecated"):
                 self.assertIn(model["id"], by_model, model["id"])
                 self.assertEqual(by_model[model["id"]], set(model.get("aspect_ratios", [])), model["id"])
+
+    def test_deprecated_models_are_marked_deprecated_in_the_models_table(self):
+        section = self.md.split("## Models", 1)[1].split("## Enumerations", 1)[0]
+        for model in self.catalog["models"]:
+            if model["status"] == "deprecated":
+                row = next(ln for ln in section.split("\n") if f"`{model['id']}`" in ln)
+                self.assertIn("Deprecated", row, model["id"])
 
     def test_thinking_rows_list_exactly_the_json_levels_and_default(self):
         for model in self.catalog["models"]:

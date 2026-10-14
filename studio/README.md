@@ -26,9 +26,9 @@ The page opens at http://127.0.0.1:8765/. Options: `--port` (default 8765), `--d
 
 ## Rules enforced in code (`core.py`)
 
-- **Models.** Only current or active IDs without preview are offered. Deprecated and shut-down IDs are not.
+- **Models.** Only current or active IDs without preview are offered. Deprecated and shut-down IDs are not. On 2026-10-13 that means `gemini-nano-banana-2.1`, `gemini-3.1-flash-lite-image` and `gemini-3-pro-image`. `gemini-3.1-flash-image` is deprecated (release notes, 2026-10-06), so it is refused for new briefs.
   The source is `references/gemini-image-models.json`.
-- **Sizes.** Only sizes with a catalog price. 512 px is offered only for `gemini-3.1-flash-image`, the one model whose documentation lists it. Its JSON value (`512`) is the enum in the Interactions API reference; no live call was made.
+- **Sizes.** Only sizes with a catalog price. 512 px is documented only for `gemini-3.1-flash-image`, which is deprecated, so no offer lists 512 px. Its JSON value (`512`) is in the Interactions API reference; no live call was made.
 - **Aspect ratios.** Each offer lists the ratios its model accepts (`aspect_ratios` in the catalog). The page
   rebuilds the list when the model changes. A ratio the model does not accept is refused at planning time. For example,
   `gemini-3-pro-image` takes 10 ratios and has no 1:4, and Nano Banana 2.1 takes all 14.
@@ -63,10 +63,10 @@ The page opens at http://127.0.0.1:8765/. Options: `--port` (default 8765), `--d
 
 The client calls the Interactions endpoint shown in the official image guide (local copy read on 2026-10-12):
 `POST /v1beta/interactions`, with text and image parts in `input` and `response_format` set to
-`{type: image, aspect_ratio, image_size}`. The image is read from `output_image.data`, or from the first image
-block in `steps[].content`.
+`{type: image, aspect_ratio, image_size}`. The image is read from the first image block in a `model_output` step
+(`steps[].content[]`, with `data` and `mime_type`), the shape the Interactions API reference documents (read 2026-10-13).
 
-UNKNOWN until a live call is made: the response field names beyond the guide's examples, and the upstream
+Not confirmed by a live call: that the API returns this shape for an image request (the reference documents it), and the upstream
 timeout (the client waits 300 s by default, our own choice; `--timeout` changes it). No live call was made while this was built.
 
 ## Data (`~/.local/share/prompt-techniques-studio`, created with mode 0700)

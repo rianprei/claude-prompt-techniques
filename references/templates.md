@@ -529,7 +529,7 @@ After each completed step: ✅ [what was done] — [file(s) affected]. Back ever
 Operation: Generate
 Model: [model ID from the catalog]
 Aspect ratio (request field): [a ratio that model accepts]
-Image size (request field): [1K | 2K | 4K; 512 only for gemini-3.1-flash-image]
+Image size (request field): [1K | 2K | 4K; 512 only for gemini-3.1-flash-image, which is deprecated]
 
 Prompt:
 [One narrative paragraph. Subject and action first; then setting and time; then composition

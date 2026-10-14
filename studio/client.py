@@ -69,10 +69,7 @@ def urllib_transport(url, headers, body, timeout):
 
 
 def find_image(data):
-    """The image block of an Interactions response: output_image, else the first image in the model steps."""
-    output = data.get("output_image")
-    if isinstance(output, dict) and output.get("data"):
-        return output
+    """The first image block in the model steps of an Interactions response (the shape the API reference documents)."""
     steps = data.get("steps")
     for step in steps if isinstance(steps, list) else []:
         if not isinstance(step, dict) or step.get("type") != "model_output":

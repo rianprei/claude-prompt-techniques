@@ -22,7 +22,7 @@ Adicione 1 linha por teste em `evals/results.md` (crie se não existir):
 | data | ferramenta | tarefa (curta) | re-prompts A (manual) | re-prompts B (skill) | vencedor | nota |
 ```
 
-Status em 2026-10-12: nenhum teste registrado ainda.
+Status em 2026-10-13: nenhum teste registrado. A rodada A/B exige chamadas aos modelos e um avaliador humano. O responsável excluiu testes com o Gemini nesta rodada, então ela não foi executada.
 
 ## O que o log responde com o tempo
 

@@ -29,8 +29,8 @@ BRIEF = {"prompt": "A calm harbor", "model": "gemini-nano-banana-2.1",
 
 
 def image_payload(data=PNG, mime="image/png"):
-    return json.dumps({"output_image": {"data": base64.b64encode(data).decode("ascii"),
-                                        "mime_type": mime}}).encode("utf-8")
+    block = {"type": "image", "data": base64.b64encode(data).decode("ascii"), "mime_type": mime}
+    return json.dumps({"steps": [{"type": "model_output", "content": [block]}]}).encode("utf-8")
 
 
 class RequestShape(unittest.TestCase):
@@ -110,10 +110,10 @@ class GenerateTests(unittest.TestCase):
 
 
 class ParseTests(unittest.TestCase):
-    def test_output_image_shape_is_read(self):
+    def test_image_in_the_first_model_step_is_read(self):
         self.assertEqual(parse_response(200, image_payload())["data"], PNG)
 
-    def test_steps_shape_is_read_when_output_image_is_missing(self):
+    def test_image_after_a_text_block_in_the_model_step_is_read(self):
         payload = {"steps": [{"type": "model_output", "content": [
             {"type": "text", "text": "here"},
             {"type": "image", "data": base64.b64encode(PNG).decode("ascii"), "mime_type": "image/png"},
@@ -144,7 +144,8 @@ class ParseTests(unittest.TestCase):
             parse_response(200, b"<html>")
         self.assertEqual(ctx.exception.code, "bad_response")
         with self.assertRaises(ProviderError) as ctx:
-            parse_response(200, json.dumps({"output_image": {"data": "%%%"}}).encode("utf-8"))
+            parse_response(200, json.dumps({"steps": [{"type": "model_output", "content": [
+                {"type": "image", "data": "%%%"}]}]}).encode("utf-8"))
         self.assertEqual(ctx.exception.code, "bad_response")
 
 

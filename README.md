@@ -209,7 +209,7 @@ Regras específicas em `references/tool-routing.md`:
 | Geradores full-stack | Bolt, v0, Lovable, Figma Make, Google Stitch |
 | Pesquisa/orquestração | Perplexity, Manus AI |
 | Browser/computer-use | Comet, Atlas, Claude in Chrome |
-| Imagem | Midjourney, GPT Image, Stable Diffusion, SeeDream, Nano Banana / Gemini Image (2.1, 2, 2 Lite, Pro), Flux, Ideogram, ComfyUI |
+| Imagem | Midjourney, GPT Image, Stable Diffusion, SeeDream, Nano Banana / Gemini Image (2.1, 2 Lite, Pro; 2 descontinuado em 2026-10-06), Flux, Ideogram, ComfyUI |
 | Vídeo | Sora, Runway, Kling, LTX Video, Dream Machine, Seedance |
 | Voz | ElevenLabs |
 | Música | Suno |
@@ -241,7 +241,7 @@ Ferramenta fora da lista: o Claude aplica regras genéricas (instrução explíc
 
 ## Princípios de persuasão
 
-`references/persuasion.md` — baseado em Meincke et al., "Call Me A Jerk" (SSRN 5357179, 2025; título e autores conferidos no Crossref em 2026-10-13). A descrição de terceiros (NeoLabHQ) dá **33,3% para 72,0%** no **GPT-4o mini**, com N=28.000; esses números não foram conferidos no preprint, porque o SSRN retornou HTTP 403 em 2026-10-12. A versão revisada por pares do mesmo grupo (PNAS, 2026, DOI 10.1073/pnas.2535868123) testou GPT-5 mini, Claude Haiku 4.5 e Gemini 3 Flash: a compliance foi de 35,3% para 51,3% em 126.000 conversas, segundo o resumo lido. Mede compliance com a instrução, não qualidade da resposta.
+`references/persuasion.md` — baseado em Meincke et al., "Call Me A Jerk" (SSRN 5357179, 2025; título e autores conferidos no Crossref em 2026-10-13). A descrição de terceiros (NeoLabHQ) dá **33,3% para 72,0%** no **GPT-4o mini**, com N=28.000; esses números não foram conferidos no preprint: o SSRN bloqueou a página (desafio do Cloudflare) em 2026-10-12 e 2026-10-13, o Crossref não tem resumo, e o arXiv e o Semantic Scholar não têm o artigo. A versão revisada por pares do mesmo grupo (PNAS, 2026, DOI 10.1073/pnas.2535868123) testou GPT-5 mini, Claude Haiku 4.5 e Gemini 3 Flash: a compliance foi de 35,3% para 51,3% em 126.000 conversas, segundo o resumo lido. Mede compliance com a instrução, não qualidade da resposta.
 
 **Aviso importante:** compliance = obediência à instrução, **não** qualidade ou veracidade da resposta. Um prompt mais "obedecido" não é automaticamente um prompt melhor. Por isso o escopo aqui é estreito: disciplina de formato e processo (seguir checklist, anunciar skill, não pular verificação) — não "melhorar respostas" em geral.
 
@@ -308,7 +308,7 @@ GEMINI_API_KEY=... python3 -m studio serve   # API real; a chave é lida em cada
 
 - Escuta só em 127.0.0.1. O token por processo protege contra outros sites: eles não leem a página que o contém nem enviam o cabeçalho sem CORS. Não protege contra processos locais: a página com o token é servida em `GET /`, então qualquer processo ou usuário que alcance 127.0.0.1 pode emitir aprovações e usar a API paga com a sua chave. Use o Studio em máquina de usuário único. A chave nunca vai para a página nem para uma URL.
 - Precisa de locks POSIX (`fcntl`): em Windows o store recusa operar. Plataforma e catálogo: [`studio/README.md`](studio/README.md).
-- Estado: P1 do plano da GUI. Nenhuma chamada real à API foi feita. O formato da resposta, além dos exemplos do guia, fica UNKNOWN até a primeira chamada real.
+- Estado: P1 do plano da GUI. Nenhuma chamada real à API foi feita. O formato da resposta segue a referência da API (`steps`, com blocos `image`; lida em 2026-10-13). Só uma chamada real confirma que o serviço devolve esse formato para pedidos de imagem.
 
 ## Limitações conhecidas
 

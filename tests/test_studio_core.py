@@ -30,8 +30,11 @@ NANO = "gemini-nano-banana-2.1"
 class OfferTests(unittest.TestCase):
     def test_only_current_and_active_models_without_preview_are_offered(self):
         ids = {offer["id"] for offer in offered_models(load_catalog())}
-        self.assertEqual(ids, {"gemini-nano-banana-2.1", "gemini-3.1-flash-image",
-                               "gemini-3.1-flash-lite-image", "gemini-3-pro-image"})
+        self.assertEqual(ids, {"gemini-nano-banana-2.1", "gemini-3.1-flash-lite-image", "gemini-3-pro-image"})
+
+    def test_deprecated_flash_is_not_offered_so_512_px_is_not_offered_either(self):
+        offers = offered_models(load_catalog())
+        self.assertNotIn("512", {size for offer in offers for size in offer["sizes"]})
 
     def test_512_px_stays_hidden_until_the_catalog_confirms_it(self):
         catalog = load_catalog()
@@ -48,8 +51,8 @@ class OfferTests(unittest.TestCase):
 
     def test_reference_cap_is_the_documented_total_of_fourteen(self):
         caps = {offer["id"]: offer["max_references"] for offer in offered_models(load_catalog())}
-        self.assertEqual(caps, {"gemini-nano-banana-2.1": 14, "gemini-3.1-flash-image": 14,
-                                "gemini-3.1-flash-lite-image": 14, "gemini-3-pro-image": 14})
+        self.assertEqual(caps, {"gemini-nano-banana-2.1": 14, "gemini-3.1-flash-lite-image": 14,
+                                "gemini-3-pro-image": 14})
 
     def test_each_offer_lists_only_the_aspect_ratios_its_model_accepts(self):
         offers = {offer["id"]: offer for offer in offered_models(load_catalog())}
@@ -102,6 +105,11 @@ class BriefTests(StoreCase):
             self.brief(model_id="gemini-3.1-flash-image-preview")
         self.assertEqual(ctx.exception.code, "model_not_offered")
 
+    def test_deprecated_flash_is_refused_before_approval(self):
+        with self.assertRaises(StudioError) as ctx:
+            self.brief(model_id="gemini-3.1-flash-image", image_size="512")
+        self.assertEqual(ctx.exception.code, "model_not_offered")
+
     def test_unofficial_aspect_ratio_is_refused(self):
         with self.assertRaises(StudioError) as ctx:
             self.brief(aspect_ratio="3:1")
@@ -115,6 +123,8 @@ class BriefTests(StoreCase):
         self.assertEqual(self.brief(model_id="gemini-3.1-flash-lite-image", aspect_ratio="21:9")["brief"]["aspect_ratio"], "21:9")
 
     def test_512_px_is_refused_while_unconfirmed(self):
+        # The model is deprecated, so the status gate would answer first. This test checks the size gate alone.
+        next(m for m in self.catalog["models"] if m["id"] == "gemini-3.1-flash-image")["status"] = "active"
         self.catalog["image_sizes"]["512_json_value_confirmed"] = False
         with self.assertRaises(StudioError) as ctx:
             self.brief(model_id="gemini-3.1-flash-image", image_size="512")
@@ -125,9 +135,9 @@ class BriefTests(StoreCase):
         refs = [self.store.save_reference("image/png", png) for _ in range(3)]
         with mock.patch("studio.core.MAX_INLINE_REQUEST_BYTES", 1000):
             with self.assertRaises(StudioError) as ctx:
-                self.brief(model_id="gemini-3.1-flash-image", references=refs)
+                self.brief(model_id=NANO, references=refs)
             self.assertEqual(ctx.exception.code, "request_too_large")
-            plan = self.brief(model_id="gemini-3.1-flash-image", references=refs[:2])
+            plan = self.brief(model_id=NANO, references=refs[:2])
         self.assertEqual(len(plan["brief"]["references"]), 2)
 
     def test_fifteen_references_are_refused_and_fourteen_are_not(self):

@@ -101,9 +101,12 @@ Model-routing rules were checked against public documentation from Anthropic,
 OpenAI, xAI, and Cursor's published model list. The rules are stated in this project's own words, and no
 vendor text is reproduced, except short quoted sentences, which are attributed where used. Anthropic, "Prompting best practices" (platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices), section "Long context prompting", read 2026-10-12.
 
-Google, Gemini API documentation (ai.google.dev: image generation guide, the Nano Banana 2.1 model page,
-API reference, pricing and deprecations), the DeepMind prompt guide (deepmind.google/models/gemini-image/prompt-guide/),
-and the Google Cloud prompting guide dated 2026-03-05. Read 2026-10-12 and again 2026-10-13. Facts are recorded
+Google, Gemini API documentation (ai.google.dev: the image generation guide, the model pages for the Nano Banana
+models, Gemini 2.5 Flash Image and Gemini 4 Argon, the release notes, the generate-content and Interactions API
+references, the image understanding page, pricing and deprecations), the DeepMind prompt guide
+(deepmind.google/models/gemini-image/prompt-guide/), and the Google Cloud prompting guide dated 2026-03-05. Read 2026-10-12,
+and again 2026-10-13 (the release notes and the model pages were read on 2026-10-13; the two API references and the
+image understanding page were read again). Facts are recorded
 (model IDs, aliases, sizes, aspect ratios, limits, prices, dates) in references/gemini-image-models.md and
 references/gemini-image-models.json. Short quoted phrases from these pages appear where they are used, with their
 source; no page text is reproduced at length.

@@ -272,10 +272,10 @@ Use this profile when the user names Nano Banana, Gemini Image or a Gemini image
 
 **1. Route the name to one model ID.** A commercial name is not an API ID. Write the ID in the request, and use the name in the explanation.
 - "Nano Banana 2.1", "Gemini Nano Banana 2.1", or no model named for a new project: `gemini-nano-banana-2.1`. The guide's primary model, and the default.
-- "Nano Banana 2", "Gemini 3.1 Flash Image", or 512 px requested: `gemini-3.1-flash-image`. The only model with 512 px.
+- "Nano Banana 2", "Gemini 3.1 Flash Image", or 512 px requested: `gemini-3.1-flash-image` is deprecated (release notes, 2026-10-06; no shutdown date announced). Say so, and name `gemini-nano-banana-2.1` for new work. It is still the only model the guide lists with 512 px.
 - "Nano Banana 2 Lite", "Gemini 3.1 Flash Lite Image", or cheapest and fastest: `gemini-3.1-flash-lite-image`. 1K only, and not for many references or long edit chains.
 - "Nano Banana Pro", "Gemini 3 Pro Image", or premium professional assets: `gemini-3-pro-image`. No 1:4, 4:1, 1:8 or 8:1. Up to 14 references in total, split 6 objects, 5 characters and 3 styles.
-- "Gemini 2.5 Flash Image": `gemini-2.5-flash-image` is deprecated. Say so, and propose Nano Banana 2 Lite, the guide's migration path.
+- "Gemini 2.5 Flash Image": `gemini-2.5-flash-image` is deprecated, and its shutdown date is disputed: 2027-03-15 in the deprecations table, 2026-10-02 in the pricing warning. Say so, do not promise that it still works, and propose Nano Banana 2 Lite, the table's replacement.
 - Preview names are shut down (the 3.1 and Pro previews on 2026-06-25). Name the replacement. Never reuse a preview ID.
 - A bare "Nano Banana" or "Gemini Image" names the family. Use `gemini-nano-banana-2.1` and say so. When a request names two models, ask one question, or choose the one the task needs and say why.
 
@@ -314,7 +314,7 @@ Describe what should be there, not what to leave out. The guide's example is "an
 
 **11. What to hand back.** One copyable prompt block, then the model ID, the ratio and the size, then the reference list (name and role) when there are references. Add one line on what was optimized. Give no theory of prompt engineering unless the user asks for it.
 
-**12. Limits and safety.** The official pages give no numbers for text length or banned words, so do not state any. A blocked prompt (`PROHIBITED_CONTENT`, `IMAGE_SAFETY` or `IMAGE_PROHIBITED_CONTENT`) is a question for the user: ask before changing it, and never rephrase it to get past the filter. Images carry a SynthID watermark, which the guide states. Do not promise C2PA: the Cloud blog says it, and the current guide does not. Use only images the user has the rights to upload.
+**12. Limits and safety.** The official pages give no numbers for text length or banned words, so do not state any. A blocked prompt (`PROHIBITED_CONTENT`, `IMAGE_SAFETY` or `IMAGE_PROHIBITED_CONTENT`) is a question for the user: ask before changing it, and never rephrase it to get past the filter. Images carry a SynthID watermark, which the guide states. C2PA is stated by the Lite model page and the Cloud blog, not by the guide: do not promise it. Use only images the user has the rights to upload.
 
 ---
 

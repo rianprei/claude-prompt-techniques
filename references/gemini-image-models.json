@@ -10,6 +10,12 @@
     "pricing": "https://ai.google.dev/gemini-api/docs/pricing",
     "deprecations": "https://ai.google.dev/gemini-api/docs/deprecations",
     "deepmind_prompt_guide": "https://deepmind.google/models/gemini-image/prompt-guide/",
+    "release_notes": "https://ai.google.dev/gemini-api/docs/changelog",
+    "model_page_gemini_2_5_flash_image": "https://ai.google.dev/gemini-api/docs/models/gemini-2.5-flash-image",
+    "model_page_gemini_3_1_flash_image": "https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-image",
+    "model_page_gemini_3_1_flash_lite_image": "https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite-image",
+    "model_page_gemini_3_pro_image": "https://ai.google.dev/gemini-api/docs/models/gemini-3-pro-image",
+    "model_page_gemini_4_argon": "https://ai.google.dev/gemini-api/docs/models/gemini-4-argon",
     "cloud_prompting_guide_dated_2026_03_05": "https://cloud.google.com/blog/products/ai-machine-learning/ultimate-prompting-guide-for-nano-banana"
   },
   "aspect_ratios": [
@@ -45,10 +51,10 @@
     "uppercase_k_required": true,
     "512_documented_for": "gemini-3.1-flash-image",
     "512_json_value_confirmed": true,
-    "512_basis": "Guide (2026-10-13): 'Gemini 3.1 Flash Image adds the smaller 512px (0.5K) resolution (not supported on Gemini Nano Banana 2.1)'; its per-model table lists 512px for 3.1 Flash only. The enum values 512, 1K, 2K, 4K are in the Interactions API reference (image_size) and the generate-content reference (imageSize). The guide also writes the label as '512px (05.K)' once. No live call was made."
+    "512_basis": "Guide (2026-10-13): 'Gemini 3.1 Flash Image adds the smaller 512px (0.5K) resolution (not supported on Gemini Nano Banana 2.1)'; its per-model table lists 512px for 3.1 Flash only. The Interactions API reference (read again 2026-10-13) lists image_size values 512, 1K, 2K and 4K. The generate-content reference (read again 2026-10-13) lists the enum IMAGE_SIZE_FIVE_TWELVE for 512px. The guide also writes the label as '512px (05.K)' once. No live call was made. The only model with 512 px is deprecated (gemini-3.1-flash-image), so the studio does not offer 512 px."
   },
   "inline_request_limit_bytes": 20000000,
-  "inline_request_limit_basis": "Image understanding page: inline image data limits the total request size (text prompts, system instructions and inline bytes) to 20MB. The studio counts each reference as base64 characters plus the prompt bytes, the conservative reading.",
+  "inline_request_limit_basis": "Image understanding page (read again 2026-10-13): 'Inline image data limits your total request size (text prompts, system instructions, and inline bytes) to 20MB.' The studio counts each reference as base64 characters plus the prompt bytes, the conservative reading.",
   "thinking_levels": [
     "MINIMAL",
     "LOW",
@@ -89,8 +95,9 @@
     "image_search_basis": "Guide (2026-10-13): Grounding with Google Image Search 'is only available for the Gemini Nano Banana 2.1 and Gemini 3.1 Flash Image models'."
   },
   "c2pa": {
-    "status": "conflict",
-    "basis": "The Cloud blog (2026-03-05) says all generated images include C2PA Content Credentials and a SynthID watermark. The current guide (2026-10-13) says all generated images include a SynthID watermark and does not mention C2PA. Do not promise C2PA."
+    "status": "stated for one model page and the Cloud blog; the guide is silent",
+    "basis": "SynthID: the guide (updated 2026-10-09) says all generated images include a SynthID watermark. C2PA: the Nano Banana 2 Lite model page (updated 2026-09-03) says 'SynthID watermarking (Always On) + C2PA', and the Cloud blog (2026-03-05) says all generated images include C2PA Content Credentials. The guide and the other model pages read on 2026-10-13 do not mention C2PA. The guide does not deny it, so this is a gap, not a contradiction.",
+    "recommendation": "Promise SynthID only. Do not promise C2PA for any model. If a user asks, say that the Lite model page and the Cloud blog state it, and that the file metadata is the check."
   },
   "safety_finish_reasons": [
     "PROHIBITED_CONTENT",
@@ -179,10 +186,13 @@
         "Nano Banana 2",
         "Gemini 3.1 Flash Image"
       ],
-      "status": "active",
-      "label_preview_or_ga": "UNKNOWN",
-      "label_basis": "Deprecations table gives the release date 2026-05-28 and the '-preview' ID was the earlier model (2026-02-26). No page read states whether this ID is labelled preview or GA.",
-      "routing": "Previous generation. The only model that offers 512 px. The guide recommends Nano Banana 2.1 for all new projects.",
+      "status": "deprecated",
+      "deprecation_basis": "Release notes, 2026-10-06: 'The gemini-3.1-flash-image model is deprecated (no shutdown date announced). Migrate to gemini-nano-banana-2.1.' The deprecations table (2026-10-12) also gives no shutdown date and names gemini-nano-banana-2.1 as the replacement.",
+      "replacement": "gemini-nano-banana-2.1",
+      "label_preview_or_ga": "Stable",
+      "label_basis": "Model page 'Versions' (updated 2026-10-09): 'Stable: gemini-3.1-flash-image'. This label does not reflect the 2026-10-06 deprecation; the release note sets the status. GA release on 2026-05-28 (release notes and deprecations table).",
+      "token_limits_basis": "Model page (updated 2026-10-09): input token limit 131,072, output token limit 32,768.",
+      "routing": "Deprecated (2026-10-06). Migrate new work to gemini-nano-banana-2.1. Still the only model in the guide with 512 px. The studio does not offer it for new briefs.",
       "released": "2026-05-28",
       "released_basis": "Deprecations table 'Nano Banana models' (2026-10-13).",
       "shutdown": null,
@@ -243,8 +253,9 @@
         "Gemini 3.1 Flash Lite Image"
       ],
       "status": "active",
-      "label_preview_or_ga": "UNKNOWN",
-      "label_basis": "Deprecations table gives the release date 2026-06-30. The model page for this ID was not read.",
+      "label_preview_or_ga": "Stable",
+      "label_basis": "Model page 'Versions' (updated 2026-09-03): 'Stable: gemini-3.1-flash-lite-image'. Release date 2026-06-30 (deprecations table and release notes). No deprecation announced.",
+      "token_limits_basis": "Model page (updated 2026-09-03): input token limit 65,536, output token limit 4,096. The model page also says 'Supported image_size values: 1024px (1K). (Note: 2K and 4K are unsupported).'",
       "routing": "Fastest and cheapest. 1K only. Not optimized for many reference inputs or long sequential edits (guide, 2026-10-13).",
       "released": "2026-06-30",
       "released_basis": "Deprecations table 'Nano Banana models' (2026-10-13).",
@@ -265,6 +276,7 @@
         "21:9"
       ],
       "aspect_ratios_basis": "Guide 'Features' section: 'Gemini 3.1 Flash Lite Image adds 1:1, 3:2, 2:3, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9, 21:9 aspect ratios.' The guide has no per-ratio pixel table for this model; 1:4, 4:1, 1:8 and 8:1 are not listed for it.",
+      "aspect_ratios_conflict": "The Lite model page (updated 2026-09-03) says 'Supports a discrete set of 14 aspect ratios including standard formats', and lists the same ten as new. Read that way, Lite would also take 1:4, 4:1, 1:8 and 8:1. This catalog keeps the ten listed ratios, the stricter reading: the studio refuses a ratio before approval, so a wrong refusal costs a redirect, while a wrong acceptance costs a paid call the API may reject. Confirm before offering the four extreme ratios for Lite.",
       "prices_usd_per_image": {
         "1K": 0.0336
       },
@@ -285,8 +297,8 @@
       "image_search_grounding": false,
       "real_people_from_web_search": null,
       "video_input": true,
-      "input_token_limit": null,
-      "output_token_limit": null,
+      "input_token_limit": 65536,
+      "output_token_limit": 4096,
       "batch": true
     },
     {
@@ -297,8 +309,8 @@
         "Gemini 3 Pro Image"
       ],
       "status": "active",
-      "label_preview_or_ga": "UNKNOWN",
-      "label_basis": "Deprecations table gives the release date 2026-05-28; the '-preview' ID was the earlier model (2025-11-20). No page read states the label.",
+      "label_preview_or_ga": "Stable",
+      "label_basis": "Model page 'Versions' (updated 2026-09-03): 'Stable: gemini-3-pro-image'. GA release on 2026-05-28 (release notes and deprecations table); the '-preview' ID was the earlier model (2025-11-20).",
       "routing": "Premium choice for complex visual tasks and professional asset production: world knowledge, localization, brand consistency, creative control. Not in the guide's 'controlling thinking levels' table.",
       "released": "2026-05-28",
       "released_basis": "Deprecations table 'Nano Banana models' (2026-10-13).",
@@ -340,15 +352,15 @@
         "style": 3
       },
       "reference_total_max": 14,
-      "reference_limits_conflict": "The guide's table lists 6 object, 5 character and 3 style references. Its Limitations section says 'supports 5 images with high fidelity, and up to 14 images in total'. The table is used here.",
+      "reference_limits_conflict": "Resolved in favour of the table. The table lists 6 object, 5 character and 3 style references, which add up to the 14 total. The Limitations sentence says 'supports 5 images with high fidelity, and up to 14 images in total'. Its 5 matches the character count, not the 6 high-fidelity objects in the table, so the sentence and the table disagree on the object count. The per-type table is used.",
       "search_grounding": true,
       "image_search_grounding": false,
       "real_people_from_web_search": null,
       "video_input": false,
       "input_token_limit": 65536,
-      "input_token_basis": "Cloud blog (2026-03-05). Not stated on the 2026-10-13 pages read.",
+      "input_token_basis": "Model page (updated 2026-09-03): input token limit 65,536. The Cloud blog (2026-03-05) gives the same number.",
       "output_token_limit": 32768,
-      "output_token_basis": "Cloud blog (2026-03-05): 'Both models support a maximum of 32,768 output tokens' (3.1 Flash and Pro).",
+      "output_token_basis": "Model page (updated 2026-09-03): output token limit 32,768. The Cloud blog (2026-03-05) gives the same number for 3.1 Flash and Pro.",
       "batch": true
     },
     {
@@ -359,14 +371,20 @@
       ],
       "aliases_note": "The bare name 'Nano Banana' is not an alias of this model. It names the family (see bare_family_name).",
       "status": "deprecated",
-      "label_preview_or_ga": null,
-      "routing": "Legacy. The guide's recommended migration path is Nano Banana 2 Lite.",
+      "status_conflict": "The deprecations table (read 2026-10-13) lists a shutdown date for it, and the pricing page warning (read 2026-10-13) says it 'is deprecated'. The release notes of 2026-09-18 say the 2.5 models 'are not deprecated' and that access is limited to users who used them before. The release notes have no deprecation entry for this model. The model page (updated 2026-09-03, before the deprecation pages) says Stable.",
+      "label_preview_or_ga": "Stable",
+      "label_basis": "Model page 'Versions' (updated 2026-09-03): 'Stable: gemini-2.5-flash-image'. This page is older than the deprecation pages, so the status above follows them.",
+      "routing": "Legacy, with access limited. Say that it is deprecated and that its shutdown date is disputed. The table's replacement is Nano Banana 2 Lite. Do not promise that it still works.",
       "released": "2025-10-02",
-      "released_basis": "Deprecations table (2026-10-13).",
+      "released_basis": "Deprecations table (read 2026-10-13).",
       "shutdown": null,
-      "shutdown_conflict": "Open conflict, not resolved: the deprecations table gives 2027-03-15; the pricing page warning (2026-10-13) says 'will be shut down on October 2, 2026'. No date is treated as confirmed, so shutdown is null.",
+      "shutdown_earliest_per_table": "2027-03-15",
+      "shutdown_conflict": "Open. The deprecations table gives 2027-03-15 and its note says the dates are the earliest possible shutdown dates. The pricing page warning gives 'October 2, 2026'. That date is earlier than the table's lower bound and has already passed, and the warning names Gemini 3.1 Flash Image as a migration target although the 2026-10-06 release note deprecated it. The catalog does not use the warning's date. No date is treated as confirmed, so shutdown is null. A live check would settle it; the owner declined live tests.",
+      "input_token_limit": 65536,
+      "output_token_limit": 32768,
+      "token_limits_basis": "Model page (updated 2026-09-03): input token limit 65,536, output token limit 32,768.",
       "replacement": "gemini-3.1-flash-lite-image",
-      "replacement_conflict": "The deprecations table and the guide's model selection name Nano Banana 2 Lite. The pricing page warning names Gemini 3.1 Flash Image or Gemini 3.1 Flash Lite Image.",
+      "replacement_conflict": "The deprecations table names Nano Banana 2 Lite. The pricing warning names Gemini 3.1 Flash Image or Gemini 3.1 Flash Lite Image. The first of these is itself deprecated (release notes, 2026-10-06).",
       "sizes": [
         "1K"
       ],
@@ -442,6 +460,12 @@
       "released": "2025-05-07",
       "shutdown": "2025-11-14",
       "replacement": "gemini-nano-banana-2.1"
+    }
+  ],
+  "outside_catalog": [
+    {
+      "id": "gemini-4-argon",
+      "reason": "Text reasoning model, not an image model. Release notes (2026-10-13): generally available. Its model page (updated 2026-10-13) lists image generation as 'Not supported', and its pricing lists text input, output, caching and grounding prices, with no image price. Not used for image routing; the validator and the studio do not match it."
     }
   ]
 }
