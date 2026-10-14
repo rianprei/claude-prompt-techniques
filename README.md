@@ -11,7 +11,7 @@ Você pede "escreve um prompt pra Midjourney gerar um gato samurai" e recebe um 
 ## Quick Start (30 segundos)
 
 ```bash
-git clone https://github.com/rianprei/claude-prompt-techniques ~/.claude/skills/prompt-techniques
+git clone https://github.com/rianprei/prompt-engineering-master ~/.claude/skills/prompt-techniques
 ```
 
 Abra sessão nova do Claude Code e peça:
@@ -76,14 +76,14 @@ Dois problemas comuns:
 **Via git (recomendado — permite atualizar com `git pull`):**
 
 ```bash
-git clone https://github.com/rianprei/claude-prompt-techniques ~/.claude/skills/prompt-techniques
+git clone https://github.com/rianprei/prompt-engineering-master ~/.claude/skills/prompt-techniques
 ```
 
 **Sem git:**
 
 ```bash
 mkdir -p ~/.claude/skills/prompt-techniques/references
-base=https://raw.githubusercontent.com/rianprei/claude-prompt-techniques/master
+base=https://raw.githubusercontent.com/rianprei/prompt-engineering-master/master
 curl -fL $base/SKILL.md -o ~/.claude/skills/prompt-techniques/SKILL.md
 curl -fL $base/README.md -o ~/.claude/skills/prompt-techniques/README.md
 curl -fL $base/LICENSE -o ~/.claude/skills/prompt-techniques/LICENSE
