@@ -1,4 +1,4 @@
-# prompt-techniques
+# prompt-engineering-master
 
 **Skill de Claude Code: referência de prompt engineering + gerador de prompts otimizados por ferramenta-alvo.**
 
