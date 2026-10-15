@@ -214,7 +214,8 @@ class FlowTests(ServerCase):
                                              {"brief_sha256": plan["brief_sha256"], "approval_id": token})
             _, state = self.json_call("GET", "/api/state")
         self.assertEqual((status, payload["error"]), (412, "missing_api_key"))
-        self.assertFalse(state["api_key_configured"])
+        gemini = next(row for row in state["providers"] if row["key"] == "gemini")
+        self.assertFalse(gemini["configured"])
         live.store.consume_approval(token, plan["brief_sha256"])  # not spent: still usable once a key exists
 
 

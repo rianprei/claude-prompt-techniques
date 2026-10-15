@@ -80,7 +80,7 @@ class BrowserRenderTest(unittest.TestCase):
 
     def test_the_page_script_runs_and_reports_the_fake_provider(self):
         dom = self.rendered_dom()
-        self.assertIn("<title>Nano Banana studio</title>", dom)
+        self.assertIn("<title>Image studio</title>", dom)
         match = re.search(r'id="provider-status"[^>]*>(.*?)</', dom, re.S)
         self.assertIsNotNone(match, "the provider status element is missing from the rendered page")
         self.assertIn("Fake provider", re.sub(r"\s+", " ", match.group(1)))

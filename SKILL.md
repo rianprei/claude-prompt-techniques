@@ -76,16 +76,16 @@ in the prompt itself.
 with the pattern list from [references/patterns.md](references/patterns.md) (task/context/format/scope/reasoning/agentic),
 adjust ONLY the dimension that failed, deliver a new version. Do not rewrite from scratch.
 
-## Image generation with Nano Banana (studio, from the shell)
+## Image generation (studio, from the shell)
 
-Run these commands from the skill folder (the one that holds this file): `cd` there first. Use when the request is to generate, edit or refine an image with Nano Banana, not only to write its prompt. Always in this order:
-1. `python3 -m studio plan ...` (or `--case ID`, or `--from RUN_ID --edit "what to change"`). It spends nothing. Show the user the model, ratio, size, nominal cost, prompt, reference hashes and warnings.
+Run these commands from the skill folder (the one that holds this file): `cd` there first. Use when the request is to generate, edit or refine an image with a model the studio offers (`python3 -m studio models` lists them: Gemini/Nano Banana, GPT Image, FLUX 3, Ideogram, Recraft, Seedream, Stability, Firefly, ComfyUI), not only to write its prompt. Always in this order:
+1. `python3 -m studio plan ...` (or `--case ID`, or `--from RUN_ID --edit "what to change"`). It spends nothing. Show the user the model, ratio, size, nominal cost (or that no official price was verified: then say there is no estimate), prompt, reference hashes and warnings.
 2. Run `approve <brief_sha256> --confirm <first 8 characters>` only after the user has agreed in this conversation. Never pass `--confirm` without that answer.
 3. `run <brief_sha256> --approval <approval_id>`. One approval is one paid call. Never loop generation; for another attempt, plan again and ask again.
 4. Open the file at `output_path` with your file viewer (it shows PNG and JPEG) and say what you see.
 5. To correct: `plan --from RUN_ID --edit "..."`, which keeps everything not named. To record: `review` (with a note) and `rate` (with `--criterion NAME=N`).
 
-Limits, what is not verified and the file layout: [studio/README.md](studio/README.md). Models and thinking levels: [references/gemini-image-models.md](references/gemini-image-models.md).
+Limits, what is not verified, the providers and the variables each one reads: [studio/README.md](studio/README.md). Gemini models and thinking levels: [references/gemini-image-models.md](references/gemini-image-models.md). The other providers' models and their sources: [references/studio-models.json](references/studio-models.json).
 
 **Per-tool detail and templates — do not load here, read on demand**:
 - [references/tool-routing.md](references/tool-routing.md) — rules specific to Claude/GPT/Cursor/Midjourney/coding agent, and the Nano Banana / Gemini Image profile (routing by name, scene and edit briefs, references, text, web assets)

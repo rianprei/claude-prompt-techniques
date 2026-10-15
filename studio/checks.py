@@ -95,5 +95,7 @@ def check_output(data, mime_type, aspect_ratio):
     }
     if size is not None:
         result["width"], result["height"] = size
-        result["aspect_ratio_ok"] = aspect_matches(size[0], size[1], aspect_ratio)
+        # "auto" (the model chooses the frame) has no ratio to measure against, so it is not checked.
+        if ":" in aspect_ratio:
+            result["aspect_ratio_ok"] = aspect_matches(size[0], size[1], aspect_ratio)
     return result

@@ -196,6 +196,7 @@ prompt-techniques/
 │   ├── gemini-image-models.md  # IDs, aliases, status, tamanhos, proporções por modelo, limites e preços (2026-10-13)
 │   ├── gemini-image-examples.md # briefs prontos do Nano Banana (pt-BR e EN), validados pelo teste
 │   ├── gemini-image-models.json # mesmos dados em JSON, lidos pelos testes e pelo studio
+│   ├── studio-models.json      # modelos dos outros provedores do Studio: IDs, tamanhos, preços só quando uma página oficial deu, fontes (2026-10-14)
 │   ├── image-targets.json      # alvos de imagem fora do Nano Banana: fatos com status e fonte (2026-10-14)
 │   └── image-targets.md        # o mesmo registro em Markdown, gerado pelo script (não editar à mão)
 ├── evals/
@@ -320,19 +321,21 @@ python3 -m unittest discover -s tests -v
 - **O que o validador não faz:** não julga se a resposta do modelo é boa. Ele lê só o texto do prompt. A qualidade continua no A/B manual de [`evals/protocol.md`](evals/protocol.md).
 - **Golden cases** (`evals/golden_cases.json`): 31 prompts fixos, cada um com o resultado esperado do validador. Eles testam o validador, não as respostas dos modelos. Se um caso quebrar, ou a regra mudou de propósito (atualize o caso) ou houve regressão.
 - **Registro de alvos de imagem** (`references/image-targets.json`): cada fato tem status e fonte; toda fonte tem URL https e data de conferência; o `references/image-targets.md` é gerado a partir dele, e um teste recusa o arquivo se ele ficar desatualizado. O renderer tem testes por família, por alias, por campo recusado e por regressão.
-- **Catálogo de imagem e contratos** (`references/gemini-image-models.json`): IDs, status, tamanhos, proporções e preços do Nano Banana, com data de verificação (2026-10-13). Os testes conferem que IDs, preços e proporções do JSON aparecem no Markdown, que proporções, tamanhos e níveis de pensamento são os valores listados na documentação lida em 2026-10-13 (cada modelo tem a sua lista de proporções; os aliases resolvem para um só ID), e que a data de verificação é a mesma nos dois arquivos. O `check_repo.py` bloqueia ID de modelo fora do catálogo, ID desligado fora dele e chave em query string. Os testes não chamam a API: se o modelo ainda aceita um valor, só uma chamada real confirma.
+- **Catálogo do Studio** (`references/gemini-image-models.json` para o Gemini e `references/studio-models.json` para os outros provedores): IDs, status, tamanhos, proporções, limites de referência, preços quando uma página oficial deu o preço, e as páginas lidas. Datas de verificação: 2026-10-13 (Gemini) e 2026-10-14 (os outros). Os testes conferem que IDs, preços e proporções do JSON aparecem no Markdown, que proporções, tamanhos e níveis de pensamento são os valores listados na documentação lida em 2026-10-13 (cada modelo tem a sua lista de proporções; os aliases resolvem para um só ID), e que a data de verificação é a mesma nos dois arquivos. O `check_repo.py` bloqueia ID de modelo fora do catálogo, ID desligado fora dele e chave em query string. Os testes não chamam a API: se o modelo ainda aceita um valor, só uma chamada real confirma.
 - **Limites conhecidos:** a maioria dos sinais é em inglês, com algumas formas em português (passo a passo, não, sem, formato, lista). Em prompts em português, as checagens de agente, CAPS e linguagem vaga não disparam, então a ausência de aviso não prova que o prompt está certo. A detecção de negação conta as negações antes da frase, dentro da mesma cláusula, e uma negação anula outra: "Não pule a checagem passo a passo" pede raciocínio e é marcado em modelo reasoning-native. Uma negação depois da frase não é lida.
 - **Hook opcional:** `git config core.hooksPath .githooks` (uma vez por clone) faz o `check_repo.py` e os testes rodarem antes de cada commit. Não é ativado sozinho.
 
 ## Studio (página local e linha de comando, com aprovação por execução paga)
 
-Gera imagens com Nano Banana por uma página local ou pela linha de comando, que qualquer agente com shell pode usar. Monta o brief, mostra o plano e o custo nominal, e só chama a API paga depois que você aprova aquele brief exato. A aprovação é de uso único, vale 30 minutos e é gasta antes da chamada. Você confirma digitando os 8 primeiros caracteres do hash do plano. A CLI não consegue verificar quem digitou, por isso a regra de pedir sua confirmação está no `SKILL.md`. Detalhes e limites estão em [`studio/README.md`](studio/README.md).
+Gera imagens com o Gemini (Nano Banana), GPT Image 2.5 e 2, FLUX 3, Ideogram 4.5, 4.0 e 3.0, Recraft V4.1, Seedream 5.0 pro, Stability (Stable Image Core e Ultra, e SD3.5), Adobe Firefly e ComfyUI (no seu computador), por uma página local ou pela linha de comando, que qualquer agente com shell pode usar. Monta o brief, mostra o plano e o custo nominal (ou que o custo não foi verificado numa página oficial), e só chama a API paga depois que você aprova aquele brief exato. Midjourney não tem integração: nenhuma página oficial de API pôde ser lida nesta verificação. A aprovação é de uso único, vale 30 minutos e é gasta antes da chamada. Você confirma digitando os 8 primeiros caracteres do hash do plano. A CLI não consegue verificar quem digitou, por isso a regra de pedir sua confirmação está no `SKILL.md`. Detalhes e limites estão em [`studio/README.md`](studio/README.md).
 
 ```bash
 python3 -m studio serve --fake-provider      # página com imagens de teste, sem rede e sem custo
 GEMINI_API_KEY=... python3 -m studio serve   # página com a API real; a chave é lida em cada execução
+python3 -m studio models                     # cada modelo, seu provedor, tamanhos, proporções e custo; que variáveis estão definidas
 python3 -m studio cases                      # casos fixos; não gasta nada
 python3 -m studio plan --prompt "..." --model gemini-nano-banana-2.1 --aspect-ratio 1:1 --size 1K
+python3 -m studio plan --prompt "..." --model gpt-image-2 --aspect-ratio 1:1 --size 1024x1024   # precisa de OPENAI_API_KEY na execução
 python3 -m studio approve <hash> --confirm <8 primeiros caracteres>   # só depois que você aprovar
 python3 -m studio run <hash> --approval <approval_id>                 # gasta essa aprovação
 ```
@@ -341,7 +344,7 @@ A edição de uma imagem gerada usa `plan --from <run_id> --edit "o que mudar"`:
 
 - Escuta só em 127.0.0.1. O token por processo protege contra outros sites: eles não leem a página que o contém nem enviam o cabeçalho sem CORS. Não protege contra processos locais: a página com o token é servida em `GET /`, então qualquer processo ou usuário que alcance 127.0.0.1 pode emitir aprovações e usar a API paga com a sua chave. Use o Studio em máquina de usuário único. A chave nunca vai para a página nem para uma URL.
 - Trava de arquivos: `fcntl` em Linux e macOS, `msvcrt` em Windows. O caminho do Windows é testado com um módulo de substituição, não numa máquina Windows. Plataforma e catálogo: [`studio/README.md`](studio/README.md).
-- Estado: edição a partir de uma imagem gerada, avaliação por critérios, casos fixos e comparação por variante estão implementados e cobertos por testes com transporte simulado. Nenhuma chamada real à API foi feita, porque a chave não estava configurada. O formato da resposta segue a referência da API (`steps`, com blocos `image`; lida em 2026-10-13). Só uma chamada real confirma que o serviço devolve esse formato para pedidos de imagem e que a edição encadeada (`--chain`) se comporta como o exemplo oficial.
+- Estado: edição a partir de uma imagem gerada, avaliação por critérios, casos fixos e comparação por variante estão implementados e cobertos por testes com transporte simulado. Nenhuma chamada paga foi feita: há uma chave da OpenAI no ambiente, mas um teste ao vivo gasta crédito e precisa da sua aprovação por execução, que não foi dada. O formato da resposta segue a referência da API (`steps`, com blocos `image`; lida em 2026-10-13). Só uma chamada real confirma que o serviço devolve esse formato para pedidos de imagem e que a edição encadeada (`--chain`) se comporta como o exemplo oficial.
 
 ## Limitações conhecidas
 

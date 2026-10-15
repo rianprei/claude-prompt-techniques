@@ -1,8 +1,9 @@
 """Contracts shared by the validator, the repo checker and the studio.
 
-references/gemini-image-models.json is the only source of model IDs, aliases, statuses,
-sizes, prices, aspect ratios and reference limits. Code reads it through this module
-instead of keeping its own copy.
+references/gemini-image-models.json is the source of the Gemini image model IDs, aliases, statuses,
+sizes, prices, aspect ratios and reference limits. references/studio-models.json holds the same fields for the other
+studio providers, and load_studio_catalog merges the two. Code reads them through this module instead of keeping its
+own copy.
 """
 
 import json
@@ -21,6 +22,35 @@ KEY_IN_URL = re.compile(r"[?&]" + "key=")
 def load_catalog(path=CATALOG_PATH):
     with open(path, encoding="utf-8") as fh:
         return json.load(fh)
+
+
+STUDIO_MODELS_PATH = os.path.join(ROOT, "references", "studio-models.json")
+
+
+def load_studio_models(path=STUDIO_MODELS_PATH):
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def load_studio_catalog(gemini_path=CATALOG_PATH, models_path=STUDIO_MODELS_PATH):
+    """The catalog the studio reads: the Gemini catalog and the other providers' models, in one list.
+
+    Gemini rows get provider 'gemini'. Gemini's top-level fields (ratios, sizes, thinking levels, reference limit) stay
+    Gemini's, because only Gemini rows rely on them. A model ID that appears twice is refused, so each ID names one model.
+    """
+    gemini = load_catalog(gemini_path)
+    others = load_studio_models(models_path)
+    models = [{**model, "provider": "gemini"} for model in gemini["models"]] + others["models"]
+    seen = set()
+    for model in models:
+        if model["id"] in seen:
+            raise ValueError(f"model id {model['id']!r} is listed twice")
+        seen.add(model["id"])
+    catalog = dict(gemini)
+    catalog["models"] = models
+    catalog["providers"] = others["providers"]
+    catalog["verified_on"] = min(gemini["verified_on"], others["verified_on"])  # the older date drives the age warning
+    return catalog
 
 
 def find_model(catalog, model_id):

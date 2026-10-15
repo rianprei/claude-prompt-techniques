@@ -49,6 +49,13 @@
     });
   }
 
+  // A size with no official price shows no estimate; the page never prints a number it did not read from the catalog.
+  function sizeLabel(model, size) {
+    const price = model.prices_usd_per_image[size];
+    if (price === undefined) return size + " (cost not verified in an official page: no estimate)";
+    return size + " (US$ " + price + " per image, nominal)";
+  }
+
   function fillSizes() {
     const model = state.models.find((m) => m.id === $("model").value);
     const select = $("size");
@@ -57,7 +64,7 @@
     for (const size of model ? model.sizes : []) {
       const option = document.createElement("option");
       option.value = size;
-      option.textContent = size + " (US$ " + model.prices_usd_per_image[size] + " per image, nominal)";
+      option.textContent = sizeLabel(model, size);
       select.appendChild(option);
     }
     if (model && model.sizes.includes(previous)) select.value = previous;
@@ -71,7 +78,7 @@
     for (const model of data.models) {
       const option = document.createElement("option");
       option.value = model.id;
-      option.textContent = model.name + " (" + model.id + ")";
+      option.textContent = model.name + " (" + model.id + ", " + model.provider + ")";
       select.appendChild(option);
     }
     if (data.models.some((m) => m.id === previous)) select.value = previous;
@@ -131,7 +138,8 @@
     renderHistory(data);
     $("provider-status").textContent = data.provider === "fake"
       ? "Fake provider: placeholder images, no network, no cost."
-      : "Live provider. Key configured: " + (data.api_key_configured ? "yes" : "no; set GEMINI_API_KEY where the studio runs.");
+      : "Live providers. " + data.providers.map((p) => p.name + (p.configured ? ": key set"
+        : ": not set (" + p.env.join(", ") + ")")).join("; ") + ".";
     refreshButtons();
   }
 
@@ -151,8 +159,9 @@
     addRow(list, "Image size", plan.brief.image_size);
     addRow(list, "Aspect ratio", plan.brief.aspect_ratio);
     addRow(list, "Reference images", String(plan.brief.references.length));
-    addRow(list, "Estimated cost", "US$ " + plan.estimated_cost_usd
-      + " for one image at the standard price (nominal; no batch discount)");
+    addRow(list, "Estimated cost", plan.estimated_cost_usd === null
+      ? "not verified in an official page: no estimate. The approval is still needed for this run."
+      : "US$ " + plan.estimated_cost_usd + " for one image at the standard price (nominal; no batch discount)");
     addRow(list, "Brief hash", plan.brief_sha256);
     const warnings = $("plan-warnings");
     warnings.replaceChildren();

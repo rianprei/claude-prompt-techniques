@@ -1,6 +1,6 @@
 """Rules for the studio: frozen briefs, single-use approvals, reviews and evaluations.
 
-Stdlib only, and nothing here touches the network. client.py makes the paid call,
+Stdlib only, and nothing here touches the network. client.py and providers.py make the paid call,
 and run_brief() calls it only after the approval has been consumed.
 
 Data lives in one directory, outside the skill folder by default (see server.py):
@@ -44,7 +44,7 @@ MAX_LIVE_APPROVALS = 64
 MAX_PROMPT_CHARS = 8000  # local cap; no official limit was found
 MAX_NOTE_CHARS = 2000  # local cap for review and evaluation notes
 MAX_REFERENCE_BYTES = 10 * 1024 * 1024  # local cap per image; the official limit applies to the whole request
-MAX_INLINE_REQUEST_BYTES = 20_000_000  # official: inline image data limits the total request to 20 MB (image understanding page, read 2026-10-13)
+MAX_INLINE_REQUEST_BYTES = 20_000_000  # Gemini's official inline limit (image understanding page, read 2026-10-13); the studio applies it to every provider as its request cap
 MAX_RUNS_LISTED = 50
 REVIEW_VERDICTS = ("pass", "targeted_fix", "regenerate", "blocked")
 NOTE_REQUIRED = ("targeted_fix", "blocked")
@@ -119,11 +119,17 @@ def sniff_image(data):
     return None
 
 
+def is_unpriced(model):
+    """True when the catalog row says no official page gave its price. Such a model is offered with no estimate."""
+    return model.get("cost") == "unverified"
+
+
 def allowed_sizes(catalog, model):
-    """Priced sizes the studio offers. 512 px stays hidden until the catalog confirms its JSON value."""
+    """Priced sizes the studio offers; an unpriced model offers all its sizes. 512 px stays hidden until the catalog confirms its JSON value."""
     confirmed = catalog["image_sizes"]["512_json_value_confirmed"]
     prices = model.get("prices_usd_per_image", {})
-    return [s for s in model.get("sizes", []) if s in prices and (s != "512" or confirmed)]
+    return [s for s in model.get("sizes", [])
+            if (is_unpriced(model) or s in prices) and (s != "512" or confirmed)]
 
 
 def max_references(model):
@@ -144,16 +150,29 @@ def offered_models(catalog):
         if model["status"] not in ("current", "active") or model["id"].endswith("-preview"):
             continue
         sizes = allowed_sizes(catalog, model)
+        prices = model.get("prices_usd_per_image", {})
         offers.append({
             "id": model["id"],
+            "provider": model.get("provider", "gemini"),
             "name": model.get("display_name", model["id"]),
             "sizes": sizes,
+            "size_ratio": model.get("size_ratio", {}),
             "aspect_ratios": model_ratios(catalog, model),
-            "prices_usd_per_image": {s: model["prices_usd_per_image"][s] for s in sizes},
+            "aspect_control": model.get("aspect_control", True),
+            "cost": "unverified" if is_unpriced(model) else "verified",
+            "prices_usd_per_image": {s: prices[s] for s in sizes if s in prices},
             "max_references": max_references(model),
             "thinking_levels": thinking_levels(model),
         })
     return offers
+
+
+def provider_of(catalog, model_id):
+    """The provider a model ID belongs to. Model IDs are unique across the catalog, so this has one answer."""
+    for model in catalog["models"]:
+        if model["id"] == model_id:
+            return model.get("provider", "gemini")
+    raise StudioError("model_not_offered", f"{model_id!r} is not in the catalog. Build a new plan.", 409)
 
 
 def _check_thinking(offer, thinking_level):
@@ -215,12 +234,15 @@ def build_brief(catalog, store, *, prompt, model_id, aspect_ratio, image_size, r
                           f"{aspect_ratio!r} is not an aspect ratio of {model_id}; it accepts {len(offer['aspect_ratios'])}.")
     if image_size not in offer["sizes"]:
         raise StudioError("image_size_not_allowed", f"{image_size!r} is not available for {model_id}.")
+    tied_ratio = offer["size_ratio"].get(image_size)  # some models fix the ratio inside the size, so the two must agree
+    if tied_ratio is not None and tied_ratio != aspect_ratio:
+        raise StudioError("size_aspect_mismatch", f"{image_size} on {model_id} is {tied_ratio}; pass --aspect-ratio {tied_ratio}.")
     if not isinstance(references, list) or len(references) > offer["max_references"]:
         raise StudioError("too_many_references",
                           f"{model_id} takes at most {offer['max_references']} reference images here.")
     refs = [store.check_reference(ref) for ref in references]
     if inline_request_bytes(prompt, [store.reference_size(ref) for ref in refs]) > MAX_INLINE_REQUEST_BYTES:
-        raise StudioError("request_too_large", "The prompt and the reference images together are over the 20 MB inline request limit.", 413)
+        raise StudioError("request_too_large", "The prompt and the reference images together are over the studio's 20 MB request cap.", 413)
     findings = validate(prompt, model_id, catalog) + catalog_age_findings(catalog)
     blocking = [f for f in findings if f["level"] == "ERROR"]
     if blocking:
@@ -243,7 +265,7 @@ def build_brief(catalog, store, *, prompt, model_id, aspect_ratio, image_size, r
     return {
         "brief_sha256": store.save_brief(brief),
         "brief": brief,
-        "estimated_cost_usd": offer["prices_usd_per_image"][image_size],
+        "estimated_cost_usd": offer["prices_usd_per_image"].get(image_size),  # None when no official price was read
         "warnings": findings,
     }
 
@@ -585,7 +607,10 @@ def run_brief(catalog, store, client_factory, brief_sha, approval_id, now=None):
     brief = store.load_brief(brief_sha)
     if brief["model"] not in {offer["id"] for offer in offered_models(catalog)}:
         raise StudioError("model_not_offered", f"{brief['model']!r} is no longer offered. Build a new plan.", 409)
-    client = client_factory()  # raises before anything is spent when the key is missing
+    client = client_factory(provider_of(catalog, brief["model"]))  # raises before anything is spent when the key is missing
+    preflight = getattr(client, "preflight", None)  # config checks that need no call; also before anything is spent
+    if preflight is not None:
+        preflight(brief)
     store.consume_approval(approval_id, brief_sha, now)
     run_id = "run_" + secrets.token_hex(8)
     record = {

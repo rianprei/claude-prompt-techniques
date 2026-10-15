@@ -307,7 +307,7 @@ class RunTests(StoreCase):
         self.assertEqual(ctx.exception.code, "approval_used")
 
     def test_missing_key_spends_nothing(self):
-        def no_key():
+        def no_key(provider=None):
             raise StudioError("missing_api_key", "not set", 412)
 
         sha = self.brief()["brief_sha256"]
@@ -319,6 +319,9 @@ class RunTests(StoreCase):
 
     def test_provider_failure_is_recorded_and_keeps_the_approval_spent(self):
         class Failing:
+            def __init__(self, provider=None):
+                pass
+
             def generate(self, brief, references):
                 raise ProviderError("http_500", "server error")
 
@@ -331,6 +334,9 @@ class RunTests(StoreCase):
 
     def test_output_that_is_not_an_image_is_a_failed_run(self):
         class NotAnImage:
+            def __init__(self, provider=None):
+                pass
+
             def generate(self, brief, references):
                 return {"data": b"plain text", "mime_type": "image/png"}
 
@@ -398,6 +404,9 @@ class ReviewAndEvaluationTests(StoreCase):
 
     def test_failed_runs_cannot_be_reviewed_or_rated(self):
         class Failing:
+            def __init__(self, provider=None):
+                pass
+
             def generate(self, brief, references):
                 raise ProviderError("http_500", "server error")
 
@@ -461,6 +470,9 @@ class StaleRunTests(StoreCase):
 class InterruptAndListingTests(StoreCase):
     def test_an_interrupt_during_the_call_is_recorded_and_propagates(self):
         class Interrupted:
+            def __init__(self, provider=None):
+                pass
+
             def generate(self, brief, references):
                 raise KeyboardInterrupt
 

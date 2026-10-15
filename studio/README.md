@@ -1,7 +1,8 @@
 # Studio: local page and command line, one approval per paid run
 
-The studio generates Nano Banana images. It has two front ends over the same rules in `core.py`: a local page
-(`serve`) and a command line (`plan`, `approve`, `run`, and the rest). An agent with a shell uses the command line, so the
+The studio generates images with Gemini (Nano Banana) and with the other providers in the table below. It has two
+front ends over the same rules in `core.py`: a local page (`serve`) and a command line (`plan`, `approve`, `run`, and
+the rest). An agent with a shell uses the command line, so the
 person does not have to operate a separate interface. The paid API is called only after an approval for that exact
 brief. Stdlib only. Nothing runs at import time.
 
@@ -9,7 +10,9 @@ brief. Stdlib only. Nothing runs at import time.
 
 ```
 python3 -m studio cases                                              # the fixed cases; spends nothing
+python3 -m studio models                                             # every model, its provider, sizes, ratios, cost; which keys are set
 python3 -m studio plan --prompt "..." --model gemini-nano-banana-2.1 --aspect-ratio 1:1 --size 1K
+python3 -m studio plan --prompt "..." --model gpt-image-2 --aspect-ratio 1:1 --size 1024x1024
 python3 -m studio approve <brief_sha256> --confirm <first 8 characters>   # only after the person agrees
 python3 -m studio run <brief_sha256> --approval <approval_id>        # spends that one approval
 python3 -m studio show <run_id>                                      # brief, record, output_path
@@ -27,9 +30,78 @@ exits 2; a provider or machine failure exits 1. `run --fake-provider` writes a g
 no cost. Every command except `library` takes `--data-dir` (default `~/.local/share/prompt-techniques-studio`,
 created with mode 0700, outside the skill folder).
 
+## Providers: what each one can do
+
+Each provider is one adapter in `studio/providers.py` (Gemini stays in `studio/client.py`). Every model is listed in
+`references/gemini-image-models.json` (Gemini) or `references/studio-models.json` (the rest), with its sizes, ratios,
+reference limit and the official pages it was read from. `python3 -m studio models` prints the same list, and shows
+which variables are set without printing any value.
+
+| Provider | Variables | Models offered | Generate | References and edit | Cost shown |
+|---|---|---|---|---|---|
+| Google Gemini | `GEMINI_API_KEY` | Nano Banana 2.1, 2 Lite, Pro | Interactions API | up to 14; `--from` edit and `--chain` | yes, catalog prices |
+| OpenAI | `OPENAI_API_KEY` | `gpt-image-2.5-sunburst`, `gpt-image-2.5-flare`, `gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`, `gpt-image-1-mini` | `/v1/images/generations` | `/v1/images/edits`, up to 16 | no: priced by tokens ($30 per million image output tokens for the 2.5 models) |
+| Black Forest Labs | `BFL_API_KEY` | `flux-3-image` | `/v1/flux-3-image`, then polling | `images`, up to 10 | no |
+| Ideogram | `IDEOGRAM_API_KEY` | `ideogram-4-5`, `ideogram-4`, `ideogram-3` | `/v2/image/generate/{model}` | precise edit (4.5 only), one image | no |
+| Recraft | `RECRAFT_API_KEY` | `recraftv4_1`, `recraftv4_1_flash` (raster) | `/v1/images/generations` | none | no |
+| BytePlus ModelArk | `ARK_API_KEY` | `dola-seedream-5-0-pro-260628` | `/api/v3/images/generations` | `image`, 1 to 10 | no |
+| Stability AI | `STABILITY_API_KEY` | `stable-image-core`, `stable-image-ultra`, `sd3.5-large`, `sd3.5-large-turbo`, `sd3.5-medium` | `/v2beta/stable-image/generate/{core,ultra}`, or `.../sd3` with the `model` field | none | yes, credits at $0.01 |
+| Adobe Firefly | `FIREFLY_SERVICES_CLIENT_ID`, `FIREFLY_SERVICES_CLIENT_SECRET` | `firefly_image` | `/v3/images/generate` | none | no: credits |
+| ComfyUI (local) | `COMFYUI_WORKFLOW`, optional `COMFYUI_URL` | `comfyui-workflow` | the server's `/prompt`, `/history`, `/view` | one `LoadImage` node | local, no API charge |
+
+- **Not offered from OpenAI:** `gpt-image-2.5-sunburst` and `gpt-image-2.5-flare` (the reference lists them with
+  arbitrary sizes and extra quality levels, but states no status in the page read), and the `chatgpt-image-latest`
+  alias, which can change under you. Add a row to `references/studio-models.json` once a page states their status and price.
+- **Not offered.** FLUX.2 (its documented endpoints are `-preview` ones, which the studio does not offer, and the non-preview
+  klein endpoint is not named in the pages read); Recraft Pro and vector models (the 2K size and the vector output are not
+  confirmed for the studio's PNG/JPEG/WebP path); `sd3.5-flash` (not in the model enum); FLUX Kontext (legacy); the
+  `chatgpt-image-latest` alias (it can change under you).
+- **Midjourney is not integrated.** The official documentation pages could not be read here: the site answered with a
+  security check. The skill still renders Midjourney prompts (`references/image-targets.json`).
+- **Reading the pages.** The sources are the official pages in the catalog. Pages that the static fetch could not read
+  were rendered in headless Chrome. The evidence is kept outside the repository, in
+  `~/lake-build/evidence/studio-providers-2026-10-14/`.
+- **A model with no official price** is offered with its sizes and no estimate. The plan says "cost not verified in an
+  official page"; the approval still applies to every run. A price comes into the catalog only from a page that gives it.
+- **A size that fixes its ratio** (for example `1536x1024` is 3:2) is refused with another ratio: `size_aspect_mismatch`.
+- **A model that takes no ratio** (Ideogram, Seedream, Firefly's default size) offers `auto` only, and sends nothing.
+- **Editing** works through `plan --from RUN --edit TEXT` on a model that takes references. A model with no references
+  refuses the edit (`too_many_references`), before any approval is spent.
+
+Partly verified (the adapter follows the page, but one piece was not confirmed by a live call):
+
+- Firefly: the reply shape `outputs[0].image.url` comes from the official examples. The reference schema was not
+  readable, and an async variant gives a different reply, which the studio does not use.
+- BFL: the status table is the one of the FLUX 3 page (Pending, Reasoning and Generating keep polling; Ready downloads
+  `result.sample` within an hour; Request Moderated, Content Moderated, Error, Failed and Task not found end the run; an
+  unlisted status ends it too). References are sent as raw base64 in `images`. The page says "URL or base64" and does not show
+  the exact form (PARTIAL).
+- Seedream: only the model ID in the page's example was found. The other Seedream IDs were not in the pages read.
+- ComfyUI: `POST /prompt` (with `prompt` and `client_id`, reply `prompt_id`), `GET /history/{prompt_id}` (its
+  `outputs[node].images[]` with `filename`, `subfolder` and `type`) and `GET /view` are the shapes of the official
+  examples. The studio reads `/history` and downloads the first output. The reply of `POST /upload/image` is not
+  documented in the pages read: the adapter reads its `name` field, which is UNKNOWN. The workflow's `Prompt` and
+  `Reference` titles are the studio's own convention, not an API rule.
+- Ideogram 4.0 and 3.0: PARTIAL. The endpoint is documented in the API overview; the studio sends only the prompt.
+- Recraft Flash: PARTIAL. The endpoint and the $0.007 price are documented; the size 1024x1024 for Flash is not confirmed.
+- Recraft replies: `response_format: b64_json` is documented, and the adapter reads `data[0].b64_json`. No example reply was
+  read, so the field name is PARTIAL.
+- Recraft: the 1K price ($0.035) is in the pricing table, but the table does not say that 1024x1024 is 1K, so no estimate.
+
+### ComfyUI workflow contract
+
+The file in `COMFYUI_WORKFLOW` is a workflow in API format. The studio fills three nodes, found by their titles:
+
+- a `CLIPTextEncode` node titled `Prompt` takes the prompt in `inputs.text` (required; checked before the approval is
+  spent);
+- a `LoadImage` node titled `Reference` takes the reference image name (required only when a reference is sent);
+- every `EmptyLatentImage` node takes `width` and `height` from the chosen size.
+
+`COMFYUI_URL` must point at this machine (`127.0.0.1`, `localhost` or `::1`). Any other host is refused.
+
 ## Approval: who says yes
 
-- `plan` builds and freezes the brief. It reports the brief hash, the nominal cost, the warnings, the reference
+- `plan` builds and freezes the brief. It reports the brief hash, the nominal cost (or that none was verified), the warnings, the reference
   hashes that would be uploaded, and the prompt. It spends nothing and writes no approval.
 - `approve` issues a single-use approval for that brief, valid for 30 minutes. It asks for the first 8 characters of
   the hash. On a terminal it prompts for them; anywhere else they must come in as `--confirm`.
@@ -87,11 +159,13 @@ The YouMind-OpenLab prompt library has no licence file, so the studio never down
 
 ## Rules enforced in code (`core.py`)
 
-- **Models.** Only current or active IDs without preview are offered. Deprecated and shut-down IDs are not. On
-  2026-10-13 that means `gemini-nano-banana-2.1`, `gemini-3.1-flash-lite-image` and `gemini-3-pro-image`.
+- **Models.** Only current or active IDs without preview are offered, from every provider. Deprecated, legacy and
+  shut-down IDs are not. Model IDs are unique across the catalog, so an ID names one provider (`provider_of`).
+  On 2026-10-14 the Gemini part means `gemini-nano-banana-2.1`, `gemini-3.1-flash-lite-image` and `gemini-3-pro-image`.
   `gemini-3.1-flash-image` is deprecated (release notes, 2026-10-06), so it is refused for new briefs.
   The source is `references/gemini-image-models.json`.
-- **Sizes.** Only sizes with a catalog price. 512 px is documented only for `gemini-3.1-flash-image`, which is
+- **Sizes.** A Gemini size is offered only with a catalog price. A model whose row says `cost: unverified` is offered
+  at all its sizes with no estimate. 512 px is documented only for `gemini-3.1-flash-image`, which is
   deprecated, so no offer lists 512 px. Its JSON value (`512`) is in the Interactions API reference; no live call was made.
 - **Aspect ratios.** Each offer lists the ratios its model accepts (`aspect_ratios` in the catalog). A ratio the model
   does not accept is refused at planning time. For example, `gemini-3-pro-image` takes 10 ratios and has no 1:4, and
@@ -100,7 +174,8 @@ The YouMind-OpenLab prompt library has no licence file, so the studio never down
   The count is capped at `reference_total_max`, which is 14 for each current image model: the guide's total ("Mix up
   to 14 reference images"). The per-type limits are not enforced, because the request does not say which type each
   image is. The 10 MB size cap per image and the 8000-character prompt cap are local choices. The whole request is
-  capped at 20 MB inline, the prompt plus each reference as base64, from the image understanding page. A brief over
+  capped at 20 MB, the prompt plus each reference as base64. That is Gemini's inline limit (image understanding page); the
+  studio applies it to every provider as its request cap. A brief over
   that limit is refused at planning time, before any approval is spent.
 - **Prompt.** `scripts/validate_prompt.py` checks it. An ERROR blocks the plan. A WARN is shown with the plan.
   For image models only the checks that apply to them run: key in URL, model status (also through the catalog's
@@ -132,9 +207,13 @@ The YouMind-OpenLab prompt library has no licence file, so the studio never down
   can read. A reference is copied into the local store at plan time, but nothing is sent to Google before the
   approval, and the plan shows each reference by hash and the prompt in full.
   The approval id is printed on stdout, so the agent sees it; it is single use and bound to one brief.
-- The API key is read from `GEMINI_API_KEY` on each run. It goes only in the `x-goog-api-key` header. It is never in a
-  URL, never stored, never printed, and redacted from provider error messages. Redirects are refused, so the header
-  never reaches a second address. The CLI tests check that the key appears in no file of the data directory and in no
+- Each provider's keys are read from its own variables (table above) on each run, when the run starts. Gemini's key
+  goes only in the `x-goog-api-key` header; the other keys go in the header each provider documents (`Authorization`,
+  `x-key`, `Api-Key`, `x-api-key`), or in a form field (the Firefly token request). A key is never in a URL, never
+  stored, never printed, and removed from every provider error message, the Firefly token included. `GET /api/state`
+  and `python3 -m studio models` say only whether a variable is set. Redirects are refused, so a header never reaches a
+  second address. A download of a generated image sends no credential, and only an HTTPS link is downloaded. The BFL
+  polling address must be on `bfl.ai`, or the key is not sent. A missing variable is refused before the approval is spent. The CLI tests check that the key appears in no file of the data directory and in no
   output of the flows they cover (a live run, a failed run, a missing key).
 - The server sends a strict Content-Security-Policy. The page uses no inline scripts and builds no HTML from data.
 
@@ -187,13 +266,22 @@ a chained edit behaves as the example suggests, the upstream timeout (the client
   and the comparison.
 - `test_studio_platform.py`: the Windows lock path (against a stand-in module), the catalog age warning and the 429 hint.
 - `test_studio_browser.py`: the page rendered in headless Chrome or Chromium, skipped when no browser is installed.
+- `test_studio_transport.py`: multipart bodies, refused redirects, the reply limit, network errors, and the image download.
+  It uses a local server on 127.0.0.1.
+- `test_studio_providers.py`: each adapter against a scripted transport: the request it sends, the reply it reads, the
+  refusals, the key removed from errors, the BFL polling host, the ComfyUI workflow, and an end-to-end approval that is
+  spent once.
+- `test_studio_models.py`: the merged catalog (unique IDs, declared providers, the variables each adapter reads, HTTPS
+  sources), the offer rules (unverified rows, verified prices, ratio tied to size), and the `models` command with a key
+  canary that must not appear in any output.
 
-No test calls Google's API. The tests use localhost and simulated transports.
+No test calls any provider's API. The tests use localhost and simulated transports, and no test costs anything.
 
 ## Not covered
 
-- Live API calls. None were made: `GEMINI_API_KEY` was not set where this was built, so the paid path is tested only
-  with a simulated transport.
+- Live API calls. None were made to any provider, although an OpenAI key was present in the environment: the paid path
+  is tested only with simulated transports, and a live call needs your approval for each paid run.
+- The Windows lock, the live replies of the providers in the table, and the cost of every model with `cost: unverified`.
 - Clicking through the page. `tests/test_studio_browser.py` renders the page in headless Chrome or Chromium and checks
   that its script ran; it is skipped when no browser is on PATH. Plan, approve and run are not clicked in a browser by
   the tests. `tests/studio_page_check.mjs` drives those steps through a small DOM stub.
@@ -201,7 +289,7 @@ No test calls Google's API. The tests use localhost and simulated transports.
   not verified by a live call.
 - Rate limits. The API documents how they work (per project, per usage tier, images per minute for image models, and
   429 RESOURCE_EXHAUSTED), but not the numbers for each model: those are shown in Google AI Studio (page read 2026-10-14).
-  The studio sets none beyond the 20 MB inline limit. A 429 comes back with a hint: the approval is already spent, so
+  The studio sets none beyond the 20 MB request cap. A 429 comes back with a hint: the approval is already spent, so
   plan again.
 - Content policy. It is not enforced by code: no real brands and no real people in prompts, and no sexualized
   depictions of real people.

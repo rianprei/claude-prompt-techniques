@@ -28,7 +28,7 @@
 
 - **id:** `midjourney`
 - **Vendor:** Midjourney
-- **Access:** API: not covered: no API page read; UI: Midjourney web and Discord; parameters are typed in the prompt bar
+- **Access:** API: not integrated: no official API page could be read (docs.midjourney.com answered with a security check on 2026-10-14). The skill renders Midjourney prompts only.; UI: Midjourney web and Discord; parameters are typed in the prompt bar
 - **Overall status:** VERIFIED
 - **Aliases:** `midjourney`, `mj`, `midjourney v8`, `midjourney v8.2`, `midjourney v8.1`
 
@@ -76,7 +76,7 @@
 
 - **id:** `gpt-image`
 - **Vendor:** OpenAI
-- **Access:** API: Image API (images.generate, images.edit) and Responses API image_generation tool; UI: ChatGPT Images is a product and was not read; its behaviour is not covered here
+- **Access:** API: Image API: POST /v1/images/generations and POST /v1/images/edits (multipart, image[] parts). The guide names gpt-image-2.5-sunburst and gpt-image-2.5-flare as the API models; gpt-image-2, gpt-image-1.5, gpt-image-1 and gpt-image-1-mini are listed as supported. Responses API image_generation tool: not wired.; UI: ChatGPT Images is a product and was not read; its behaviour is not covered here
 - **Overall status:** VERIFIED
 - **Aliases:** `gpt image`, `gpt image 2.5`, `gpt-image-2.5-sunburst`, `gpt-image-2.5-flare`, `gpt image 2`, `chatgpt images`, `openai image`
 
@@ -123,7 +123,7 @@
 
 - **id:** `flux-3`
 - **Vendor:** Black Forest Labs
-- **Access:** API: POST https://api.bfl.ai/v1/flux-3-image (asynchronous: returns polling_url); UI: BFL playground, not read
+- **Access:** API: POST https://api.bfl.ai/v1/flux-3-image, then GET the polling_url. Status table in the FLUX 3 page: Pending, Reasoning, Generating (keep polling); Ready (download result.sample within 1 hour); Request Moderated; Content Moderated; Error; Task not found. The studio wires this table.; UI: BFL playground, not read
 - **Overall status:** VERIFIED
 - **Aliases:** `flux 3`, `flux 3 image`, `bfl flux 3`
 
@@ -169,7 +169,7 @@
 
 - **id:** `flux-2`
 - **Vendor:** Black Forest Labs
-- **Access:** API: API reference pages exist for [pro] and [flex]; field names were not read; UI: not read
+- **Access:** API: Preview endpoints documented: flux-2-pro-preview and flux-2-klein-9b-preview. The studio does not offer preview endpoints. The FLUX.2 [flex] and [max] endpoints and a non-preview klein endpoint were not named in the pages read.; UI: not read
 - **Overall status:** PARTIAL
 - **Aliases:** `flux 2`, `flux 2 pro`, `flux.2 flex`, `flux 2 klein`, `flux 2 max`, `flux 2 dev`
 
@@ -205,7 +205,7 @@
 
 - **id:** `flux-kontext`
 - **Vendor:** Black Forest Labs
-- **Access:** API: POST https://api.bfl.ai/v1/flux-kontext-pro; UI: BFL playground, not read
+- **Access:** API: POST https://api.bfl.ai/v1/flux-kontext-pro (documented; legacy family, not offered by the studio).; UI: BFL playground, not read
 - **Overall status:** VERIFIED
 - **Aliases:** `kontext`, `flux kontext`, `flux.1 kontext`, `kontext pro`
 
@@ -238,7 +238,7 @@
 
 - **id:** `ideogram`
 - **Vendor:** Ideogram
-- **Access:** API: POST https://api.ideogram.ai/v2/image/generate/ideogram-4-5 and POST https://api.ideogram.ai/v2/image/precise-edit/ideogram-4-5; UI: Ideogram website (main site returned HTTP 403 when fetched)
+- **Access:** API: POST https://api.ideogram.ai/v2/image/generate/ideogram-4-5 (and ideogram-4, ideogram-3 in the API overview); POST https://api.ideogram.ai/v2/image/precise-edit/ideogram-4-5 (multipart, one image). Image URLs expire; the studio downloads at once.; UI: Ideogram website (main site returned HTTP 403 when fetched)
 - **Overall status:** VERIFIED
 - **Aliases:** `ideogram`, `ideogram 4.5`, `ideogram 4`, `ideogram 4.0`, `ideogram v4`
 
@@ -295,7 +295,7 @@
 
 - **id:** `recraft`
 - **Vendor:** Recraft
-- **Access:** API: Recraft API: /generations, /generations/raster, /generations/vector; UI: Recraft Studio (negative prompt field and an 'Avoid text in image' switch)
+- **Access:** API: POST https://external.api.recraft.ai/v1/images/generations with models recraftv4_1 and recraftv4_1_flash (the studio offers both, raster); image-to-image, inpaint and outpaint endpoints are documented but not wired. Vector and Pro models are not offered.; UI: Recraft Studio (negative prompt field and an 'Avoid text in image' switch)
 - **Overall status:** VERIFIED
 - **Aliases:** `recraft`, `recraft v4`, `recraft v4.1`, `recraft v3`, `recraft v4.1 flash`
 
@@ -342,7 +342,7 @@
 
 - **id:** `firefly`
 - **Vendor:** Adobe
-- **Access:** API: Firefly Services API (generate endpoints under /v3 were named in a secondary summary); UI: Adobe Firefly web app, not read
+- **Access:** API: Adobe Firefly Services: token from POST https://ims-na1.adobelogin.com/ims/token/v3 (client_credentials), then POST https://firefly-api.adobe.io/v3/images/generate with modelId firefly_image. The reply's outputs[0].image.url is the pre-signed link. PARTIAL: the reply shape comes from the official examples; the reference schema was not readable.; UI: Adobe Firefly web app, not read
 - **Overall status:** PARTIAL
 - **Aliases:** `firefly`, `adobe firefly`, `firefly image 5`, `image5`
 
@@ -383,7 +383,7 @@
 
 - **id:** `seedream`
 - **Vendor:** ByteDance (BytePlus ModelArk)
-- **Access:** API: BytePlus ModelArk image generation API (named in a secondary summary); UI: Dreamina (product name, not read)
+- **Access:** API: BytePlus ModelArk: POST https://ark.ap-southeast.bytepluses.com/api/v3/images/generations (page read 2026-10-14; response_format b64_json, sequential_image_generation disabled, references as data URLs). Only the model ID dola-seedream-5-0-pro-260628 appears in the pages read.; UI: Dreamina (product name, not read)
 - **Overall status:** PARTIAL
 - **Aliases:** `seedream`, `seedream 5`, `seedream 5.0`, `seedream 5.0 pro`, `seedream 5.0 flash`, `dreamina`, `dreamina seedream`, `bytedance seedream`, `seedream 5.0 lite`, `seedream 4.5`, `seedream 4.0`
 
@@ -428,7 +428,7 @@
 
 - **id:** `sd-3-5`
 - **Vendor:** Stability AI
-- **Access:** API: Stability API (reference page client-rendered; not read); UI: ComfyUI workflows (local models)
+- **Access:** API: Stability: POST https://api.stability.ai/v2beta/stable-image/generate/sd3 with a model field (sd3.5-large, sd3.5-large-turbo, sd3.5-medium). Core and Ultra are at /generate/core and /generate/ultra. Read from the rendered API reference on 2026-10-14. The studio wires generation only.; UI: ComfyUI workflows (local models)
 - **Overall status:** PARTIAL
 - **Aliases:** `stable diffusion 3.5`, `sd 3.5`, `stable diffusion 3.5 large`, `sd 3.5 large`, `sd 3.5 turbo`, `stable diffusion 3.5 turbo`
 
@@ -468,7 +468,7 @@
 
 - **id:** `sdxl`
 - **Vendor:** Stability AI (community checkpoints)
-- **Access:** API: not read; UI: ComfyUI or other local tools
+- **Access:** API: not read: no SDXL API reference was read. Not offered by the studio.; UI: ComfyUI or other local tools
 - **Overall status:** PARTIAL
 - **Aliases:** `sdxl`, `stable diffusion xl`, `stable diffusion xl base`
 
@@ -499,7 +499,7 @@
 
 - **id:** `comfyui`
 - **Vendor:** ComfyUI
-- **Access:** API: node graph; no API; UI: ComfyUI desktop and web
+- **Access:** API: Self-hosted server routes (official routes page, 2026-10-14): POST /prompt (returns prompt_id), GET /history/{prompt_id}, GET /view, POST /upload/image. The body of /prompt and the outputs of /history are shown in the official API example; the reply of /upload/image is not documented in the pages read.; UI: ComfyUI desktop and web
 - **Overall status:** VERIFIED
 - **Aliases:** `comfyui`, `comfy`
 

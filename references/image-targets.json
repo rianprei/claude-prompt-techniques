@@ -20,7 +20,7 @@
       "vendor": "Midjourney",
       "route": "renderer",
       "access": {
-        "api": "not covered: no API page read",
+        "api": "not integrated: no official API page could be read (docs.midjourney.com answered with a security check on 2026-10-14). The skill renders Midjourney prompts only.",
         "ui": "Midjourney web and Discord; parameters are typed in the prompt bar"
       },
       "aliases": [
@@ -183,7 +183,7 @@
       "vendor": "OpenAI",
       "route": "renderer",
       "access": {
-        "api": "Image API (images.generate, images.edit) and Responses API image_generation tool",
+        "api": "Image API: POST /v1/images/generations and POST /v1/images/edits (multipart, image[] parts). The guide names gpt-image-2.5-sunburst and gpt-image-2.5-flare as the API models; gpt-image-2, gpt-image-1.5, gpt-image-1 and gpt-image-1-mini are listed as supported. Responses API image_generation tool: not wired.",
         "ui": "ChatGPT Images is a product and was not read; its behaviour is not covered here"
       },
       "aliases": [
@@ -352,7 +352,7 @@
       "vendor": "Black Forest Labs",
       "route": "renderer",
       "access": {
-        "api": "POST https://api.bfl.ai/v1/flux-3-image (asynchronous: returns polling_url)",
+        "api": "POST https://api.bfl.ai/v1/flux-3-image, then GET the polling_url. Status table in the FLUX 3 page: Pending, Reasoning, Generating (keep polling); Ready (download result.sample within 1 hour); Request Moderated; Content Moderated; Error; Task not found. The studio wires this table.",
         "ui": "BFL playground, not read"
       },
       "aliases": [
@@ -521,7 +521,7 @@
       "vendor": "Black Forest Labs",
       "route": "renderer",
       "access": {
-        "api": "API reference pages exist for [pro] and [flex]; field names were not read",
+        "api": "Preview endpoints documented: flux-2-pro-preview and flux-2-klein-9b-preview. The studio does not offer preview endpoints. The FLUX.2 [flex] and [max] endpoints and a non-preview klein endpoint were not named in the pages read.",
         "ui": "not read"
       },
       "aliases": [
@@ -628,7 +628,7 @@
       "vendor": "Black Forest Labs",
       "route": "renderer",
       "access": {
-        "api": "POST https://api.bfl.ai/v1/flux-kontext-pro",
+        "api": "POST https://api.bfl.ai/v1/flux-kontext-pro (documented; legacy family, not offered by the studio).",
         "ui": "BFL playground, not read"
       },
       "aliases": [
@@ -715,7 +715,7 @@
       "vendor": "Ideogram",
       "route": "renderer",
       "access": {
-        "api": "POST https://api.ideogram.ai/v2/image/generate/ideogram-4-5 and POST https://api.ideogram.ai/v2/image/precise-edit/ideogram-4-5",
+        "api": "POST https://api.ideogram.ai/v2/image/generate/ideogram-4-5 (and ideogram-4, ideogram-3 in the API overview); POST https://api.ideogram.ai/v2/image/precise-edit/ideogram-4-5 (multipart, one image). Image URLs expire; the studio downloads at once.",
         "ui": "Ideogram website (main site returned HTTP 403 when fetched)"
       },
       "aliases": [
@@ -937,7 +937,7 @@
       "vendor": "Recraft",
       "route": "renderer",
       "access": {
-        "api": "Recraft API: /generations, /generations/raster, /generations/vector",
+        "api": "POST https://external.api.recraft.ai/v1/images/generations with models recraftv4_1 and recraftv4_1_flash (the studio offers both, raster); image-to-image, inpaint and outpaint endpoints are documented but not wired. Vector and Pro models are not offered.",
         "ui": "Recraft Studio (negative prompt field and an 'Avoid text in image' switch)"
       },
       "aliases": [
@@ -1109,7 +1109,7 @@
       "vendor": "Adobe",
       "route": "renderer",
       "access": {
-        "api": "Firefly Services API (generate endpoints under /v3 were named in a secondary summary)",
+        "api": "Adobe Firefly Services: token from POST https://ims-na1.adobelogin.com/ims/token/v3 (client_credentials), then POST https://firefly-api.adobe.io/v3/images/generate with modelId firefly_image. The reply's outputs[0].image.url is the pre-signed link. PARTIAL: the reply shape comes from the official examples; the reference schema was not readable.",
         "ui": "Adobe Firefly web app, not read"
       },
       "aliases": [
@@ -1234,7 +1234,7 @@
       "vendor": "ByteDance (BytePlus ModelArk)",
       "route": "renderer",
       "access": {
-        "api": "BytePlus ModelArk image generation API (named in a secondary summary)",
+        "api": "BytePlus ModelArk: POST https://ark.ap-southeast.bytepluses.com/api/v3/images/generations (page read 2026-10-14; response_format b64_json, sequential_image_generation disabled, references as data URLs). Only the model ID dola-seedream-5-0-pro-260628 appears in the pages read.",
         "ui": "Dreamina (product name, not read)"
       },
       "aliases": [
@@ -1400,7 +1400,7 @@
       "vendor": "Stability AI",
       "route": "renderer",
       "access": {
-        "api": "Stability API (reference page client-rendered; not read)",
+        "api": "Stability: POST https://api.stability.ai/v2beta/stable-image/generate/sd3 with a model field (sd3.5-large, sd3.5-large-turbo, sd3.5-medium). Core and Ultra are at /generate/core and /generate/ultra. Read from the rendered API reference on 2026-10-14. The studio wires generation only.",
         "ui": "ComfyUI workflows (local models)"
       },
       "aliases": [
@@ -1531,7 +1531,7 @@
       "vendor": "Stability AI (community checkpoints)",
       "route": "renderer",
       "access": {
-        "api": "not read",
+        "api": "not read: no SDXL API reference was read. Not offered by the studio.",
         "ui": "ComfyUI or other local tools"
       },
       "aliases": [
@@ -1610,7 +1610,7 @@
       "vendor": "ComfyUI",
       "route": "renderer",
       "access": {
-        "api": "node graph; no API",
+        "api": "Self-hosted server routes (official routes page, 2026-10-14): POST /prompt (returns prompt_id), GET /history/{prompt_id}, GET /view, POST /upload/image. The body of /prompt and the outputs of /history are shown in the official API example; the reply of /upload/image is not documented in the pages read.",
         "ui": "ComfyUI desktop and web"
       },
       "aliases": [

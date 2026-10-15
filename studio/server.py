@@ -19,7 +19,8 @@ from urllib.parse import urlsplit
 from .core import (APPROVAL_TTL, MAX_REFERENCE_BYTES, Store, StudioError, build_brief, offered_models,
                    preferences, record_evaluation, record_review, run_brief, summarize_run)
 from .client import KEY_ENV, TIMEOUT_SECONDS, FakeClient, api_key_from_env, real_client
-from contracts import load_catalog  # studio/__init__.py put scripts/ on sys.path
+from .providers import configured
+from contracts import load_studio_catalog  # studio/__init__.py put scripts/ on sys.path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_DATA_DIR = os.path.join(os.environ.get("XDG_DATA_HOME") or os.path.join(os.path.expanduser("~"), ".local", "share"),
@@ -37,13 +38,22 @@ CSP = ("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self';
 class Studio:
     """What the handlers need: the catalog, the store, how to reach the provider and the page token."""
 
-    def __init__(self, data_dir, client_factory=real_client, provider="gemini", catalog=None):
-        self.catalog = catalog if catalog is not None else load_catalog()
+    def __init__(self, data_dir, client_factory=real_client, provider="live", catalog=None):
+        self.catalog = catalog if catalog is not None else load_studio_catalog()
         self.store = Store(data_dir)
         self.store.mark_stale_runs()  # runs that a stopped studio left as "running"
         self.client_factory = client_factory
         self.provider = provider
         self.token = secrets.token_urlsafe(32)
+
+
+def provider_states(catalog, fake=False):
+    """One row per provider: whether its variables are set. The values themselves are never read out."""
+    rows = [{"key": "gemini", "name": "Google Gemini (Nano Banana)", "env": [KEY_ENV],
+             "configured": fake or api_key_from_env() is not None}]
+    for key, info in catalog["providers"].items():
+        rows.append({"key": key, "name": info["name"], "env": info["env"], "configured": fake or configured(key)})
+    return rows
 
 
 def _read_static(name):
@@ -97,7 +107,7 @@ class Handler(BaseHTTPRequestHandler):
         studio = self.studio
         return {
             "provider": studio.provider,
-            "api_key_configured": studio.provider == "fake" or api_key_from_env() is not None,
+            "providers": provider_states(studio.catalog, fake=studio.provider == "fake"),
             "models": offered_models(studio.catalog),
             "aspect_ratios": studio.catalog["aspect_ratios"],
             "approval_ttl_minutes": int(APPROVAL_TTL.total_seconds() // 60),
@@ -211,14 +221,16 @@ def main(argv=None):
     if args.fake_provider:
         studio = Studio(args.data_dir, client_factory=FakeClient, provider="fake")
     else:
-        studio = Studio(args.data_dir, client_factory=lambda: real_client(timeout=args.timeout), provider="gemini")
+        studio = Studio(args.data_dir, client_factory=lambda provider: real_client(provider, timeout=args.timeout),
+                        provider="live")
     httpd = make_server(studio, port=args.port)
     print(f"Studio at http://127.0.0.1:{httpd.server_address[1]}/ (provider: {studio.provider})")
     if studio.provider == "fake":
         print("Fake provider: placeholder images, no network, no cost.")
     else:
-        print(f"Live provider: each paid run needs a new approval, valid for "
-              f"{int(APPROVAL_TTL.total_seconds() // 60)} minutes. The key is read from {KEY_ENV} on each run.")
+        print(f"Live providers: each paid run needs a new approval, valid for "
+              f"{int(APPROVAL_TTL.total_seconds() // 60)} minutes. Each provider's keys are read from its variables on "
+              "each run; GET /api/state lists which are set.")
     print("Press Ctrl+C to stop.")
     try:
         httpd.serve_forever()

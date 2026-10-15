@@ -2,7 +2,7 @@
 
 Every command prints one JSON object on stdout. A refused request prints {"error", "message"} on stderr and exits 2;
 a provider or machine failure exits 1. Only `run` calls the paid API, and only with an unspent approval issued for
-that exact brief. plan, approve, show, history, review, rate, compare, cases and library spend nothing.
+that exact brief. plan, approve, show, history, review, rate, compare, cases, library and models spend nothing.
 
 The approval is the person's step. `approve` names the first 8 characters of the brief hash, which the plan shows.
 On a terminal it asks for them; elsewhere they must come in as --confirm. The code cannot tell who typed them, so
@@ -15,13 +15,13 @@ import os
 import sys
 from types import SimpleNamespace
 
-from contracts import load_catalog  # studio/__init__.py put scripts/ on sys.path
+from contracts import load_studio_catalog  # studio/__init__.py put scripts/ on sys.path
 from .client import FakeClient, TIMEOUT_SECONDS, real_client
 from .core import (CRITERIA, MAX_REFERENCE_BYTES, Store, StudioError, build_brief, offered_models,
                    plan_refinement, record_evaluation, record_review, run_brief, sniff_image, summarize_run)
 from .evalset import compare_case, find_case, load_cases, validate_cases
 from .library import search as search_library
-from .server import DEFAULT_DATA_DIR, main as serve_main
+from .server import DEFAULT_DATA_DIR, main as serve_main, provider_states
 
 CONFIRM_LENGTH = 8  # characters of the brief hash the person must type to approve; short enough to type, long enough to check
 MAX_PROMPT_FILE_BYTES = 64 * 1024  # local cap on a prompt read from a file
@@ -50,6 +50,13 @@ def _price(catalog, model_id, image_size):
         if offer["id"] == model_id:
             return offer["prices_usd_per_image"].get(image_size)
     return None
+
+
+def _cost_text(price):
+    """The cost line of a plan. No estimate is shown unless an official page gave the price."""
+    if price is None:
+        return "cost not verified in an official page: no estimate (approval still needed for each run)"
+    return f"about {price} USD per image"
 
 
 def _prompt_text(args):
@@ -153,6 +160,7 @@ def cmd_plan(args, ctx):
         "reference_sha256": [ref["sha256"] for ref in fields["references"]],  # what the approval uploads, by hash
         "prompt": fields["prompt"],
         "estimated_cost_usd": brief["estimated_cost_usd"],
+        "cost_note": None if brief["estimated_cost_usd"] is not None else _cost_text(None),
         "warnings": brief["warnings"],
         "next": (f"Show this plan to the user. Only after the user approves it in the conversation, run: "
                  f"approve {digest} --confirm {digest[:CONFIRM_LENGTH]}"),
@@ -172,7 +180,7 @@ def cmd_approve(args, ctx):
                               f"Approval needs the person to confirm. Show the plan, then pass --confirm {prefix} "
                               "only after the user has typed it.", 409)
         sys.stderr.write(f"Plan: {brief['model']}, {brief['aspect_ratio']}, {brief['image_size']}, "
-                         f"about {_price(catalog, brief['model'], brief['image_size'])} USD per image\n")
+                         f"{_cost_text(_price(catalog, brief['model'], brief['image_size']))}\n")
         try:
             typed = ctx.input_func(f"Type {prefix} to approve this one paid run: ")
         except EOFError:  # Ctrl-D at the prompt is a refusal, not a crash
@@ -250,15 +258,23 @@ def cmd_library(args, ctx):
     return 0
 
 
+def cmd_models(args, ctx):
+    """Every model the studio can plan, with its provider, sizes, ratios and cost, and which providers have variables set."""
+    _emit({"models": offered_models(ctx.catalog),
+           "providers": provider_states(ctx.catalog, fake=False)})
+    return 0
+
+
 HANDLERS = {"plan": cmd_plan, "approve": cmd_approve, "run": cmd_run, "show": cmd_show, "history": cmd_history,
             "review": cmd_review, "rate": cmd_rate, "compare": cmd_compare, "cases": cmd_cases,
-            "library": cmd_library}
+            "library": cmd_library, "models": cmd_models}
 
 
 def build_parser():
     parser = argparse.ArgumentParser(prog="python3 -m studio",
-                                     description="Local studio for Nano Banana: plan and approve paid image calls, "
-                                                 "then inspect, refine and rate the results.")
+                                     description="Local studio for image models (Gemini, GPT Image, FLUX, Ideogram, "
+                                                 "Recraft, Seedream, Stability, ComfyUI): plan and approve paid image "
+                                                 "calls, then inspect, refine and rate the results.")
     commands = parser.add_subparsers(dest="command", required=True)
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--data-dir", default=DEFAULT_DATA_DIR,
@@ -270,9 +286,9 @@ def build_parser():
     plan.add_argument("--prompt", help="the prompt text")
     plan.add_argument("--prompt-file", help="read the prompt from this file")
     plan.add_argument("--case", help="use a fixed case from evals/image_cases.json")
-    plan.add_argument("--model", help="model id, for example gemini-nano-banana-2.1")
-    plan.add_argument("--aspect-ratio", help="W:H, one the model accepts")
-    plan.add_argument("--size", help="1K, 2K, 4K or 512 where the model offers it")
+    plan.add_argument("--model", help="model id from the models command, for example gemini-nano-banana-2.1 or gpt-image-2")
+    plan.add_argument("--aspect-ratio", help="W:H, one the model accepts ('auto' where the model chooses)")
+    plan.add_argument("--size", help="a size the model offers, for example 1K, 2K, 4K, 1024x1024 or default")
     plan.add_argument("--thinking-level", help="minimal, low, medium or high, where the model lists it")
     plan.add_argument("--ref", action="append", default=[], help="reference image (PNG, JPEG or WebP); repeatable")
     plan.add_argument("--from", dest="from_run", help="edit this run's output (run_...)")
@@ -317,6 +333,9 @@ def build_parser():
     library = commands.add_parser("library", help="search style and example headings; no network")
     library.add_argument("query", nargs="+", help="words that the heading must contain")
     library.add_argument("--library", help="a local folder of Markdown files you already have (optional)")
+
+    commands.add_parser("models", parents=[common],
+                        help="every model you can plan, its provider, sizes, ratios, cost and which keys are set")
     return parser
 
 
@@ -336,8 +355,9 @@ def main(argv=None, *, client_factory=None, stdin_isatty=None, input_func=None):
         if store is not None:
             store.mark_stale_runs()  # the same start-up rule as the page: a stopped run is marked failed
         if args.command == "run" and client_factory is None:
-            client_factory = FakeClient if args.fake_provider else (lambda: real_client(timeout=args.timeout))
-        ctx = SimpleNamespace(catalog=load_catalog(), store=store, client_factory=client_factory,
+            client_factory = FakeClient if args.fake_provider else (
+                lambda provider: real_client(provider, timeout=args.timeout))
+        ctx = SimpleNamespace(catalog=load_studio_catalog(), store=store, client_factory=client_factory,
                               stdin_isatty=stdin_isatty or _is_tty, input_func=input_func or input)
         return HANDLERS[args.command](args, ctx)
     except StudioError as exc:

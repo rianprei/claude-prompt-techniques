@@ -42,7 +42,7 @@ def simulated(calls, interaction_id="int_sim_0001", status=200, image=PNG):
 
 
 def live_factory(transport):
-    return lambda: GeminiClient(KEY, transport=transport)
+    return lambda provider: GeminiClient(KEY, transport=transport)
 
 
 class CliCase(unittest.TestCase):
